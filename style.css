@@ -151,6 +151,17 @@ main,
   background: color-mix(in srgb, var(--cat-hue, var(--muted)) 16%, transparent);
 }
 
+.sidebar-feed-btn--all {
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid var(--border);
+  font-weight: 600;
+}
+
+.sidebar-feed-btn--all.is-active {
+  background: color-mix(in srgb, var(--fg) 8%, transparent);
+}
+
 .sidebar-feed-dot {
   width: 8px;
   height: 8px;

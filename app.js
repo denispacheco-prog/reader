@@ -186,6 +186,20 @@ function renderSidebar(items) {
   );
 
   sidebarListEl.innerHTML = '';
+
+  const allLi = document.createElement('li');
+  const allBtn = document.createElement('button');
+  allBtn.type = 'button';
+  allBtn.className = 'sidebar-feed-btn sidebar-feed-btn--all' + (state.sourceFilter === null ? ' is-active' : '');
+  allBtn.textContent = 'todos os feeds';
+  allBtn.addEventListener('click', () => {
+    state.sourceFilter = null;
+    renderSidebar(state.items);
+    renderStream(searchEl.value.trim().toLowerCase());
+  });
+  allLi.append(allBtn);
+  sidebarListEl.append(allLi);
+
   sources.forEach((source) => {
     const li = document.createElement('li');
 
