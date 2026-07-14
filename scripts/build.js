@@ -42,6 +42,18 @@ function decodeXmlEntities(str) {
     .replace(/&apos;/g, "'");
 }
 
+function decodeXml(buffer) {
+  const preview = Buffer.from(buffer.slice(0, 200)).toString('latin1');
+  const match = preview.match(/encoding=["']([^"']+)["']/i);
+  const label = match ? match[1].toLowerCase() : 'utf-8';
+
+  try {
+    return new TextDecoder(label).decode(buffer);
+  } catch {
+    return new TextDecoder('utf-8').decode(buffer);
+  }
+}
+
 async function fetchFeedItems(feed) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
@@ -51,7 +63,7 @@ async function fetchFeedItems(feed) {
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`);
     }
-    const xml = await response.text();
+    const xml = decodeXml(await response.arrayBuffer());
     const parsed = await parser.parseString(xml);
     const sourceName = feed.title || parsed.title || feed.xmlUrl;
 
