@@ -18,6 +18,20 @@
   </script>
 </head>
 <body>
+  <button
+    id="sidebar-toggle"
+    class="sidebar-toggle-btn"
+    type="button"
+    aria-label="mostrar feeds"
+    aria-expanded="false"
+    aria-controls="sidebar"
+  >☰</button>
+
+  <aside id="sidebar" class="sidebar" aria-hidden="true">
+    <div class="sidebar-header">feeds</div>
+    <ul id="sidebar-feed-list" class="sidebar-feed-list"></ul>
+  </aside>
+
   <header class="site-header">
     <div class="site-header-row">
       <h1 class="site-title">Reader</h1>

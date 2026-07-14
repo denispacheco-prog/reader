@@ -25,12 +25,16 @@ const streamEl = document.getElementById('stream');
 const closureEl = document.getElementById('ambient-closure');
 const searchEl = document.getElementById('search');
 const themeToggleEl = document.getElementById('theme-toggle');
+const sidebarEl = document.getElementById('sidebar');
+const sidebarToggleEl = document.getElementById('sidebar-toggle');
+const sidebarListEl = document.getElementById('sidebar-feed-list');
 
 const state = {
   items: [],
   waterlineDate: readWaterline(),
   observer: null,
   initialRenderDone: false,
+  sourceFilter: null,
 };
 
 function readWaterline() {
@@ -45,11 +49,18 @@ function isNew(item) {
 }
 
 function filterItems(items, query) {
-  if (!query) return items;
-  return items.filter((item) => {
-    const haystack = `${item.title} ${item.source} ${item.category || ''} ${item.summary}`.toLowerCase();
-    return haystack.includes(query);
-  });
+  let result = state.sourceFilter
+    ? items.filter((item) => item.source === state.sourceFilter)
+    : items;
+
+  if (query) {
+    result = result.filter((item) => {
+      const haystack = `${item.title} ${item.source} ${item.category || ''} ${item.summary}`.toLowerCase();
+      return haystack.includes(query);
+    });
+  }
+
+  return result;
 }
 
 function formatDate(isoDate) {
@@ -125,7 +136,19 @@ function renderItem(item, animateIndex) {
   date.className = 'item-date';
   date.textContent = formatDate(item.date);
 
-  meta.append(date);
+  const copyBtn = document.createElement('button');
+  copyBtn.type = 'button';
+  copyBtn.className = 'copy-link-btn';
+  copyBtn.title = 'copiar link';
+  copyBtn.setAttribute('aria-label', 'copiar link');
+  copyBtn.textContent = '⧉';
+  copyBtn.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    copyLink(item.link, copyBtn);
+  });
+
+  meta.append(date, copyBtn);
 
   const title = document.createElement('h2');
   title.className = 'item-title';
@@ -143,6 +166,73 @@ function renderItem(item, animateIndex) {
   el.append(meta, title, summary);
   return el;
 }
+
+function copyLink(link, btn) {
+  navigator.clipboard.writeText(link).then(() => {
+    btn.classList.add('copied');
+    btn.textContent = '✓';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.textContent = '⧉';
+    }, 1200);
+  }).catch((err) => {
+    console.error('[app] falha ao copiar link:', err);
+  });
+}
+
+function renderSidebar(items) {
+  const sources = [...new Set(items.map((item) => item.source))].sort((a, b) =>
+    a.localeCompare(b, 'pt-BR', { sensitivity: 'base' })
+  );
+
+  sidebarListEl.innerHTML = '';
+  sources.forEach((source) => {
+    const li = document.createElement('li');
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'sidebar-feed-btn' + (state.sourceFilter === source ? ' is-active' : '');
+    btn.style.setProperty('--cat-hue', hueFor(source));
+
+    const dot = document.createElement('span');
+    dot.className = 'sidebar-feed-dot';
+
+    const name = document.createElement('span');
+    name.className = 'sidebar-feed-name';
+    name.textContent = source;
+
+    btn.append(dot, name);
+    btn.addEventListener('click', () => {
+      state.sourceFilter = state.sourceFilter === source ? null : source;
+      renderSidebar(state.items);
+      renderStream(searchEl.value.trim().toLowerCase());
+    });
+
+    li.append(btn);
+    sidebarListEl.append(li);
+  });
+}
+
+function setSidebarOpen(open) {
+  sidebarEl.classList.toggle('is-open', open);
+  sidebarToggleEl.classList.toggle('is-open', open);
+  sidebarEl.setAttribute('aria-hidden', String(!open));
+  sidebarToggleEl.setAttribute('aria-expanded', String(open));
+}
+
+sidebarToggleEl.addEventListener('click', () => {
+  setSidebarOpen(!sidebarEl.classList.contains('is-open'));
+});
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') setSidebarOpen(false);
+});
+
+document.addEventListener('click', (event) => {
+  if (!sidebarEl.classList.contains('is-open')) return;
+  if (sidebarEl.contains(event.target) || sidebarToggleEl.contains(event.target)) return;
+  setSidebarOpen(false);
+});
 
 function disconnectObserver() {
   if (state.observer) {
@@ -195,6 +285,7 @@ async function loadReader() {
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const data = await response.json();
     state.items = data.items || [];
+    renderSidebar(state.items);
     renderStream('');
   } catch (err) {
     streamEl.innerHTML = '';
