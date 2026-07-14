@@ -1,6 +1,26 @@
 const WATERLINE_KEY = 'reader:waterline';
 const THEME_KEY = 'reader:theme';
 
+const SOURCE_PALETTE = [
+  '#e87ba4',
+  '#0891b2',
+  '#eda100',
+  '#1baf7a',
+  '#4a3aa7',
+  '#74b9ff',
+  '#008300',
+  '#2a78d6',
+  '#eb6834',
+];
+
+function sourceColor(name) {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = (hash * 31 + name.charCodeAt(i)) >>> 0;
+  }
+  return SOURCE_PALETTE[hash % SOURCE_PALETTE.length];
+}
+
 const streamEl = document.getElementById('stream');
 const closureEl = document.getElementById('ambient-closure');
 const searchEl = document.getElementById('search');
@@ -10,6 +30,7 @@ const state = {
   items: [],
   waterlineDate: readWaterline(),
   observer: null,
+  initialRenderDone: false,
 };
 
 function readWaterline() {
@@ -43,6 +64,7 @@ function formatDate(isoDate) {
 
 function renderStream(query) {
   const filtered = filterItems(state.items, query);
+  const animateEntrance = !state.initialRenderDone;
   streamEl.innerHTML = '';
 
   if (filtered.length === 0) {
@@ -53,27 +75,32 @@ function renderStream(query) {
       : 'nada encontrado para essa busca.';
     streamEl.appendChild(empty);
     disconnectObserver();
-    closureEl.hidden = true;
+    closureEl.classList.remove('is-visible');
+    state.initialRenderDone = true;
     return;
   }
 
   const fragment = document.createDocumentFragment();
-  for (const item of filtered) {
-    fragment.appendChild(renderItem(item));
-  }
+  filtered.forEach((item, index) => {
+    fragment.appendChild(renderItem(item, animateEntrance ? index : null));
+  });
   streamEl.appendChild(fragment);
+  state.initialRenderDone = true;
 
   if (query) {
     disconnectObserver();
-    closureEl.hidden = true;
+    closureEl.classList.remove('is-visible');
   } else {
     setupAmbientClosure(filtered);
   }
 }
 
-function renderItem(item) {
+function renderItem(item, animateIndex) {
   const el = document.createElement('article');
-  el.className = 'item' + (isNew(item) ? ' is-new' : '');
+  el.className = 'item' + (isNew(item) ? ' is-new' : '') + (animateIndex === null ? ' no-enter-anim' : '');
+  if (animateIndex !== null) {
+    el.style.animationDelay = `${Math.min(animateIndex, 8) * 40}ms`;
+  }
   el.dataset.link = item.link;
 
   const meta = document.createElement('p');
@@ -82,6 +109,7 @@ function renderItem(item) {
   const source = document.createElement('span');
   source.className = 'item-source';
   source.textContent = item.source;
+  source.style.setProperty('--cat-hue', sourceColor(item.source));
 
   const date = document.createElement('span');
   date.className = 'item-date';
@@ -119,11 +147,11 @@ function setupAmbientClosure(items) {
   const newItems = items.filter(isNew);
 
   if (newItems.length === 0) {
-    closureEl.hidden = false;
+    closureEl.classList.add('is-visible');
     return;
   }
 
-  closureEl.hidden = true;
+  closureEl.classList.remove('is-visible');
   const lastNew = newItems[newItems.length - 1];
   const targetEl = streamEl.querySelector(`[data-link="${cssEscape(lastNew.link)}"]`);
   if (!targetEl) return;
@@ -131,9 +159,9 @@ function setupAmbientClosure(items) {
   state.observer = new IntersectionObserver(
     ([entry]) => {
       if (entry.isIntersecting) {
-        closureEl.hidden = true;
+        closureEl.classList.remove('is-visible');
       } else if (entry.boundingClientRect.top < 0) {
-        closureEl.hidden = false;
+        closureEl.classList.add('is-visible');
       }
     },
     { threshold: 0 }
@@ -162,7 +190,7 @@ async function loadReader() {
     streamEl.innerHTML = '';
     const error = document.createElement('p');
     error.className = 'empty';
-    error.textContent = 'não foi possível carregar o reader. rode "node scripts/build.js" e sirva a pasta com um servidor estático.';
+    error.textContent = 'não foi possível carregar o Reader. rode "node scripts/build.js" e sirva a pasta com um servidor estático.';
     streamEl.appendChild(error);
     console.error('[app] falha ao carregar reader.json:', err);
   }

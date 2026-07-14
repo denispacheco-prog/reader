@@ -1,15 +1,95 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<opml version="2.0">
+<opml version="1.0">
   <head>
-    <title>reader feeds</title>
+    <title>Feeds of Denis Pacheco from Inoreader [https://www.inoreader.com]</title>
   </head>
   <body>
-    <outline text="Feeds" title="Feeds">
-      <outline type="rss" text="NASA Breaking News" title="NASA Breaking News" xmlUrl="https://www.nasa.gov/rss/dyn/breaking_news.rss" htmlUrl="https://www.nasa.gov/news/" />
-      <outline type="rss" text="Hacker News" title="Hacker News" xmlUrl="https://hnrss.org/frontpage" htmlUrl="https://news.ycombinator.com/" />
-      <outline type="rss" text="Simon Willison's Weblog" title="Simon Willison's Weblog" xmlUrl="https://simonwillison.net/atom/everything/" htmlUrl="https://simonwillison.net/" />
-      <outline type="rss" text="BBC News - World" title="BBC News - World" xmlUrl="http://feeds.bbci.co.uk/news/world/rss.xml" htmlUrl="https://www.bbc.com/news/world" />
-      <outline type="rss" text="The Verge" title="The Verge" xmlUrl="https://www.theverge.com/rss/index.xml" htmlUrl="https://www.theverge.com/" />
+    <outline text="MIT News - Computer Science and Artificial Intelligence Laboratory (CSAIL)" title="MIT News - Computer Science and Artificial Intelligence Laboratory (CSAIL)" type="rss" xmlUrl="https://web.mit.edu/newsoffice/topic/mitcomputers-rss.xml" htmlUrl="https://newsoffice.mit.edu/topic/mitcomputer-science-and-artificial-intelligence-laboratory-csail-rss.xml"/>
+    <outline text="Phys.org - latest science and technology news stories" title="Phys.org - latest science and technology news stories" type="rss" xmlUrl="https://phys.org/rss-feed/" htmlUrl="https://phys.org/"/>
+    <outline text="Reactor" title="Reactor" type="rss" xmlUrl="https://reactormag.com/feed/" htmlUrl="https://reactormag.com/feed/"/>
+    <outline text="The A.V. Club" title="The A.V. Club" type="rss" xmlUrl="https://www.avclub.com/article-category/film/feed" htmlUrl="http://www.avclub.com/search?tags=film"/>
+    <outline text="Top News - MIT Technology Review" title="Top News - MIT Technology Review" type="rss" xmlUrl="https://www.technologyreview.com/topnews.rss" htmlUrl="https://www.technologyreview.com/topnews.rss"/>
+    <outline text="Notícias" title="Notícias">
+      <outline text="/Film" title="/Film" type="rss" xmlUrl="https://feeds.feedburner.com/slashfilm" htmlUrl="https://www.slashfilm.com/"/>
+      <outline text="Aeon | Science" title="Aeon | Science" type="rss" xmlUrl="https://aeon.co/feed.rss" htmlUrl="https://aeon.co/"/>
+      <outline text="Anime News Network" title="Anime News Network" type="rss" xmlUrl="https://www.animenewsnetwork.com/news/rss.xml" htmlUrl="https://www.animenewsnetwork.com/news/"/>
+      <outline text="Ars Technica" title="Ars Technica" type="rss" xmlUrl="https://feeds.arstechnica.com/arstechnica/index/" htmlUrl="https://arstechnica.com/"/>
+      <outline text="Art and design | The Guardian" title="Art and design | The Guardian" type="rss" xmlUrl="https://www.theguardian.com/artanddesign/rss" htmlUrl="https://www.theguardian.com/artanddesign"/>
+      <outline text="Axios" title="Axios" type="rss" xmlUrl="https://www.axios.com/feeds/feed.rss" htmlUrl="https://www.axios.com/"/>
+      <outline text="BBC Brasil - Internacional" title="BBC Brasil - Internacional" type="rss" xmlUrl="https://feeds.bbci.co.uk/portuguese/internacional/rss.xml" htmlUrl="https://www.bbcbrasil.com/"/>
+      <outline text="BBC Brasil - Notícias, vídeos, análise e contexto em português" title="BBC Brasil - Notícias, vídeos, análise e contexto em português" type="rss" xmlUrl="https://www.bbc.co.uk/portuguese/index.xml" htmlUrl="http://www.bbc.co.uk/portuguese/index.xml"/>
+      <outline text="BBC Culture" title="BBC Culture" type="rss" xmlUrl="https://www.bbc.com/culture/feed.rss" htmlUrl="http://www.bbc.com/culture/feed.rss"/>
+      <outline text="BBC News" title="BBC News" type="rss" xmlUrl="https://feeds.bbci.co.uk/news/rss.xml" htmlUrl="https://www.bbc.com"/>
+      <outline text="BBC News - Asia" title="BBC News - Asia" type="rss" xmlUrl="https://feeds.bbci.co.uk/news/world/asia/rss.xml" htmlUrl="https://www.bbc.co.uk/news/world/asia/#sa-ns_mchannel=rss&amp;ns_source=PublicRSS20-sa"/>
+      <outline text="BBC News - Technology" title="BBC News - Technology" type="rss" xmlUrl="http://newsrss.bbc.co.uk/rss/newsonline_world_edition/technology/rss.xml" htmlUrl="http://www.bbc.co.uk/news/technology/#sa-ns_mchannel=rss&amp;ns_source=PublicRSS20-sa"/>
+      <outline text="Bleeding Cool" title="Bleeding Cool" type="rss" xmlUrl="https://www.bleedingcool.com/feed/" htmlUrl="https://www.bleedingcool.com/"/>
+      <outline text="Collider" title="Collider" type="rss" xmlUrl="https://www.collider.com/feed/" htmlUrl="https://collider.com/"/>
+      <outline text="Culture - Slate Magazine" title="Culture - Slate Magazine" type="rss" xmlUrl="https://slate.com/feeds/culture.rss" htmlUrl="https://slate.com/culture"/>
+      <outline text="Culture | The Guardian" title="Culture | The Guardian" type="rss" xmlUrl="http://feeds.guardian.co.uk/theguardian/culture/rss" htmlUrl="http://www.theguardian.com/culture"/>
+      <outline text="Datablog | The Guardian" title="Datablog | The Guardian" type="rss" xmlUrl="https://www.guardian.co.uk/news/datablog/rss" htmlUrl="https://www.theguardian.com/news/datablog"/>
+      <outline text="Deadline" title="Deadline" type="rss" xmlUrl="https://www.deadline.com/feed/" htmlUrl="https://deadline.com/"/>
+      <outline text="Decider" title="Decider" type="rss" xmlUrl="https://decider.com/feed/" htmlUrl="https://decider.com/"/>
+      <outline text="Engadget" title="Engadget" type="rss" xmlUrl="https://www.engadget.com/rss.xml" htmlUrl="http://www.engadget.com/"/>
+      <outline text="Estadão" title="Estadão" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCrtOL8bJsh-csozGS2aV77Q" htmlUrl="http://www.youtube.com/channel/UCrtOL8bJsh-csozGS2aV77Q"/>
+      <outline text="Film | The Guardian" title="Film | The Guardian" type="rss" xmlUrl="https://www.theguardian.com/uk/film/rss" htmlUrl="http://www.theguardian.com/film"/>
+      <outline text="Folha de S.Paulo - Ciência - Principal" title="Folha de S.Paulo - Ciência - Principal" type="rss" xmlUrl="https://feeds.folha.uol.com.br/ciencia/rss091.xml" htmlUrl="https://redir.folha.com.br/redir/online/ciencia/rss091/*http://www1.folha.uol.com.br/ciencia/"/>
+      <outline text="Folha de S.Paulo - Cotidiano - Principal" title="Folha de S.Paulo - Cotidiano - Principal" type="rss" xmlUrl="https://feeds.folha.uol.com.br/cotidiano/rss091.xml" htmlUrl="https://redir.folha.com.br/redir/online/cotidiano/rss091/*http://www1.folha.uol.com.br/cotidiano/"/>
+      <outline text="Folha de S.Paulo - Em cima da hora - Principal" title="Folha de S.Paulo - Em cima da hora - Principal" type="rss" xmlUrl="https://feeds.folha.uol.com.br/emcimadahora/rss091.xml" htmlUrl="https://redir.folha.com.br/redir/online/emcimadahora/rss091/*http://www1.folha.uol.com.br/emcimadahora/"/>
+      <outline text="Folha de S.Paulo - Ilustrada - Principal" title="Folha de S.Paulo - Ilustrada - Principal" type="rss" xmlUrl="https://feeds.folha.uol.com.br/ilustrada/rss091.xml" htmlUrl="https://redir.folha.com.br/redir/online/ilustrada/rss091/*http://www1.folha.uol.com.br/ilustrada/"/>
+      <outline text="Folha de S.Paulo - Ilustríssima - Principal" title="Folha de S.Paulo - Ilustríssima - Principal" type="rss" xmlUrl="https://feeds.folha.uol.com.br/ilustrissima/rss091.xml" htmlUrl="https://redir.folha.com.br/redir/online/ilustrissima/rss091/*http://www1.folha.uol.com.br/ilustrissima/"/>
+      <outline text="Folha de S.Paulo - Mundo - Principal" title="Folha de S.Paulo - Mundo - Principal" type="rss" xmlUrl="https://feeds.folha.uol.com.br/mundo/rss091.xml" htmlUrl="https://redir.folha.com.br/redir/online/mundo/rss091/*http://www1.folha.uol.com.br/mundo/"/>
+      <outline text="Folha de S.Paulo - Poder - Principal" title="Folha de S.Paulo - Poder - Principal" type="rss" xmlUrl="https://feeds.folha.uol.com.br/poder/rss091.xml" htmlUrl="https://redir.folha.com.br/redir/online/poder/rss091/*http://www1.folha.uol.com.br/poder/"/>
+      <outline text="Folha de S.Paulo - Tec - Principal" title="Folha de S.Paulo - Tec - Principal" type="rss" xmlUrl="https://feeds.folha.uol.com.br/tec/rss091.xml" htmlUrl="https://redir.folha.com.br/redir/online/tec/rss091/*http://www1.folha.uol.com.br/tec/"/>
+      <outline text="GamesRadar+" title="GamesRadar+" type="rss" xmlUrl="https://www.gamesradar.com/all-platforms/news/rss/" htmlUrl="https://www.gamesradar.com/all-platforms/news/rss/"/>
+      <outline text="Gaming &amp; Culture � Ars Technica" title="Gaming &amp; Culture � Ars Technica" type="rss" xmlUrl="https://feeds.arstechnica.com/arstechnica/gaming/" htmlUrl="https://arstechnica.com/"/>
+      <outline text="GeekTyrant" title="GeekTyrant" type="rss" xmlUrl="https://geektyrant.com/news/atom.xml" htmlUrl="https://geektyrant.com/"/>
+      <outline text="io9 | Gizmodo" title="io9 | Gizmodo" type="rss" xmlUrl="https://io9.gizmodo.com/rss" htmlUrl="http://io9.com/"/>
+      <outline text="Jacobin" title="Jacobin" type="rss" xmlUrl="https://jacobinmag.com/feed/" htmlUrl="https://jacobinmag.com/"/>
+      <outline text="JBox" title="JBox" type="rss" xmlUrl="https://www.jbox.com.br/feed/" htmlUrl="https://www.jbox.com.br/"/>
+      <outline text="Le Monde Diplomatique" title="Le Monde Diplomatique" type="rss" xmlUrl="https://diplomatique.org.br/feed/" htmlUrl="https://diplomatique.org.br/"/>
+      <outline text="Lifehacker" title="Lifehacker" type="rss" xmlUrl="https://lifehacker.com/feed" htmlUrl="http://lifehacker.com/"/>
+      <outline text="MIT Technology Review" title="MIT Technology Review" type="rss" xmlUrl="https://www.technologyreview.com/feed/" htmlUrl="https://www.technologyreview.com/"/>
+      <outline text="MIT Technology Review � Brasil" title="MIT Technology Review � Brasil" type="rss" xmlUrl="https://mittechreview.com.br/feed/" htmlUrl="https://mittechreview.com.br/"/>
+      <outline text="Music | The Guardian" title="Music | The Guardian" type="rss" xmlUrl="http://feeds.guardian.co.uk/theguardian/music/rss" htmlUrl="http://www.theguardian.com/music"/>
+      <outline text="Nature" title="Nature" type="rss" xmlUrl="https://www.nature.com/nature/current_issue/rss" htmlUrl="https://www.nature.com/nature/current_issue/"/>
+      <outline text="New Scientist - Home" title="New Scientist - Home" type="rss" xmlUrl="http://feeds.newscientist.com/invention" htmlUrl="http://www.newscientist.com/"/>
+      <outline text="News - South China Morning Post" title="News - South China Morning Post" type="rss" xmlUrl="https://www.scmp.com/rss/91/feed" htmlUrl="https://www.scmp.com/rss/91/feed"/>
+      <outline text="News, Politics, Opinion, Commentary, and Analysis" title="News, Politics, Opinion, Commentary, and Analysis" type="rss" xmlUrl="https://www.newyorker.com/feed/news" htmlUrl="https://www.newyorker.com/news"/>
+      <outline text="NPR" title="NPR" type="rss" xmlUrl="https://www.npr.org/rss/rss.php?id=1007" htmlUrl="https://www.npr.org/templates/story/story.php?storyId=1007"/>
+      <outline text="NYT &gt; Movies" title="NYT &gt; Movies" type="rss" xmlUrl="https://www.nytimes.com/services/xml/rss/nyt/Movies.xml" htmlUrl="https://www.nytimes.com/pages/movies/index.html?partner=rss&amp;emc=rss"/>
+      <outline text="NYT &gt; Science" title="NYT &gt; Science" type="rss" xmlUrl="https://www.nytimes.com/services/xml/rss/nyt/Science.xml" htmlUrl="https://www.nytimes.com/pages/science/index.html?partner=rss&amp;emc=rss"/>
+      <outline text="NYT &gt; Technology" title="NYT &gt; Technology" type="rss" xmlUrl="https://www.nytimes.com/services/xml/rss/nyt/Technology.xml" htmlUrl="https://www.nytimes.com/pages/technology/index.html?partner=rss&amp;emc=rss"/>
+      <outline text="NYT &gt; The New York Times Magazine" title="NYT &gt; The New York Times Magazine" type="rss" xmlUrl="https://www.nytimes.com/services/xml/rss/nyt/Magazine.xml" htmlUrl="https://www.nytimes.com/pages/magazine/index.html?partner=rss&amp;emc=rss"/>
+      <outline text="NYT &gt; Top Stories" title="NYT &gt; Top Stories" type="rss" xmlUrl="https://www.nytimes.com/services/xml/rss/nyt/HomePage.xml" htmlUrl="https://www.nytimes.com/pages/index.html?partner=rss&amp;emc=rss"/>
+      <outline text="Olhar Digital" title="Olhar Digital" type="rss" xmlUrl="https://olhardigital.com.br/rss" htmlUrl="https://olhardigital.com.br/"/>
+      <outline text="Pitchfork" title="Pitchfork" type="rss" xmlUrl="https://pitchfork.com/rss/news/" htmlUrl="https://pitchfork.com/news/"/>
+      <outline text="Polygon" title="Polygon" type="rss" xmlUrl="https://www.polygon.com/rss/index.xml" htmlUrl="https://www.polygon.com/"/>
+      <outline text="Quanta Magazine" title="Quanta Magazine" type="rss" xmlUrl="https://www.quantamagazine.org/feed/" htmlUrl="https://www.quantamagazine.org/"/>
+      <outline text="Rest of World -" title="Rest of World -" type="rss" xmlUrl="https://restofworld.org/feed/" htmlUrl="https://restofworld.org/"/>
+      <outline text="revista piauí" title="revista piauí" type="rss" xmlUrl="https://piaui.folha.uol.com.br/feed/" htmlUrl="https://piaui.folha.uol.com.br/"/>
+      <outline text="Rolling Stone" title="Rolling Stone" type="rss" xmlUrl="http://rollingstone.com.br/feed/" htmlUrl="http://rollingstone.com.br/"/>
+      <outline text="Science | The Guardian" title="Science | The Guardian" type="rss" xmlUrl="http://feeds.guardian.co.uk/theguardian/science/rss" htmlUrl="http://www.theguardian.com/science"/>
+      <outline text="Science Daily - Aerospace" title="Science Daily - Aerospace" type="rss" xmlUrl="https://www.sciencedaily.com/rss/matter_energy/aerospace.xml" htmlUrl="https://www.sciencedaily.com/rss/matter_energy/aerospace.xml"/>
+      <outline text="ScienceAlert - Latest" title="ScienceAlert - Latest" type="rss" xmlUrl="https://feeds.feedburner.com/sciencealert-latestnews" htmlUrl="https://www.sciencealert.com/"/>
+      <outline text="ScienceDaily " title="ScienceDaily " type="rss" xmlUrl="https://www.sciencedaily.com/newsfeed.xml" htmlUrl="https://www.sciencedaily.com/"/>
+      <outline text="Scientific American Content" title="Scientific American Content" type="rss" xmlUrl="https://www.scientificamerican.com/platform/syndication/rss/" htmlUrl="https://www.scientificamerican.com/"/>
+      <outline text="Slashdot" title="Slashdot" type="rss" xmlUrl="https://rss.slashdot.org/Slashdot/slashdot" htmlUrl="https://slashdot.org/"/>
+      <outline text="Slate - Culture" title="Slate - Culture" type="rss" xmlUrl="https://www.slate.com/rss" htmlUrl="https://www.slate.com/articles.teaser.all.10.rss"/>
+      <outline text="Space.com" title="Space.com" type="rss" xmlUrl="https://www.space.com/feeds/all" htmlUrl="https://www.space.com/feeds/all"/>
+      <outline text="Technology | The Atlantic" title="Technology | The Atlantic" type="rss" xmlUrl="https://feeds.feedburner.com/AtlanticScienceAndTechnology" htmlUrl="https://www.theatlantic.com/technology/"/>
+      <outline text="Technology | The Guardian" title="Technology | The Guardian" type="rss" xmlUrl="https://www.theguardian.com/technology/rss" htmlUrl="https://www.theguardian.com/uk/technology"/>
+      <outline text="The Atlantic " title="The Atlantic " type="rss" xmlUrl="https://feeds.feedburner.com/TheAtlantic" htmlUrl="https://www.theatlantic.com/"/>
+      <outline text="The Guardian - Artificial intelligence" title="The Guardian - Artificial intelligence" type="rss" xmlUrl="https://www.guardian.co.uk/technology/artificialintelligenceai/rss" htmlUrl="https://www.theguardian.com/technology/artificialintelligenceai"/>
+      <outline text="The Japan Times: All Stories" title="The Japan Times: All Stories" type="rss" xmlUrl="https://feeds.feedburner.com/japantimes" htmlUrl="https://www.japantimes.co.jp/"/>
+      <outline text="The Mary Sue" title="The Mary Sue" type="rss" xmlUrl="https://www.themarysue.com/feed/" htmlUrl="https://www.themarysue.com/"/>
+      <outline text="The New York Times" title="The New York Times" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCqnbDFdCpuN8CMEg0VuEBqA" htmlUrl="http://www.youtube.com/user/TheNewYorkTimes"/>
+      <outline text="The New Yorker - Culture" title="The New Yorker - Culture" type="rss" xmlUrl="https://www.newyorker.com/feed/rss" htmlUrl="https://www.newyorker.com/mrss/feeds/everything.xml"/>
+      <outline text="The Verge -  All Posts" title="The Verge -  All Posts" type="rss" xmlUrl="https://www.theverge.com/rss/index.xml" htmlUrl="http://www.theverge.com/"/>
+      <outline text="TheWrapTheWrap" title="TheWrapTheWrap" type="rss" xmlUrl="https://www.thewrap.com/feed/" htmlUrl="https://www.thewrap.com/"/>
+      <outline text="Variety" title="Variety" type="rss" xmlUrl="https://variety.com/feed/" htmlUrl="https://variety.com/"/>
+      <outline text="Vox - All" title="Vox - All" type="rss" xmlUrl="https://www.vox.com/rss/index.xml" htmlUrl="https://www.vox.com/"/>
+      <outline text="Wired" title="Wired" type="rss" xmlUrl="https://www.wired.com/feed/rss" htmlUrl="https://www.wired.com/"/>
+      <outline text="World news | The Guardian" title="World news | The Guardian" type="rss" xmlUrl="https://feeds.guardian.co.uk/theguardian/world/rss" htmlUrl="https://www.theguardian.com/world"/>
     </outline>
   </body>
 </opml>

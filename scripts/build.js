@@ -8,7 +8,7 @@ const ROOT = path.resolve(__dirname, '..');
 
 const OPML_PATH = path.join(ROOT, 'feeds.opml');
 const OUTPUT_PATH = path.join(ROOT, 'reader.json');
-const WINDOW_DAYS = 14;
+const WINDOW_DAYS = 7;
 const FETCH_TIMEOUT_MS = 10000;
 const SUMMARY_MAX_LENGTH = 500;
 
