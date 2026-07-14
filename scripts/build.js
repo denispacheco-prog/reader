@@ -16,18 +16,29 @@ const parser = new Parser();
 
 function parseOpml(xml) {
   const feeds = [];
-  const outlineRegex = /<outline\b[^>]*>/g;
-  const matches = xml.match(outlineRegex) || [];
+  const categoryStack = [];
+  const tagRegex = /<outline\b[^>]*\/>|<outline\b[^>]*>|<\/outline>/g;
+  const tags = xml.match(tagRegex) || [];
 
-  for (const tag of matches) {
-    const xmlUrlMatch = tag.match(/\bxmlUrl="([^"]*)"/);
-    if (!xmlUrlMatch) continue;
+  for (const tag of tags) {
+    if (tag === '</outline>') {
+      categoryStack.pop();
+      continue;
+    }
 
     const titleMatch = tag.match(/\btitle="([^"]*)"/) || tag.match(/\btext="([^"]*)"/);
-    feeds.push({
-      xmlUrl: decodeXmlEntities(xmlUrlMatch[1]),
-      title: titleMatch ? decodeXmlEntities(titleMatch[1]) : xmlUrlMatch[1],
-    });
+    const title = titleMatch ? decodeXmlEntities(titleMatch[1]) : null;
+    const xmlUrlMatch = tag.match(/\bxmlUrl="([^"]*)"/);
+
+    if (xmlUrlMatch) {
+      feeds.push({
+        xmlUrl: decodeXmlEntities(xmlUrlMatch[1]),
+        title: title || xmlUrlMatch[1],
+        category: categoryStack[categoryStack.length - 1] || null,
+      });
+    } else if (!tag.endsWith('/>')) {
+      categoryStack.push(title);
+    }
   }
 
   return feeds;
@@ -68,7 +79,7 @@ async function fetchFeedItems(feed) {
     const sourceName = feed.title || parsed.title || feed.xmlUrl;
 
     return parsed.items
-      .map((item) => normalizeItem(item, sourceName))
+      .map((item) => normalizeItem(item, sourceName, feed.category))
       .filter((item) => item !== null);
   } catch (err) {
     console.error(`[build] falha ao buscar "${feed.title}" (${feed.xmlUrl}): ${err.message}`);
@@ -78,7 +89,7 @@ async function fetchFeedItems(feed) {
   }
 }
 
-function normalizeItem(item, sourceName) {
+function normalizeItem(item, sourceName, category) {
   const link = item.link;
   const rawDate = item.isoDate || item.pubDate;
   const date = rawDate ? new Date(rawDate) : null;
@@ -94,6 +105,7 @@ function normalizeItem(item, sourceName) {
     title: (item.title || '(sem título)').trim(),
     link,
     source: sourceName,
+    category,
     date: date.toISOString(),
     summary,
   };

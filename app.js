@@ -13,7 +13,7 @@ const SOURCE_PALETTE = [
   '#eb6834',
 ];
 
-function sourceColor(name) {
+function hueFor(name) {
   let hash = 0;
   for (let i = 0; i < name.length; i++) {
     hash = (hash * 31 + name.charCodeAt(i)) >>> 0;
@@ -47,7 +47,7 @@ function isNew(item) {
 function filterItems(items, query) {
   if (!query) return items;
   return items.filter((item) => {
-    const haystack = `${item.title} ${item.source} ${item.summary}`.toLowerCase();
+    const haystack = `${item.title} ${item.source} ${item.category || ''} ${item.summary}`.toLowerCase();
     return haystack.includes(query);
   });
 }
@@ -109,13 +109,23 @@ function renderItem(item, animateIndex) {
   const source = document.createElement('span');
   source.className = 'item-source';
   source.textContent = item.source;
-  source.style.setProperty('--cat-hue', sourceColor(item.source));
+  source.style.setProperty('--cat-hue', hueFor(item.source));
+
+  meta.append(source);
+
+  if (item.category) {
+    const category = document.createElement('span');
+    category.className = 'item-category';
+    category.textContent = item.category;
+    category.style.setProperty('--cat-hue', hueFor(item.category));
+    meta.append(category);
+  }
 
   const date = document.createElement('span');
   date.className = 'item-date';
   date.textContent = formatDate(item.date);
 
-  meta.append(source, date);
+  meta.append(date);
 
   const title = document.createElement('h2');
   title.className = 'item-title';

@@ -199,6 +199,14 @@ main {
   color: color-mix(in srgb, var(--cat-hue, var(--muted)) 70%, var(--fg));
 }
 
+.item-category {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: color-mix(in srgb, var(--cat-hue, var(--muted)) 65%, var(--muted));
+}
+
 .item-date {
   color: var(--muted);
 }
