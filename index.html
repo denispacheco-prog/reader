@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>reader</title>
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    (function () {
+      try {
+        var theme = localStorage.getItem('reader:theme');
+        if (theme === 'light' || theme === 'dark') {
+          document.documentElement.dataset.theme = theme;
+        }
+      } catch (err) {}
+    })();
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header-row">
+      <h1 class="site-title">reader</h1>
+      <button id="theme-toggle" class="theme-toggle-btn" type="button" aria-label="alternar tema"></button>
+    </div>
+    <input
+      id="search"
+      class="search-input"
+      type="search"
+      placeholder="buscar no que já foi lido..."
+      autocomplete="off"
+    />
+  </header>
+
+  <main id="stream" aria-live="polite">
+    <p class="loading">carregando...</p>
+  </main>
+
+  <p id="ambient-closure" class="ambient-closure" hidden>
+    você está em dia.
+  </p>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

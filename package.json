@@ -1,0 +1,16 @@
+{
+  "name": "reader",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Leitor de RSS pessoal, estilo river.",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "node scripts/build.js"
+  },
+  "dependencies": {
+    "rss-parser": "^3.13.0"
+  }
+}
