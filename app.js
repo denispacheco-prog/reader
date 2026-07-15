@@ -30,6 +30,7 @@ const sidebarEl = document.getElementById('sidebar');
 const sidebarToggleEl = document.getElementById('sidebar-toggle');
 const sidebarListEl = document.getElementById('sidebar-feed-list');
 const refreshStatusEl = document.getElementById('refresh-status');
+const backToTopEl = document.getElementById('back-to-top');
 
 const state = {
   items: [],
@@ -399,6 +400,14 @@ themeToggleEl.addEventListener('click', toggleTheme);
 searchEl.addEventListener('input', () => {
   renderStream(searchEl.value.trim().toLowerCase());
 });
+
+backToTopEl.addEventListener('click', () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+window.addEventListener('scroll', () => {
+  backToTopEl.classList.toggle('is-visible', window.scrollY > 600);
+}, { passive: true });
 
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'hidden') saveWaterline();
