@@ -1,5 +1,6 @@
 const WATERLINE_KEY = 'reader:waterline';
 const THEME_KEY = 'reader:theme';
+const REFRESH_INTERVAL_MINUTES = 30;
 
 const SOURCE_PALETTE = [
   '#e87ba4',
@@ -28,6 +29,7 @@ const themeToggleEl = document.getElementById('theme-toggle');
 const sidebarEl = document.getElementById('sidebar');
 const sidebarToggleEl = document.getElementById('sidebar-toggle');
 const sidebarListEl = document.getElementById('sidebar-feed-list');
+const refreshStatusEl = document.getElementById('refresh-status');
 
 const state = {
   items: [],
@@ -35,6 +37,7 @@ const state = {
   observer: null,
   initialRenderDone: false,
   sourceFilter: null,
+  generatedAt: null,
 };
 
 function readWaterline() {
@@ -293,14 +296,28 @@ function saveWaterline() {
   localStorage.setItem(WATERLINE_KEY, newest.date);
 }
 
+function updateRefreshStatus() {
+  if (!state.generatedAt) return;
+
+  const nextRefresh = new Date(state.generatedAt).getTime() + REFRESH_INTERVAL_MINUTES * 60000;
+  const minutesLeft = Math.ceil((nextRefresh - Date.now()) / 60000);
+
+  refreshStatusEl.textContent = minutesLeft > 0
+    ? `atualiza em ~${minutesLeft} min`
+    : 'atualização a caminho';
+}
+
 async function loadReader() {
   try {
     const response = await fetch('reader.json');
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const data = await response.json();
     state.items = data.items || [];
+    state.generatedAt = data.generatedAt || null;
     renderSidebar(state.items);
     renderStream('');
+    updateRefreshStatus();
+    setInterval(updateRefreshStatus, 60000);
   } catch (err) {
     streamEl.innerHTML = '';
     const error = document.createElement('p');

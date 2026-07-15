@@ -253,6 +253,13 @@ main,
   color: var(--muted);
 }
 
+.refresh-status {
+  margin: 0.5rem 0 0;
+  font-size: 0.7rem;
+  color: var(--muted);
+  opacity: 0.55;
+}
+
 main {
   padding-bottom: 3rem;
 }
