@@ -4,8 +4,10 @@
   --fg: #2b2a28;
   --muted: #8a8579;
   --border: #e6e3dc;
+  --rule: #e6e3dc;
   --accent: #0060df;
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-serif: Charter, "Iowan Old Style", Palatino, Georgia, serif;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -14,6 +16,7 @@
     --fg: #e8e4dc;
     --muted: #9c968a;
     --border: #3a362f;
+    --rule: #3a362f;
     --accent: #6ea8fe;
   }
 }
@@ -23,6 +26,7 @@
   --fg: #2b2a28;
   --muted: #8a8579;
   --border: #e6e3dc;
+  --rule: #e6e3dc;
   --accent: #0060df;
 }
 
@@ -31,6 +35,7 @@
   --fg: #e8e4dc;
   --muted: #9c968a;
   --border: #3a362f;
+  --rule: #3a362f;
   --accent: #6ea8fe;
 }
 
@@ -48,15 +53,15 @@ body {
   background: var(--bg);
   color: var(--fg);
   font-family: var(--font-sans);
-  font-size: 1.125rem;
-  line-height: 1.65;
+  font-size: 1.1875rem;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 
 .site-header,
 main,
 .ambient-closure {
-  max-width: 66ch;
+  max-width: 64ch;
   margin: 0 auto;
   padding: 0 1.25rem;
 }
@@ -109,7 +114,7 @@ main,
 .sidebar-header {
   padding: 0 1.25rem 0.75rem;
   margin-bottom: 0.5rem;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--rule);
   font-size: 0.72rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -154,7 +159,7 @@ main,
 .sidebar-feed-btn--all {
   margin-bottom: 0.5rem;
   padding-bottom: 0.65rem;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--rule);
   font-weight: 600;
 }
 
@@ -240,7 +245,7 @@ main,
   color: var(--fg);
   background: transparent;
   border: none;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--rule);
   padding: 0.4rem 0.1rem;
   outline: none;
 }
@@ -268,6 +273,44 @@ main {
 .empty {
   color: var(--muted);
   font-style: italic;
+  text-align: center;
+  padding: 3.5rem 0;
+}
+
+.stream-date-heading {
+  margin: 2.75rem 0 1rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  opacity: 0.65;
+}
+
+.stream-date-heading:first-child {
+  margin-top: 0;
+}
+
+.waterline-marker {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin: 0.5rem 0 1.75rem;
+  color: var(--accent);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  opacity: 0.8;
+}
+
+.waterline-marker::before,
+.waterline-marker::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--accent);
+  opacity: 0.45;
 }
 
 @keyframes item-enter {
@@ -282,8 +325,7 @@ main {
 }
 
 .item {
-  padding: 1.75rem 0;
-  border-top: 1px solid var(--border);
+  padding: 1.85rem 0;
   animation: item-enter 500ms cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
@@ -291,34 +333,26 @@ main {
   animation: none;
 }
 
-.item:first-child {
-  border-top: none;
-}
-
-.item.is-new {
-  border-left: 2px solid var(--accent);
-  padding-left: 1rem;
-  margin-left: -1.02rem;
+.item:not(.is-new) {
+  opacity: 0.78;
 }
 
 .item-meta {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.6rem;
   font-size: 0.8rem;
   color: var(--muted);
   opacity: 0.75;
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.4rem;
 }
 
 .item-source {
-  display: inline-block;
-  border: none;
-  border-radius: 999px;
-  padding: 0.1rem 0.65rem;
+  font-size: 0.7rem;
   font-weight: 600;
-  background: color-mix(in srgb, var(--cat-hue, var(--muted)) 18%, var(--bg));
-  color: color-mix(in srgb, var(--cat-hue, var(--muted)) 70%, var(--fg));
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: color-mix(in srgb, var(--cat-hue, var(--muted)) 75%, var(--muted));
 }
 
 .item-category {
@@ -327,6 +361,10 @@ main {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: color-mix(in srgb, var(--cat-hue, var(--muted)) 65%, var(--muted));
+}
+
+.item-category::before {
+  content: "· ";
 }
 
 .item-date {
@@ -360,7 +398,8 @@ main {
 }
 
 .item-title {
-  font-size: 1.35rem;
+  font-family: var(--font-serif);
+  font-size: 1.55rem;
   line-height: 1.3;
   font-weight: 600;
   margin: 0 0 0.5rem;
@@ -376,6 +415,7 @@ main {
 }
 
 .item-summary {
+  font-family: var(--font-serif);
   margin: 0;
   color: var(--fg);
 }
@@ -412,6 +452,10 @@ main {
 @media (max-width: 480px) {
   body {
     font-size: 1.05rem;
+  }
+
+  .item-title {
+    font-size: 1.3rem;
   }
 
   .site-header {

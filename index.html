@@ -6,13 +6,19 @@
   <title>Reader</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📰</text></svg>" />
   <link rel="stylesheet" href="style.css" />
+  <meta id="theme-color-meta" name="theme-color" content="#faf9f6" />
   <script>
     (function () {
       try {
         var theme = localStorage.getItem('reader:theme');
+        var resolved = theme === 'light' || theme === 'dark'
+          ? theme
+          : (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
         if (theme === 'light' || theme === 'dark') {
           document.documentElement.dataset.theme = theme;
         }
+        var meta = document.getElementById('theme-color-meta');
+        if (meta) meta.setAttribute('content', resolved === 'dark' ? '#221f1c' : '#faf9f6');
       } catch (err) {}
     })();
   </script>

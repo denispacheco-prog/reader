@@ -76,6 +76,38 @@ function formatDate(isoDate) {
   });
 }
 
+function startOfDay(date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function dayLabel(isoDate) {
+  const date = new Date(isoDate);
+  const today = startOfDay(new Date());
+  const diffDays = Math.round((today - startOfDay(date)) / 86400000);
+
+  if (diffDays === 0) return 'hoje';
+  if (diffDays === 1) return 'ontem';
+  return date.toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    month: 'long',
+    year: date.getFullYear() !== today.getFullYear() ? 'numeric' : undefined,
+  });
+}
+
+function renderDateHeading(label) {
+  const heading = document.createElement('h3');
+  heading.className = 'stream-date-heading';
+  heading.textContent = label;
+  return heading;
+}
+
+function renderWaterlineMarker() {
+  const marker = document.createElement('div');
+  marker.className = 'waterline-marker';
+  marker.textContent = 'lido anteriormente';
+  return marker;
+}
+
 function renderStream(query) {
   const filtered = filterItems(state.items, query);
   const animateEntrance = !state.initialRenderDone;
@@ -95,7 +127,16 @@ function renderStream(query) {
   }
 
   const fragment = document.createDocumentFragment();
+  let lastDayLabel = null;
   filtered.forEach((item, index) => {
+    const label = dayLabel(item.date);
+    if (label !== lastDayLabel) {
+      fragment.appendChild(renderDateHeading(label));
+      lastDayLabel = label;
+    }
+    if (index > 0 && isNew(filtered[index - 1]) && !isNew(item)) {
+      fragment.appendChild(renderWaterlineMarker());
+    }
     fragment.appendChild(renderItem(item, animateEntrance ? index : null));
   });
   streamEl.appendChild(fragment);
@@ -340,6 +381,9 @@ function updateThemeToggleButton(theme) {
   const label = theme === 'dark' ? 'mudar para tema claro' : 'mudar para tema escuro';
   themeToggleEl.setAttribute('aria-label', label);
   themeToggleEl.title = label;
+
+  const themeColorMeta = document.getElementById('theme-color-meta');
+  if (themeColorMeta) themeColorMeta.setAttribute('content', theme === 'dark' ? '#221f1c' : '#faf9f6');
 }
 
 function toggleTheme() {
