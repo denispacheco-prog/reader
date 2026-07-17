@@ -22,6 +22,19 @@ function hueFor(name) {
   return SOURCE_PALETTE[hash % SOURCE_PALETTE.length];
 }
 
+const CATEGORY_COLORS = {
+  'Notícias': '#008300',
+  'Tecnologia': '#2a78d6',
+  'Ciência': '#0891b2',
+  'Cultura & Entretenimento': '#e87ba4',
+  'Jogos': '#4a3aa7',
+  'Opinião': '#eb6834',
+};
+
+function categoryColor(name) {
+  return CATEGORY_COLORS[name] || hueFor(name);
+}
+
 const streamEl = document.getElementById('stream');
 const closureEl = document.getElementById('ambient-closure');
 const searchEl = document.getElementById('search');
@@ -179,7 +192,7 @@ function renderItem(item, animateIndex) {
     const category = document.createElement('span');
     category.className = 'item-category';
     category.textContent = item.category;
-    category.style.setProperty('--cat-hue', hueFor(item.category));
+    category.style.setProperty('--cat-hue', categoryColor(item.category));
     meta.append(category);
   }
 
@@ -301,7 +314,7 @@ function renderCategoryMenu(items) {
     btn.type = 'button';
     btn.className = 'category-menu-btn' + (state.categoryFilter === category ? ' is-active' : '');
     btn.textContent = category;
-    btn.style.setProperty('--cat-hue', hueFor(category));
+    btn.style.setProperty('--cat-hue', categoryColor(category));
     btn.addEventListener('click', () => {
       state.categoryFilter = state.categoryFilter === category ? null : category;
       renderCategoryMenu(state.items);
