@@ -48,10 +48,12 @@
           target="_blank"
           rel="noopener noreferrer"
           title="gerenciar feeds no GitHub"
-        >gerenciar feeds</a>
+          aria-label="gerenciar feeds no GitHub"
+        >⚙</a>
         <button id="theme-toggle" class="theme-toggle-btn" type="button" aria-label="alternar tema"></button>
       </div>
     </div>
+    <nav id="category-menu" class="category-menu" aria-label="filtrar por categoria"></nav>
     <input
       id="search"
       class="search-input"
@@ -59,7 +61,6 @@
       placeholder="Busca..."
       autocomplete="off"
     />
-    <p id="refresh-status" class="refresh-status"></p>
   </header>
 
   <main id="stream" aria-live="polite">

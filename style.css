@@ -211,7 +211,10 @@ main,
 }
 
 .feeds-link {
-  font-size: 0.75rem;
+  display: inline-flex;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0.25rem;
   color: var(--muted);
   opacity: 0.7;
   text-decoration: none;
@@ -220,7 +223,6 @@ main,
 .feeds-link:hover {
   opacity: 1;
   color: var(--fg);
-  text-decoration: underline;
 }
 
 .theme-toggle-btn {
@@ -258,11 +260,43 @@ main,
   color: var(--muted);
 }
 
-.refresh-status {
-  margin: 0.5rem 0 0;
-  font-size: 0.7rem;
-  color: var(--muted);
-  opacity: 0.55;
+.category-menu {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 1.1rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.category-menu::-webkit-scrollbar {
+  display: none;
+}
+
+.category-menu-btn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.15rem 0;
+  color: color-mix(in srgb, var(--cat-hue, var(--muted)) 65%, var(--muted));
+  opacity: 0.7;
+  border-bottom: 2px solid transparent;
+  transition: opacity 150ms ease, border-color 150ms ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.category-menu-btn:hover {
+  opacity: 1;
+}
+
+.category-menu-btn.is-active {
+  opacity: 1;
+  border-bottom-color: var(--cat-hue, var(--muted));
 }
 
 main {

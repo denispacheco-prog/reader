@@ -29,8 +29,9 @@ const themeToggleEl = document.getElementById('theme-toggle');
 const sidebarEl = document.getElementById('sidebar');
 const sidebarToggleEl = document.getElementById('sidebar-toggle');
 const sidebarListEl = document.getElementById('sidebar-feed-list');
-const refreshStatusEl = document.getElementById('refresh-status');
+const siteTitleEl = document.querySelector('.site-title');
 const backToTopEl = document.getElementById('back-to-top');
+const categoryMenuEl = document.getElementById('category-menu');
 
 const state = {
   items: [],
@@ -38,6 +39,7 @@ const state = {
   observer: null,
   initialRenderDone: false,
   sourceFilter: null,
+  categoryFilter: null,
   generatedAt: null,
 };
 
@@ -56,6 +58,10 @@ function filterItems(items, query) {
   let result = state.sourceFilter
     ? items.filter((item) => item.source === state.sourceFilter)
     : items;
+
+  if (state.categoryFilter) {
+    result = result.filter((item) => item.category === state.categoryFilter);
+  }
 
   if (query) {
     result = result.filter((item) => {
@@ -272,6 +278,39 @@ function renderSidebar(items) {
   });
 }
 
+function renderCategoryMenu(items) {
+  const categories = [...new Set(items.map((item) => item.category).filter(Boolean))].sort((a, b) =>
+    a.localeCompare(b, 'pt-BR', { sensitivity: 'base' })
+  );
+
+  categoryMenuEl.innerHTML = '';
+
+  const allBtn = document.createElement('button');
+  allBtn.type = 'button';
+  allBtn.className = 'category-menu-btn' + (state.categoryFilter === null ? ' is-active' : '');
+  allBtn.textContent = 'todas';
+  allBtn.addEventListener('click', () => {
+    state.categoryFilter = null;
+    renderCategoryMenu(state.items);
+    renderStream(searchEl.value.trim().toLowerCase());
+  });
+  categoryMenuEl.append(allBtn);
+
+  categories.forEach((category) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'category-menu-btn' + (state.categoryFilter === category ? ' is-active' : '');
+    btn.textContent = category;
+    btn.style.setProperty('--cat-hue', hueFor(category));
+    btn.addEventListener('click', () => {
+      state.categoryFilter = state.categoryFilter === category ? null : category;
+      renderCategoryMenu(state.items);
+      renderStream(searchEl.value.trim().toLowerCase());
+    });
+    categoryMenuEl.append(btn);
+  });
+}
+
 function setSidebarOpen(open) {
   sidebarEl.classList.toggle('is-open', open);
   sidebarToggleEl.classList.toggle('is-open', open);
@@ -344,7 +383,7 @@ function updateRefreshStatus() {
   const nextRefresh = new Date(state.generatedAt).getTime() + REFRESH_INTERVAL_MINUTES * 60000;
   const minutesLeft = Math.ceil((nextRefresh - Date.now()) / 60000);
 
-  refreshStatusEl.textContent = minutesLeft > 0
+  siteTitleEl.title = minutesLeft > 0
     ? `atualiza em ~${minutesLeft} min`
     : 'atualização a caminho';
 }
@@ -357,6 +396,7 @@ async function loadReader() {
     state.items = data.items || [];
     state.generatedAt = data.generatedAt || null;
     renderSidebar(state.items);
+    renderCategoryMenu(state.items);
     renderStream('');
     updateRefreshStatus();
     setInterval(updateRefreshStatus, 60000);
