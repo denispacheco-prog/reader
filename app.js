@@ -35,6 +35,28 @@ function categoryColor(name) {
   return CATEGORY_COLORS[name] || hueFor(name);
 }
 
+const SHADE_STEPS = [0, 0.22, -0.18, 0.4, -0.32, 0.12];
+
+function shadeColor(hex, ratio) {
+  const target = ratio >= 0 ? 255 : 0;
+  const amount = Math.abs(ratio);
+  const num = parseInt(hex.slice(1), 16);
+  const channels = [(num >> 16) & 255, (num >> 8) & 255, num & 255];
+  const mixed = channels.map((c) => Math.round(c + (target - c) * amount));
+  return `#${mixed.map((v) => v.toString(16).padStart(2, '0')).join('')}`;
+}
+
+function sourceColor(name, category) {
+  if (!category) return hueFor(name);
+
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = (hash * 31 + name.charCodeAt(i)) >>> 0;
+  }
+  const step = SHADE_STEPS[hash % SHADE_STEPS.length];
+  return shadeColor(categoryColor(category), step);
+}
+
 const streamEl = document.getElementById('stream');
 const closureEl = document.getElementById('ambient-closure');
 const searchEl = document.getElementById('search');
@@ -184,7 +206,7 @@ function renderItem(item, animateIndex) {
   const source = document.createElement('span');
   source.className = 'item-source';
   source.textContent = item.source;
-  source.style.setProperty('--cat-hue', hueFor(item.source));
+  source.style.setProperty('--cat-hue', sourceColor(item.source, item.category));
 
   meta.append(source);
 
@@ -245,7 +267,12 @@ function copyLink(link, btn) {
 }
 
 function renderSidebar(items) {
-  const sources = [...new Set(items.map((item) => item.source))].sort((a, b) =>
+  const sourceCategories = new Map();
+  items.forEach((item) => {
+    if (!sourceCategories.has(item.source)) sourceCategories.set(item.source, item.category);
+  });
+
+  const sources = [...sourceCategories.keys()].sort((a, b) =>
     a.localeCompare(b, 'pt-BR', { sensitivity: 'base' })
   );
 
@@ -270,7 +297,7 @@ function renderSidebar(items) {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'sidebar-feed-btn' + (state.sourceFilter === source ? ' is-active' : '');
-    btn.style.setProperty('--cat-hue', hueFor(source));
+    btn.style.setProperty('--cat-hue', sourceColor(source, sourceCategories.get(source)));
 
     const dot = document.createElement('span');
     dot.className = 'sidebar-feed-dot';
