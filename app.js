@@ -168,6 +168,13 @@ function formatDate(isoDate) {
   });
 }
 
+function formatDateShort(isoDate) {
+  const date = new Date(isoDate);
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = date.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '');
+  return `${day} ${month}`;
+}
+
 function startOfDay(date) {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 }
@@ -282,10 +289,39 @@ function renderDashboard(query) {
   const categories = orderCategories([...groups.keys()]);
 
   const fragment = document.createDocumentFragment();
+  if (categories.length > 1) {
+    fragment.appendChild(renderDashboardCover(categories, groups, animateEntrance));
+  }
   categories.forEach((category) => {
     fragment.appendChild(renderDashboardSection(category, groups.get(category), animateEntrance));
   });
   streamEl.appendChild(fragment);
+}
+
+function renderDashboardCover(categories, groups, animateEntrance) {
+  const section = document.createElement('section');
+  section.className = 'dashboard-section dashboard-cover-section';
+
+  const heading = document.createElement('h2');
+  heading.className = 'dashboard-section-title';
+  heading.textContent = 'Capa';
+
+  const grid = document.createElement('div');
+  grid.className = 'dashboard-cover';
+  const featuredIndex = Math.floor(Math.random() * categories.length);
+  categories.forEach((category, index) => {
+    const item = groups.get(category)[0];
+    if (!item) return;
+    grid.appendChild(renderDashboardCard(item, {
+      cover: true,
+      featured: index === featuredIndex,
+      animate: animateEntrance,
+      delay: Math.min(index, 8) * 30,
+    }));
+  });
+
+  section.append(heading, grid);
+  return section;
 }
 
 function renderDashboardSection(category, items, animateEntrance) {
@@ -310,28 +346,25 @@ function renderDashboardSection(category, items, animateEntrance) {
   return section;
 }
 
-function renderDashboardCard(item, { hero = false, animate = false, delay = 0 } = {}) {
+function renderDashboardCard(item, { hero = false, cover = false, featured = false, animate = false, delay = 0 } = {}) {
   const card = document.createElement('article');
   card.className = 'dashboard-card'
     + (hero ? ' dashboard-card--hero' : '')
+    + (cover ? ' dashboard-card--cover' : '')
+    + (cover && featured ? ' dashboard-card--cover-featured' : '')
     + (isNew(item) ? ' is-new' : '')
     + (animate ? '' : ' no-enter-anim');
   if (animate) card.style.animationDelay = `${delay}ms`;
   card.style.setProperty('--cat-hue', sourceColor(item.source, item.category));
   card.dataset.link = item.link;
 
-  const meta = document.createElement('p');
-  meta.className = 'dashboard-card-meta';
-
-  const source = document.createElement('span');
-  source.className = 'dashboard-card-source';
-  source.textContent = item.source;
-
-  const date = document.createElement('span');
-  date.className = 'dashboard-card-date';
-  date.textContent = formatDate(item.date);
-
-  meta.append(source, date);
+  if ((hero || cover) && item.category) {
+    const kicker = document.createElement('p');
+    kicker.className = 'dashboard-card-kicker';
+    kicker.textContent = item.category;
+    kicker.style.setProperty('--cat-hue', categoryColor(item.category));
+    card.append(kicker);
+  }
 
   const title = document.createElement(hero ? 'h2' : 'h3');
   title.className = 'dashboard-card-title';
@@ -342,9 +375,22 @@ function renderDashboardCard(item, { hero = false, animate = false, delay = 0 } 
   link.textContent = item.title;
   title.appendChild(link);
 
-  card.append(meta, title);
+  const meta = document.createElement('p');
+  meta.className = 'dashboard-card-meta';
 
-  if (hero && item.summary) {
+  const source = document.createElement('span');
+  source.className = 'dashboard-card-source';
+  source.textContent = item.source;
+
+  const date = document.createElement('span');
+  date.className = 'dashboard-card-date';
+  date.textContent = formatDateShort(item.date);
+
+  meta.append(source, date);
+
+  card.append(title, meta);
+
+  if ((hero || cover) && item.summary) {
     const summary = document.createElement('p');
     summary.className = 'dashboard-card-summary';
     summary.textContent = item.summary;
