@@ -3,6 +3,7 @@ const THEME_KEY = 'reader:theme';
 const VIEW_KEY = 'reader:view';
 const CATEGORY_ORDER_KEY = 'reader:categoryOrder';
 const REFRESH_INTERVAL_MINUTES = 30;
+const POLL_INTERVAL_MS = 120000;
 const DASHBOARD_ITEMS_PER_CATEGORY = 8;
 const DEFAULT_CATEGORY_ORDER = ['Notícias', 'Tecnologia', 'Ciência', 'Futurismo', 'Cultura', 'Jogos', 'Opinião'];
 
@@ -306,6 +307,7 @@ function renderDashboardCard(item, { hero = false, animate = false, delay = 0 } 
     + (animate ? '' : ' no-enter-anim');
   if (animate) card.style.animationDelay = `${delay}ms`;
   card.style.setProperty('--cat-hue', sourceColor(item.source, item.category));
+  card.dataset.link = item.link;
 
   const meta = document.createElement('p');
   meta.className = 'dashboard-card-meta';
@@ -609,18 +611,56 @@ function updateRefreshStatus() {
     : 'atualização a caminho';
 }
 
+function captureScrollAnchor() {
+  if (window.scrollY <= 0) return null;
+  const anchorEl = [...streamEl.querySelectorAll('[data-link]')].find(
+    (el) => el.getBoundingClientRect().bottom > 0
+  );
+  if (!anchorEl) return null;
+  return { link: anchorEl.dataset.link, offset: anchorEl.getBoundingClientRect().top };
+}
+
+function restoreScrollAnchor(anchor) {
+  if (!anchor) return;
+  const el = streamEl.querySelector(`[data-link="${cssEscape(anchor.link)}"]`);
+  if (!el) return;
+  window.scrollBy(0, el.getBoundingClientRect().top - anchor.offset);
+}
+
+function applyReaderData(data) {
+  const anchor = captureScrollAnchor();
+  state.items = data.items || [];
+  state.generatedAt = data.generatedAt || null;
+  renderSidebar(state.items);
+  renderCategoryMenu(state.items);
+  render();
+  updateRefreshStatus();
+  restoreScrollAnchor(anchor);
+}
+
+async function checkForUpdates() {
+  try {
+    const response = await fetch('reader.json', { cache: 'no-store' });
+    if (!response.ok) return;
+    const data = await response.json();
+    if (data.generatedAt && data.generatedAt === state.generatedAt) return;
+    applyReaderData(data);
+  } catch (err) {
+    console.error('[app] falha ao verificar atualização:', err);
+  }
+}
+
 async function loadReader() {
   try {
     const response = await fetch('reader.json');
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const data = await response.json();
-    state.items = data.items || [];
-    state.generatedAt = data.generatedAt || null;
-    renderSidebar(state.items);
-    renderCategoryMenu(state.items);
-    render();
-    updateRefreshStatus();
+    applyReaderData(data);
     setInterval(updateRefreshStatus, 60000);
+    setInterval(checkForUpdates, POLL_INTERVAL_MS);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') checkForUpdates();
+    });
   } catch (err) {
     streamEl.innerHTML = '';
     const error = document.createElement('p');
