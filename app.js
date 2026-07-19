@@ -1,6 +1,9 @@
 const WATERLINE_KEY = 'reader:waterline';
 const THEME_KEY = 'reader:theme';
+const VIEW_KEY = 'reader:view';
 const REFRESH_INTERVAL_MINUTES = 30;
+const DASHBOARD_ITEMS_PER_CATEGORY = 8;
+const CATEGORY_ORDER = ['Notícias', 'Tecnologia', 'Ciência', 'Cultura & Entretenimento', 'Jogos', 'Opinião'];
 
 const SOURCE_PALETTE = [
   '#e87ba4',
@@ -67,6 +70,7 @@ const sidebarListEl = document.getElementById('sidebar-feed-list');
 const siteTitleEl = document.querySelector('.site-title');
 const backToTopEl = document.getElementById('back-to-top');
 const categoryMenuEl = document.getElementById('category-menu');
+const viewToggleEl = document.getElementById('view-toggle');
 
 const state = {
   items: [],
@@ -76,6 +80,7 @@ const state = {
   sourceFilter: null,
   categoryFilter: null,
   generatedAt: null,
+  viewMode: readViewMode(),
 };
 
 function readWaterline() {
@@ -83,6 +88,10 @@ function readWaterline() {
   if (!stored) return null;
   const date = new Date(stored);
   return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function readViewMode() {
+  return localStorage.getItem(VIEW_KEY) === 'dashboard' ? 'dashboard' : 'river';
 }
 
 function isNew(item) {
@@ -150,18 +159,34 @@ function renderWaterlineMarker() {
   return marker;
 }
 
+function renderEmptyMessage() {
+  const empty = document.createElement('p');
+  empty.className = 'empty';
+  empty.textContent = state.items.length === 0
+    ? 'nenhum item disponível.'
+    : 'nada encontrado para essa busca.';
+  return empty;
+}
+
+function currentQuery() {
+  return searchEl.value.trim().toLowerCase();
+}
+
+function render() {
+  if (state.viewMode === 'dashboard') {
+    renderDashboard(currentQuery());
+  } else {
+    renderStream(currentQuery());
+  }
+}
+
 function renderStream(query) {
   const filtered = filterItems(state.items, query);
   const animateEntrance = !state.initialRenderDone;
   streamEl.innerHTML = '';
 
   if (filtered.length === 0) {
-    const empty = document.createElement('p');
-    empty.className = 'empty';
-    empty.textContent = state.items.length === 0
-      ? 'nenhum item disponível.'
-      : 'nada encontrado para essa busca.';
-    streamEl.appendChild(empty);
+    streamEl.appendChild(renderEmptyMessage());
     disconnectObserver();
     closureEl.classList.remove('is-visible');
     state.initialRenderDone = true;
@@ -190,6 +215,108 @@ function renderStream(query) {
   } else {
     setupAmbientClosure(filtered);
   }
+}
+
+function renderDashboard(query) {
+  disconnectObserver();
+  closureEl.classList.remove('is-visible');
+
+  const filtered = filterItems(state.items, query);
+  const animateEntrance = !state.initialRenderDone;
+  streamEl.innerHTML = '';
+  state.initialRenderDone = true;
+
+  if (filtered.length === 0) {
+    streamEl.appendChild(renderEmptyMessage());
+    return;
+  }
+
+  const groups = new Map();
+  filtered.forEach((item) => {
+    const category = item.category || 'Outros';
+    if (!groups.has(category)) groups.set(category, []);
+    groups.get(category).push(item);
+  });
+
+  const categories = [...groups.keys()].sort((a, b) => {
+    const indexA = CATEGORY_ORDER.indexOf(a);
+    const indexB = CATEGORY_ORDER.indexOf(b);
+    if (indexA === -1 && indexB === -1) return a.localeCompare(b, 'pt-BR', { sensitivity: 'base' });
+    if (indexA === -1) return 1;
+    if (indexB === -1) return -1;
+    return indexA - indexB;
+  });
+
+  const fragment = document.createDocumentFragment();
+  categories.forEach((category) => {
+    fragment.appendChild(renderDashboardSection(category, groups.get(category), animateEntrance));
+  });
+  streamEl.appendChild(fragment);
+}
+
+function renderDashboardSection(category, items, animateEntrance) {
+  const section = document.createElement('section');
+  section.className = 'dashboard-section';
+
+  const heading = document.createElement('h2');
+  heading.className = 'dashboard-section-title';
+  heading.textContent = category;
+  heading.style.setProperty('--cat-hue', categoryColor(category));
+
+  const [heroItem, ...restItems] = items.slice(0, DASHBOARD_ITEMS_PER_CATEGORY);
+  const hero = renderDashboardCard(heroItem, { hero: true, animate: animateEntrance });
+
+  const grid = document.createElement('div');
+  grid.className = 'dashboard-grid';
+  restItems.forEach((item, index) => {
+    grid.appendChild(renderDashboardCard(item, { animate: animateEntrance, delay: Math.min(index, 8) * 30 }));
+  });
+
+  section.append(heading, hero, grid);
+  return section;
+}
+
+function renderDashboardCard(item, { hero = false, animate = false, delay = 0 } = {}) {
+  const card = document.createElement('article');
+  card.className = 'dashboard-card'
+    + (hero ? ' dashboard-card--hero' : '')
+    + (isNew(item) ? ' is-new' : '')
+    + (animate ? '' : ' no-enter-anim');
+  if (animate) card.style.animationDelay = `${delay}ms`;
+  card.style.setProperty('--cat-hue', sourceColor(item.source, item.category));
+
+  const meta = document.createElement('p');
+  meta.className = 'dashboard-card-meta';
+
+  const source = document.createElement('span');
+  source.className = 'dashboard-card-source';
+  source.textContent = item.source;
+
+  const date = document.createElement('span');
+  date.className = 'dashboard-card-date';
+  date.textContent = formatDate(item.date);
+
+  meta.append(source, date);
+
+  const title = document.createElement(hero ? 'h2' : 'h3');
+  title.className = 'dashboard-card-title';
+  const link = document.createElement('a');
+  link.href = item.link;
+  link.target = '_blank';
+  link.rel = 'noopener noreferrer';
+  link.textContent = item.title;
+  title.appendChild(link);
+
+  card.append(meta, title);
+
+  if (hero && item.summary) {
+    const summary = document.createElement('p');
+    summary.className = 'dashboard-card-summary';
+    summary.textContent = item.summary;
+    card.append(summary);
+  }
+
+  return card;
 }
 
 function renderItem(item, animateIndex) {
@@ -286,7 +413,7 @@ function renderSidebar(items) {
   allBtn.addEventListener('click', () => {
     state.sourceFilter = null;
     renderSidebar(state.items);
-    renderStream(searchEl.value.trim().toLowerCase());
+    render();
   });
   allLi.append(allBtn);
   sidebarListEl.append(allLi);
@@ -310,7 +437,7 @@ function renderSidebar(items) {
     btn.addEventListener('click', () => {
       state.sourceFilter = state.sourceFilter === source ? null : source;
       renderSidebar(state.items);
-      renderStream(searchEl.value.trim().toLowerCase());
+      render();
     });
 
     li.append(btn);
@@ -332,7 +459,7 @@ function renderCategoryMenu(items) {
   allBtn.addEventListener('click', () => {
     state.categoryFilter = null;
     renderCategoryMenu(state.items);
-    renderStream(searchEl.value.trim().toLowerCase());
+    render();
   });
   categoryMenuEl.append(allBtn);
 
@@ -345,7 +472,7 @@ function renderCategoryMenu(items) {
     btn.addEventListener('click', () => {
       state.categoryFilter = state.categoryFilter === category ? null : category;
       renderCategoryMenu(state.items);
-      renderStream(searchEl.value.trim().toLowerCase());
+      render();
     });
     categoryMenuEl.append(btn);
   });
@@ -437,7 +564,7 @@ async function loadReader() {
     state.generatedAt = data.generatedAt || null;
     renderSidebar(state.items);
     renderCategoryMenu(state.items);
-    renderStream('');
+    render();
     updateRefreshStatus();
     setInterval(updateRefreshStatus, 60000);
   } catch (err) {
@@ -477,8 +604,29 @@ function toggleTheme() {
 updateThemeToggleButton(getEffectiveTheme());
 themeToggleEl.addEventListener('click', toggleTheme);
 
+function updateViewToggleButton(mode) {
+  viewToggleEl.classList.toggle('is-active', mode === 'dashboard');
+  const label = mode === 'dashboard' ? 'voltar ao modo lista' : 'alternar para modo mosaico';
+  viewToggleEl.setAttribute('aria-label', label);
+  viewToggleEl.setAttribute('aria-pressed', String(mode === 'dashboard'));
+  viewToggleEl.title = label;
+}
+
+function setViewMode(mode) {
+  state.viewMode = mode;
+  document.documentElement.dataset.view = mode;
+  localStorage.setItem(VIEW_KEY, mode);
+  updateViewToggleButton(mode);
+  render();
+}
+
+updateViewToggleButton(state.viewMode);
+viewToggleEl.addEventListener('click', () => {
+  setViewMode(state.viewMode === 'dashboard' ? 'river' : 'dashboard');
+});
+
 searchEl.addEventListener('input', () => {
-  renderStream(searchEl.value.trim().toLowerCase());
+  render();
 });
 
 backToTopEl.addEventListener('click', () => {

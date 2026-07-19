@@ -19,6 +19,10 @@
         }
         var meta = document.getElementById('theme-color-meta');
         if (meta) meta.setAttribute('content', resolved === 'dark' ? '#221f1c' : '#faf9f6');
+
+        if (localStorage.getItem('reader:view') === 'dashboard') {
+          document.documentElement.dataset.view = 'dashboard';
+        }
       } catch (err) {}
     })();
   </script>
@@ -50,6 +54,14 @@
           title="gerenciar feeds no GitHub"
           aria-label="gerenciar feeds no GitHub"
         >⚙</a>
+        <button
+          id="view-toggle"
+          class="view-toggle-btn"
+          type="button"
+          aria-label="alternar para modo mosaico"
+          aria-pressed="false"
+          title="modo mosaico"
+        >▦</button>
         <button id="theme-toggle" class="theme-toggle-btn" type="button" aria-label="alternar tema"></button>
       </div>
     </div>
