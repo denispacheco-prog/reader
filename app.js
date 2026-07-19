@@ -37,8 +37,16 @@ const CATEGORY_COLORS = {
   'Opinião': '#eb6834',
 };
 
+const CATEGORY_ALIASES = {
+  'Cultura & Entretenimento': 'Cultura',
+};
+
+function canonicalCategory(name) {
+  return CATEGORY_ALIASES[name] || name;
+}
+
 function categoryColor(name) {
-  return CATEGORY_COLORS[name] || hueFor(name);
+  return CATEGORY_COLORS[canonicalCategory(name)] || hueFor(name);
 }
 
 const SHADE_STEPS = [0, 0.22, -0.18, 0.4, -0.32, 0.12];
@@ -110,9 +118,12 @@ function readCategoryOrder() {
 
 function orderCategories(categories) {
   const base = state.categoryOrder && state.categoryOrder.length ? state.categoryOrder : DEFAULT_CATEGORY_ORDER;
-  const known = base.filter((category) => categories.includes(category));
+  const baseCanonical = base.map(canonicalCategory);
+  const known = categories
+    .filter((category) => baseCanonical.includes(canonicalCategory(category)))
+    .sort((a, b) => baseCanonical.indexOf(canonicalCategory(a)) - baseCanonical.indexOf(canonicalCategory(b)));
   const unknown = categories
-    .filter((category) => !base.includes(category))
+    .filter((category) => !baseCanonical.includes(canonicalCategory(category)))
     .sort((a, b) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }));
   return [...known, ...unknown];
 }
