@@ -75,7 +75,7 @@
       <outline text="New Atlas" title="New Atlas" type="rss" xmlUrl="https://newatlas.com/index.rss" htmlUrl="https://newatlas.com/"/>
       <outline text="Singularity Hub" title="Singularity Hub" type="rss" xmlUrl="https://singularityhub.com/feed/" htmlUrl="https://singularityhub.com/"/>
     </outline>
-    <outline text="Cultura &amp; Entretenimento" title="Cultura &amp; Entretenimento">
+    <outline text="Cultura" title="Cultura">
       <outline text="/Film" title="/Film" type="rss" xmlUrl="https://feeds.feedburner.com/slashfilm" htmlUrl="https://www.slashfilm.com/"/>
       <outline text="Anime News Network" title="Anime News Network" type="rss" xmlUrl="https://www.animenewsnetwork.com/news/rss.xml" htmlUrl="https://www.animenewsnetwork.com/news/"/>
       <outline text="Atlas Obscura" title="Atlas Obscura" type="rss" xmlUrl="https://www.atlasobscura.com/feeds/latest" htmlUrl="https://www.atlasobscura.com/"/>
