@@ -83,6 +83,7 @@ opml_content = """<?xml version="1.0" encoding="UTF-8"?>
       <outline text="MUBI Notebook" title="MUBI Notebook" type="rss" xmlUrl="https://mubi.com/notebook/posts.atom" htmlUrl="https://mubi.com/notebook"/>
       <outline text="NYT — Magazine" title="NYT — Magazine" type="rss" xmlUrl="https://www.nytimes.com/services/xml/rss/nyt/Magazine.xml" htmlUrl="https://www.nytimes.com/section/magazine"/>
       <outline text="NYT — Movies" title="NYT — Movies" type="rss" xmlUrl="https://www.nytimes.com/services/xml/rss/nyt/Movies.xml" htmlUrl="https://www.nytimes.com/section/movies"/>
+      <outline text="Oddity Central" title="Oddity Central" type="rss" xmlUrl="https://feeds.feedburner.com/OddityCentral" htmlUrl="https://www.odditycentral.com/"/>
       <outline text="Pitchfork" title="Pitchfork" type="rss" xmlUrl="https://pitchfork.com/rss/news/" htmlUrl="https://pitchfork.com/news/"/>
       <outline text="Reactor" title="Reactor" type="rss" xmlUrl="https://reactormag.com/feed/" htmlUrl="https://reactormag.com/"/>
       <outline text="Rolling Stone" title="Rolling Stone" type="rss" xmlUrl="https://rollingstone.com.br/feed/" htmlUrl="https://rollingstone.com.br/"/>
