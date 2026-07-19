@@ -311,6 +311,19 @@ html[data-view="dashboard"] main {
   border-bottom-color: var(--cat-hue, var(--muted));
 }
 
+.category-menu-btn[draggable="true"] {
+  cursor: grab;
+}
+
+.category-menu-btn.is-dragging {
+  opacity: 0.35;
+}
+
+.category-menu-btn.drag-over {
+  border-bottom-color: var(--fg);
+  border-bottom-style: dashed;
+}
+
 main {
   padding-bottom: 3rem;
 }

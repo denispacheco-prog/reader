@@ -1,9 +1,10 @@
 const WATERLINE_KEY = 'reader:waterline';
 const THEME_KEY = 'reader:theme';
 const VIEW_KEY = 'reader:view';
+const CATEGORY_ORDER_KEY = 'reader:categoryOrder';
 const REFRESH_INTERVAL_MINUTES = 30;
 const DASHBOARD_ITEMS_PER_CATEGORY = 8;
-const CATEGORY_ORDER = ['Notícias', 'Tecnologia', 'Ciência', 'Cultura & Entretenimento', 'Jogos', 'Opinião'];
+const DEFAULT_CATEGORY_ORDER = ['Notícias', 'Tecnologia', 'Ciência', 'Futurismo', 'Cultura', 'Jogos', 'Opinião'];
 
 const SOURCE_PALETTE = [
   '#e87ba4',
@@ -29,7 +30,8 @@ const CATEGORY_COLORS = {
   'Notícias': '#008300',
   'Tecnologia': '#2a78d6',
   'Ciência': '#0891b2',
-  'Cultura & Entretenimento': '#e87ba4',
+  'Futurismo': '#74b9ff',
+  'Cultura': '#c2255c',
   'Jogos': '#4a3aa7',
   'Opinião': '#eb6834',
 };
@@ -81,6 +83,8 @@ const state = {
   categoryFilter: null,
   generatedAt: null,
   viewMode: readViewMode(),
+  categoryOrder: readCategoryOrder(),
+  draggedCategory: null,
 };
 
 function readWaterline() {
@@ -92,6 +96,31 @@ function readWaterline() {
 
 function readViewMode() {
   return localStorage.getItem(VIEW_KEY) === 'dashboard' ? 'dashboard' : 'river';
+}
+
+function readCategoryOrder() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(CATEGORY_ORDER_KEY));
+    return Array.isArray(stored) ? stored.filter((c) => typeof c === 'string') : null;
+  } catch (err) {
+    return null;
+  }
+}
+
+function orderCategories(categories) {
+  const base = state.categoryOrder && state.categoryOrder.length ? state.categoryOrder : DEFAULT_CATEGORY_ORDER;
+  const known = base.filter((category) => categories.includes(category));
+  const unknown = categories
+    .filter((category) => !base.includes(category))
+    .sort((a, b) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }));
+  return [...known, ...unknown];
+}
+
+function moveCategory(order, category, targetCategory) {
+  const next = order.filter((c) => c !== category);
+  const targetIndex = next.indexOf(targetCategory);
+  next.splice(targetIndex === -1 ? next.length : targetIndex, 0, category);
+  return next;
 }
 
 function isNew(item) {
@@ -238,14 +267,7 @@ function renderDashboard(query) {
     groups.get(category).push(item);
   });
 
-  const categories = [...groups.keys()].sort((a, b) => {
-    const indexA = CATEGORY_ORDER.indexOf(a);
-    const indexB = CATEGORY_ORDER.indexOf(b);
-    if (indexA === -1 && indexB === -1) return a.localeCompare(b, 'pt-BR', { sensitivity: 'base' });
-    if (indexA === -1) return 1;
-    if (indexB === -1) return -1;
-    return indexA - indexB;
-  });
+  const categories = orderCategories([...groups.keys()]);
 
   const fragment = document.createDocumentFragment();
   categories.forEach((category) => {
@@ -446,9 +468,8 @@ function renderSidebar(items) {
 }
 
 function renderCategoryMenu(items) {
-  const categories = [...new Set(items.map((item) => item.category).filter(Boolean))].sort((a, b) =>
-    a.localeCompare(b, 'pt-BR', { sensitivity: 'base' })
-  );
+  const categories = orderCategories([...new Set(items.map((item) => item.category).filter(Boolean))]);
+  state.categoryOrder = categories;
 
   categoryMenuEl.innerHTML = '';
 
@@ -466,6 +487,7 @@ function renderCategoryMenu(items) {
   categories.forEach((category) => {
     const btn = document.createElement('button');
     btn.type = 'button';
+    btn.draggable = true;
     btn.className = 'category-menu-btn' + (state.categoryFilter === category ? ' is-active' : '');
     btn.textContent = category;
     btn.style.setProperty('--cat-hue', categoryColor(category));
@@ -474,6 +496,38 @@ function renderCategoryMenu(items) {
       renderCategoryMenu(state.items);
       render();
     });
+
+    btn.addEventListener('dragstart', (event) => {
+      state.draggedCategory = category;
+      event.dataTransfer.effectAllowed = 'move';
+      event.dataTransfer.setData('text/plain', category);
+      btn.classList.add('is-dragging');
+    });
+    btn.addEventListener('dragend', () => {
+      btn.classList.remove('is-dragging');
+      state.draggedCategory = null;
+    });
+    btn.addEventListener('dragover', (event) => {
+      if (!state.draggedCategory || state.draggedCategory === category) return;
+      event.preventDefault();
+      event.dataTransfer.dropEffect = 'move';
+      btn.classList.add('drag-over');
+    });
+    btn.addEventListener('dragleave', () => {
+      btn.classList.remove('drag-over');
+    });
+    btn.addEventListener('drop', (event) => {
+      event.preventDefault();
+      btn.classList.remove('drag-over');
+      const dragged = state.draggedCategory;
+      if (!dragged || dragged === category) return;
+      const newOrder = moveCategory(state.categoryOrder, dragged, category);
+      state.categoryOrder = newOrder;
+      localStorage.setItem(CATEGORY_ORDER_KEY, JSON.stringify(newOrder));
+      renderCategoryMenu(state.items);
+      render();
+    });
+
     categoryMenuEl.append(btn);
   });
 }
