@@ -1,7 +1,7 @@
-opml_content = """<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <opml version="1.0">
   <head>
-    <title>Feeds — reader (Denis) - Atualizado</title>
+    <title>Feeds — reader (Denis)</title>
   </head>
   <body>
     <outline text="Notícias" title="Notícias">
@@ -52,7 +52,6 @@ opml_content = """<?xml version="1.0" encoding="UTF-8"?>
       <outline text="Ars Technica — Science" title="Ars Technica — Science" type="rss" xmlUrl="https://feeds.arstechnica.com/arstechnica/science" htmlUrl="https://arstechnica.com/science/"/>
       <outline text="Folha de S.Paulo — Ciência" title="Folha de S.Paulo — Ciência" type="rss" xmlUrl="https://feeds.folha.uol.com.br/ciencia/rss091.xml" htmlUrl="https://www1.folha.uol.com.br/ciencia/"/>
       <outline text="Futurity" title="Futurity" type="rss" xmlUrl="https://www.futurity.org/feed/" htmlUrl="https://www.futurity.org/"/>
-      <outline text="IEEE Spectrum" title="IEEE Spectrum" type="rss" xmlUrl="https://spectrum.ieee.org/feeds/feed.rss" htmlUrl="https://spectrum.ieee.org/"/>
       <outline text="Nature" title="Nature" type="rss" xmlUrl="https://www.nature.com/nature/current_issue/rss" htmlUrl="https://www.nature.com/nature/"/>
       <outline text="Nautilus" title="Nautilus" type="rss" xmlUrl="https://nautil.us/feed/" htmlUrl="https://nautil.us/"/>
       <outline text="New Scientist" title="New Scientist" type="rss" xmlUrl="https://www.newscientist.com/feed/home/" htmlUrl="https://www.newscientist.com/"/>
@@ -68,18 +67,31 @@ opml_content = """<?xml version="1.0" encoding="UTF-8"?>
       <outline text="The Conversation" title="The Conversation" type="rss" xmlUrl="https://theconversation.com/br/articles.atom" htmlUrl="https://theconversation.com/br"/>
       <outline text="The Guardian — Science" title="The Guardian — Science" type="rss" xmlUrl="https://www.theguardian.com/science/rss" htmlUrl="https://www.theguardian.com/science"/>
     </outline>
+    <outline text="Futurismo" title="Futurismo">
+      <outline text="Benedict Evans" title="Benedict Evans" type="rss" xmlUrl="https://www.ben-evans.com/benedictevans?format=rss" htmlUrl="https://www.ben-evans.com/"/>
+      <outline text="Futurism.com" title="Futurism.com" type="rss" xmlUrl="https://futurism.com/feed" htmlUrl="https://futurism.com/"/>
+      <outline text="IEEE Spectrum" title="IEEE Spectrum" type="rss" xmlUrl="https://spectrum.ieee.org/feeds/feed.rss" htmlUrl="https://spectrum.ieee.org/"/>
+      <outline text="Interesting Engineering" title="Interesting Engineering" type="rss" xmlUrl="https://interestingengineering.com/feed" htmlUrl="https://interestingengineering.com/"/>
+      <outline text="New Atlas" title="New Atlas" type="rss" xmlUrl="https://newatlas.com/index.rss" htmlUrl="https://newatlas.com/"/>
+      <outline text="Singularity Hub" title="Singularity Hub" type="rss" xmlUrl="https://singularityhub.com/feed/" htmlUrl="https://singularityhub.com/"/>
+    </outline>
     <outline text="Cultura &amp; Entretenimento" title="Cultura &amp; Entretenimento">
       <outline text="/Film" title="/Film" type="rss" xmlUrl="https://feeds.feedburner.com/slashfilm" htmlUrl="https://www.slashfilm.com/"/>
       <outline text="Anime News Network" title="Anime News Network" type="rss" xmlUrl="https://www.animenewsnetwork.com/news/rss.xml" htmlUrl="https://www.animenewsnetwork.com/news/"/>
+      <outline text="Atlas Obscura" title="Atlas Obscura" type="rss" xmlUrl="https://www.atlasobscura.com/feeds/latest" htmlUrl="https://www.atlasobscura.com/"/>
       <outline text="BBC Culture" title="BBC Culture" type="rss" xmlUrl="https://www.bbc.com/culture/feed.rss" htmlUrl="https://www.bbc.com/culture"/>
       <outline text="Bleeding Cool" title="Bleeding Cool" type="rss" xmlUrl="https://www.bleedingcool.com/feed/" htmlUrl="https://www.bleedingcool.com/"/>
+      <outline text="Boing Boing" title="Boing Boing" type="rss" xmlUrl="https://boingboing.net/feed" htmlUrl="https://boingboing.net/"/>
       <outline text="Collider" title="Collider" type="rss" xmlUrl="https://www.collider.com/feed/" htmlUrl="https://collider.com/"/>
+      <outline text="Damn Interesting" title="Damn Interesting" type="rss" xmlUrl="https://www.damninteresting.com/feed/" htmlUrl="https://www.damninteresting.com/"/>
       <outline text="Deadline" title="Deadline" type="rss" xmlUrl="https://www.deadline.com/feed/" htmlUrl="https://deadline.com/"/>
       <outline text="Decider" title="Decider" type="rss" xmlUrl="https://decider.com/feed/" htmlUrl="https://decider.com/"/>
       <outline text="GeekTyrant" title="GeekTyrant" type="rss" xmlUrl="https://geektyrant.com/news/atom.xml" htmlUrl="https://geektyrant.com/"/>
       <outline text="Hyperallergic" title="Hyperallergic" type="rss" xmlUrl="https://hyperallergic.com/feed/" htmlUrl="https://hyperallergic.com/"/>
       <outline text="IndieWire" title="IndieWire" type="rss" xmlUrl="https://www.indiewire.com/feed/" htmlUrl="https://www.indiewire.com/"/>
       <outline text="io9" title="io9" type="rss" xmlUrl="https://io9.gizmodo.com/rss" htmlUrl="https://gizmodo.com/io9"/>
+      <outline text="Kottke" title="Kottke" type="rss" xmlUrl="https://kottke.org/index.xml" htmlUrl="https://kottke.org/"/>
+      <outline text="Laughing Squid" title="Laughing Squid" type="rss" xmlUrl="https://laughingsquid.com/feed/" htmlUrl="https://laughingsquid.com/"/>
       <outline text="MUBI Notebook" title="MUBI Notebook" type="rss" xmlUrl="https://mubi.com/notebook/posts.atom" htmlUrl="https://mubi.com/notebook"/>
       <outline text="NYT — Magazine" title="NYT — Magazine" type="rss" xmlUrl="https://www.nytimes.com/services/xml/rss/nyt/Magazine.xml" htmlUrl="https://www.nytimes.com/section/magazine"/>
       <outline text="NYT — Movies" title="NYT — Movies" type="rss" xmlUrl="https://www.nytimes.com/services/xml/rss/nyt/Movies.xml" htmlUrl="https://www.nytimes.com/section/movies"/>
@@ -127,9 +139,4 @@ opml_content = """<?xml version="1.0" encoding="UTF-8"?>
       <outline text="The New Yorker — News" title="The New Yorker — News" type="rss" xmlUrl="https://www.newyorker.com/feed/news" htmlUrl="https://www.newyorker.com/news"/>
     </outline>
   </body>
-</opml>"""
-
-with open("feeds-atualizado.opml", "w", encoding="utf-8") as f:
-    f.write(opml_content)
-
-print("File created.")
+</opml>
