@@ -4,23 +4,30 @@
     <title>Feeds — reader (Denis)</title>
   </head>
   <body>
-    <outline text="Notícias" title="Notícias">
+    <outline text="Brasil" title="Brasil">
       <outline text="Agência Pública" title="Agência Pública" type="rss" xmlUrl="https://apublica.org/feed/" htmlUrl="https://apublica.org/"/>
+      <outline text="BBC Brasil" title="BBC Brasil" type="rss" xmlUrl="https://feeds.bbci.co.uk/portuguese/rss.xml" htmlUrl="https://www.bbc.com/portuguese"/>
+      <outline text="Folha de S.Paulo — Cotidiano" title="Folha de S.Paulo — Cotidiano" type="rss" xmlUrl="https://feeds.folha.uol.com.br/cotidiano/rss091.xml" htmlUrl="https://www1.folha.uol.com.br/cotidiano/"/>
+      <outline text="Folha de S.Paulo — Em Cima da Hora" title="Folha de S.Paulo — Em Cima da Hora" type="rss" xmlUrl="https://feeds.folha.uol.com.br/emcimadahora/rss091.xml" htmlUrl="https://www1.folha.uol.com.br/emcimadahora/"/>
+      <outline text="Folha de S.Paulo — Poder" title="Folha de S.Paulo — Poder" type="rss" xmlUrl="https://feeds.folha.uol.com.br/poder/rss091.xml" htmlUrl="https://www1.folha.uol.com.br/poder/"/>
+      <outline text="Gama Revista" title="Gama Revista" type="rss" xmlUrl="https://gamarevista.com.br/feed/" htmlUrl="https://gamarevista.com.br/"/>
+      <outline text="Poder360" title="Poder360" type="rss" xmlUrl="https://www.poder360.com.br/feed/" htmlUrl="https://www.poder360.com.br/"/>
+      <outline text="Quatro Cinco Um" title="Quatro Cinco Um" type="rss" xmlUrl="https://quatrocincoum.com.br/feed/" htmlUrl="https://quatrocincoum.com.br/"/>
+      <outline text="Revista piauí" title="Revista piauí" type="rss" xmlUrl="https://piaui.folha.uol.com.br/feed/" htmlUrl="https://piaui.folha.uol.com.br/"/>
+      <outline text="Sumaúma" title="Sumaúma" type="rss" xmlUrl="https://sumauma.com/feed/" htmlUrl="https://sumauma.com/"/>
+    </outline>
+    <outline text="Mundo" title="Mundo">
       <outline text="Al Jazeera English" title="Al Jazeera English" type="rss" xmlUrl="https://www.aljazeera.com/xml/rss/all.xml" htmlUrl="https://www.aljazeera.com/"/>
       <outline text="Axios" title="Axios" type="rss" xmlUrl="https://www.axios.com/feeds/feed.rss" htmlUrl="https://www.axios.com/"/>
-      <outline text="BBC Brasil" title="BBC Brasil" type="rss" xmlUrl="https://feeds.bbci.co.uk/portuguese/rss.xml" htmlUrl="https://www.bbc.com/portuguese"/>
       <outline text="BBC Brasil — Internacional" title="BBC Brasil — Internacional" type="rss" xmlUrl="https://feeds.bbci.co.uk/portuguese/internacional/rss.xml" htmlUrl="https://www.bbc.com/portuguese/topics/cz74k717pw5t"/>
       <outline text="BBC News" title="BBC News" type="rss" xmlUrl="https://feeds.bbci.co.uk/news/rss.xml" htmlUrl="https://www.bbc.com/news"/>
       <outline text="BBC News — Asia" title="BBC News — Asia" type="rss" xmlUrl="https://feeds.bbci.co.uk/news/world/asia/rss.xml" htmlUrl="https://www.bbc.com/news/world/asia"/>
       <outline text="Bellingcat" title="Bellingcat" type="rss" xmlUrl="https://www.bellingcat.com/feed/" htmlUrl="https://www.bellingcat.com/"/>
       <outline text="Carbon Brief" title="Carbon Brief" type="rss" xmlUrl="https://www.carbonbrief.org/feed/" htmlUrl="https://www.carbonbrief.org/"/>
-      <outline text="Folha de S.Paulo — Cotidiano" title="Folha de S.Paulo — Cotidiano" type="rss" xmlUrl="https://feeds.folha.uol.com.br/cotidiano/rss091.xml" htmlUrl="https://www1.folha.uol.com.br/cotidiano/"/>
-      <outline text="Folha de S.Paulo — Em Cima da Hora" title="Folha de S.Paulo — Em Cima da Hora" type="rss" xmlUrl="https://feeds.folha.uol.com.br/emcimadahora/rss091.xml" htmlUrl="https://www1.folha.uol.com.br/emcimadahora/"/>
       <outline text="Folha de S.Paulo — Mundo" title="Folha de S.Paulo — Mundo" type="rss" xmlUrl="https://feeds.folha.uol.com.br/mundo/rss091.xml" htmlUrl="https://www1.folha.uol.com.br/mundo/"/>
       <outline text="NPR" title="NPR" type="rss" xmlUrl="https://www.npr.org/rss/rss.php?id=1007" htmlUrl="https://www.npr.org/"/>
       <outline text="Nikkei Asia" title="Nikkei Asia" type="rss" xmlUrl="https://asia.nikkei.com/rss/feed/nar" htmlUrl="https://asia.nikkei.com/"/>
       <outline text="NYT — Top Stories" title="NYT — Top Stories" type="rss" xmlUrl="https://www.nytimes.com/services/xml/rss/nyt/HomePage.xml" htmlUrl="https://www.nytimes.com/"/>
-      <outline text="Poder360" title="Poder360" type="rss" xmlUrl="https://www.poder360.com.br/feed/" htmlUrl="https://www.poder360.com.br/"/>
       <outline text="Rest of World" title="Rest of World" type="rss" xmlUrl="https://restofworld.org/feed/" htmlUrl="https://restofworld.org/"/>
       <outline text="South China Morning Post" title="South China Morning Post" type="rss" xmlUrl="https://www.scmp.com/rss/91/feed" htmlUrl="https://www.scmp.com/"/>
       <outline text="The Guardian — World" title="The Guardian — World" type="rss" xmlUrl="https://www.theguardian.com/world/rss" htmlUrl="https://www.theguardian.com/world"/>
@@ -132,18 +139,13 @@
       <outline text="Respec" title="Respec" type="rss" xmlUrl="https://www.respec.net/feed" htmlUrl="https://www.respec.net/"/>
       <outline text="Rock Paper Shotgun" title="Rock Paper Shotgun" type="rss" xmlUrl="https://www.rockpapershotgun.com/feed" htmlUrl="https://www.rockpapershotgun.com/"/>
     </outline>
-    <outline text="Opinião" title="Opinião">
+    <outline text="Ensaios" title="Ensaios">
       <outline text="Data Is Plural" title="Data Is Plural" type="rss" xmlUrl="https://www.data-is-plural.com/feed/" htmlUrl="https://www.data-is-plural.com/"/>
-      <outline text="Folha de S.Paulo — Poder" title="Folha de S.Paulo — Poder" type="rss" xmlUrl="https://feeds.folha.uol.com.br/poder/rss091.xml" htmlUrl="https://www1.folha.uol.com.br/poder/"/>
-      <outline text="Gama Revista" title="Gama Revista" type="rss" xmlUrl="https://gamarevista.com.br/feed/" htmlUrl="https://gamarevista.com.br/"/>
       <outline text="Jacobin" title="Jacobin" type="rss" xmlUrl="https://jacobinmag.com/feed/" htmlUrl="https://jacobin.com/"/>
       <outline text="Le Monde Diplomatique" title="Le Monde Diplomatique" type="rss" xmlUrl="https://diplomatique.org.br/feed/" htmlUrl="https://diplomatique.org.br/"/>
       <outline text="Longreads" title="Longreads" type="rss" xmlUrl="https://longreads.com/feed/" htmlUrl="https://longreads.com/"/>
       <outline text="n+1" title="n+1" type="rss" xmlUrl="https://www.nplusonemag.com/feed/" htmlUrl="https://www.nplusonemag.com/"/>
       <outline text="Noema Magazine" title="Noema Magazine" type="rss" xmlUrl="https://www.noemamag.com/feed/" htmlUrl="https://www.noemamag.com/"/>
-      <outline text="Quatro Cinco Um" title="Quatro Cinco Um" type="rss" xmlUrl="https://quatrocincoum.com.br/feed/" htmlUrl="https://quatrocincoum.com.br/"/>
-      <outline text="Revista piauí" title="Revista piauí" type="rss" xmlUrl="https://piaui.folha.uol.com.br/feed/" htmlUrl="https://piaui.folha.uol.com.br/"/>
-      <outline text="Sumaúma" title="Sumaúma" type="rss" xmlUrl="https://sumauma.com/feed/" htmlUrl="https://sumauma.com/"/>
       <outline text="The Atlantic" title="The Atlantic" type="rss" xmlUrl="https://feeds.feedburner.com/TheAtlantic" htmlUrl="https://www.theatlantic.com/"/>
       <outline text="The Baffler" title="The Baffler" type="rss" xmlUrl="https://thebaffler.com/feed" htmlUrl="https://thebaffler.com/"/>
       <outline text="The Guardian — Datablog" title="The Guardian — Datablog" type="rss" xmlUrl="https://www.theguardian.com/news/datablog/rss" htmlUrl="https://www.theguardian.com/news/datablog"/>

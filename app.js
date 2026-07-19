@@ -5,7 +5,7 @@ const CATEGORY_ORDER_KEY = 'reader:categoryOrder';
 const REFRESH_INTERVAL_MINUTES = 30;
 const POLL_INTERVAL_MS = 120000;
 const DASHBOARD_ITEMS_PER_CATEGORY = 8;
-const DEFAULT_CATEGORY_ORDER = ['Notícias', 'Tecnologia', 'Ciência', 'Futurismo', 'Cultura', 'Jogos', 'Opinião'];
+const DEFAULT_CATEGORY_ORDER = ['Brasil', 'Mundo', 'Tecnologia', 'Ciência', 'Futurismo', 'Cultura', 'Jogos', 'Ensaios'];
 
 const SOURCE_PALETTE = [
   '#e87ba4',
@@ -28,13 +28,14 @@ function hueFor(name) {
 }
 
 const CATEGORY_COLORS = {
-  'Notícias': '#008300',
+  'Brasil': '#008300',
+  'Mundo': '#1baf7a',
   'Tecnologia': '#2a78d6',
   'Ciência': '#0891b2',
   'Futurismo': '#74b9ff',
   'Cultura': '#c2255c',
   'Jogos': '#4a3aa7',
-  'Opinião': '#eb6834',
+  'Ensaios': '#eb6834',
 };
 
 const CATEGORY_ALIASES = {
