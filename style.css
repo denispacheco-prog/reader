@@ -547,14 +547,17 @@ main {
 }
 
 .dashboard-cover {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  grid-auto-flow: dense;
+  display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
 }
 
+.dashboard-cover .dashboard-card {
+  flex: 1 1 220px;
+}
+
 .dashboard-card--cover-featured {
-  grid-column: span 2;
+  flex: 2 1 380px;
 }
 
 @keyframes dashboard-card-enter {
@@ -619,12 +622,11 @@ main {
   -webkit-line-clamp: 2;
 }
 
-.dashboard-card--cover-featured .dashboard-card-title {
-  font-size: 1.6rem;
+.dashboard-card--cover-featured {
+  padding: 1.2rem 1.4rem;
 }
 
 .dashboard-card--cover-featured .dashboard-card-summary {
-  font-size: 0.95rem;
   -webkit-line-clamp: 3;
 }
 
@@ -695,13 +697,13 @@ main {
     padding-top: 1.75rem;
   }
 
-  .dashboard-grid,
-  .dashboard-cover {
+  .dashboard-grid {
     grid-template-columns: 1fr;
   }
 
+  .dashboard-cover .dashboard-card,
   .dashboard-card--cover-featured {
-    grid-column: span 1;
+    flex-basis: 100%;
   }
 }
 
