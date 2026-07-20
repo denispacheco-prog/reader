@@ -176,6 +176,12 @@ function formatDateShort(isoDate) {
   return `${day} ${month}`;
 }
 
+function formatUpdatedAt(isoDate) {
+  const time = new Date(isoDate).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  const label = dayLabel(isoDate);
+  return label === 'hoje' ? `atualizado às ${time}` : `atualizado ${label} às ${time}`;
+}
+
 function startOfDay(date) {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 }
@@ -306,6 +312,14 @@ function renderDashboardCover(categories, groups, animateEntrance) {
   const heading = document.createElement('h2');
   heading.className = 'dashboard-section-title';
   heading.textContent = 'Capa';
+  section.append(heading);
+
+  if (state.generatedAt) {
+    const updated = document.createElement('p');
+    updated.className = 'dashboard-cover-updated';
+    updated.textContent = formatUpdatedAt(state.generatedAt);
+    section.append(updated);
+  }
 
   const grid = document.createElement('div');
   grid.className = 'dashboard-cover';
@@ -321,7 +335,7 @@ function renderDashboardCover(categories, groups, animateEntrance) {
     }));
   });
 
-  section.append(heading, grid);
+  section.append(grid);
   return section;
 }
 

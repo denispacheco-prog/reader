@@ -11,6 +11,8 @@ const OUTPUT_PATH = path.join(ROOT, 'reader.json');
 const WINDOW_DAYS = 7;
 const FETCH_TIMEOUT_MS = 10000;
 const SUMMARY_MAX_LENGTH = 500;
+const FETCH_USER_AGENT =
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
 
 const parser = new Parser();
 
@@ -70,7 +72,10 @@ async function fetchFeedItems(feed) {
   const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
   try {
-    const response = await fetch(feed.xmlUrl, { signal: controller.signal });
+    const response = await fetch(feed.xmlUrl, {
+      signal: controller.signal,
+      headers: { 'User-Agent': FETCH_USER_AGENT },
+    });
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`);
     }

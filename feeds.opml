@@ -88,7 +88,7 @@
       <outline text="New Atlas" title="New Atlas" type="rss" xmlUrl="https://newatlas.com/index.rss" htmlUrl="https://newatlas.com/"/>
       <outline text="Singularity Hub" title="Singularity Hub" type="rss" xmlUrl="https://singularityhub.com/feed/" htmlUrl="https://singularityhub.com/"/>
     </outline>
-    <outline text="Cultura &amp; Entretenimento" title="Cultura &amp; Entretenimento">
+    <outline text="Cultura" title="Cultura">
       <outline text="/Film" title="/Film" type="rss" xmlUrl="https://feeds.feedburner.com/slashfilm" htmlUrl="https://www.slashfilm.com/"/>
       <outline text="Anime News Network" title="Anime News Network" type="rss" xmlUrl="https://www.animenewsnetwork.com/news/rss.xml" htmlUrl="https://www.animenewsnetwork.com/news/"/>
       <outline text="Atlas Obscura" title="Atlas Obscura" type="rss" xmlUrl="https://www.atlasobscura.com/feeds/latest" htmlUrl="https://www.atlasobscura.com/"/>
@@ -140,7 +140,7 @@
       <outline text="Rock Paper Shotgun" title="Rock Paper Shotgun" type="rss" xmlUrl="https://www.rockpapershotgun.com/feed" htmlUrl="https://www.rockpapershotgun.com/"/>
     </outline>
     <outline text="Ensaios" title="Ensaios">
-      <outline text="Data Is Plural" title="Data Is Plural" type="rss" xmlUrl="https://www.data-is-plural.com/feed/" htmlUrl="https://www.data-is-plural.com/"/>
+      <outline text="Data Is Plural" title="Data Is Plural" type="rss" xmlUrl="https://www.data-is-plural.com/feed.xml" htmlUrl="https://www.data-is-plural.com/"/>
       <outline text="Jacobin" title="Jacobin" type="rss" xmlUrl="https://jacobinmag.com/feed/" htmlUrl="https://jacobin.com/"/>
       <outline text="Le Monde Diplomatique" title="Le Monde Diplomatique" type="rss" xmlUrl="https://diplomatique.org.br/feed/" htmlUrl="https://diplomatique.org.br/"/>
       <outline text="Longreads" title="Longreads" type="rss" xmlUrl="https://longreads.com/feed/" htmlUrl="https://longreads.com/"/>
