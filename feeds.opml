@@ -62,6 +62,7 @@
       <outline text="Ars Technica — Science" title="Ars Technica — Science" type="rss" xmlUrl="https://feeds.arstechnica.com/arstechnica/science" htmlUrl="https://arstechnica.com/science/"/>
       <outline text="Folha de S.Paulo — Ciência" title="Folha de S.Paulo — Ciência" type="rss" xmlUrl="https://feeds.folha.uol.com.br/ciencia/rss091.xml" htmlUrl="https://www1.folha.uol.com.br/ciencia/"/>
       <outline text="Futurity" title="Futurity" type="rss" xmlUrl="https://www.futurity.org/feed/" htmlUrl="https://www.futurity.org/"/>
+      <outline text="Live Science" title="Live Science" type="rss" xmlUrl="https://www.livescience.com/feeds.xml" htmlUrl="https://www.livescience.com/"/>
       <outline text="NASA" title="NASA" type="rss" xmlUrl="https://www.nasa.gov/news-release/feed/" htmlUrl="https://www.nasa.gov/"/>
       <outline text="Nature" title="Nature" type="rss" xmlUrl="https://www.nature.com/nature/current_issue/rss" htmlUrl="https://www.nature.com/nature/"/>
       <outline text="Nautilus" title="Nautilus" type="rss" xmlUrl="https://nautil.us/feed/" htmlUrl="https://nautil.us/"/>
