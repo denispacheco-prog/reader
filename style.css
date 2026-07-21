@@ -193,6 +193,7 @@ main,
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 0.5rem;
 }
 
@@ -258,21 +259,25 @@ html[data-view="dashboard"] main {
 
 .search-input {
   font-family: inherit;
-  font-size: 0.95rem;
+  font-size: 0.82rem;
   color: var(--fg);
   background: transparent;
   border: none;
   border-bottom: 1px solid var(--rule);
-  padding: 0.4rem 0.1rem;
+  padding: 0.25rem 0.1rem;
   outline: none;
+  width: 6.5rem;
+  transition: width 200ms ease, border-color 150ms ease;
 }
 
 .search-input:focus {
   border-bottom-color: var(--fg);
+  width: 10rem;
 }
 
 .search-input::placeholder {
   color: var(--muted);
+  opacity: 0.7;
 }
 
 .category-menu {
@@ -745,6 +750,14 @@ main {
 
   .site-header {
     padding-top: 1.75rem;
+  }
+
+  .search-input {
+    width: 5rem;
+  }
+
+  .search-input:focus {
+    width: 8rem;
   }
 
   .dashboard-grid {
