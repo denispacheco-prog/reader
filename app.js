@@ -2,6 +2,7 @@ const WATERLINE_KEY = 'reader:waterline';
 const THEME_KEY = 'reader:theme';
 const VIEW_KEY = 'reader:view';
 const CATEGORY_ORDER_KEY = 'reader:categoryOrder';
+const SAVED_KEY = 'reader:saved';
 const REFRESH_INTERVAL_MINUTES = 30;
 const POLL_INTERVAL_MS = 120000;
 const DASHBOARD_ITEMS_PER_CATEGORY = 8;
@@ -19,12 +20,16 @@ const SOURCE_PALETTE = [
   '#eb6834',
 ];
 
-function hueFor(name) {
+function hashString(str) {
   let hash = 0;
-  for (let i = 0; i < name.length; i++) {
-    hash = (hash * 31 + name.charCodeAt(i)) >>> 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash * 31 + str.charCodeAt(i)) >>> 0;
   }
-  return SOURCE_PALETTE[hash % SOURCE_PALETTE.length];
+  return hash;
+}
+
+function hueFor(name) {
+  return SOURCE_PALETTE[hashString(name) % SOURCE_PALETTE.length];
 }
 
 const CATEGORY_COLORS = {
@@ -64,11 +69,7 @@ function shadeColor(hex, ratio) {
 function sourceColor(name, category) {
   if (!category) return hueFor(name);
 
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) {
-    hash = (hash * 31 + name.charCodeAt(i)) >>> 0;
-  }
-  const step = SHADE_STEPS[hash % SHADE_STEPS.length];
+  const step = SHADE_STEPS[hashString(name) % SHADE_STEPS.length];
   return shadeColor(categoryColor(category), step);
 }
 
@@ -83,6 +84,7 @@ const siteTitleEl = document.querySelector('.site-title');
 const backToTopEl = document.getElementById('back-to-top');
 const categoryMenuEl = document.getElementById('category-menu');
 const viewToggleEl = document.getElementById('view-toggle');
+const savedToggleEl = document.getElementById('saved-toggle');
 
 const state = {
   items: [],
@@ -95,6 +97,9 @@ const state = {
   viewMode: readViewMode(),
   categoryOrder: readCategoryOrder(),
   draggedCategory: null,
+  selectedLink: null,
+  saved: readSaved(),
+  savedFilterActive: false,
 };
 
 function readWaterline() {
@@ -115,6 +120,43 @@ function readCategoryOrder() {
   } catch (err) {
     return null;
   }
+}
+
+function readSaved() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(SAVED_KEY));
+    return stored && typeof stored === 'object' && !Array.isArray(stored) ? stored : {};
+  } catch (err) {
+    return {};
+  }
+}
+
+function isSaved(link) {
+  return Object.prototype.hasOwnProperty.call(state.saved, link);
+}
+
+function toggleSaved(item) {
+  if (isSaved(item.link)) {
+    delete state.saved[item.link];
+  } else {
+    state.saved[item.link] = {
+      title: item.title,
+      link: item.link,
+      source: item.source,
+      category: item.category,
+      date: item.date,
+      summary: item.summary,
+    };
+  }
+  localStorage.setItem(SAVED_KEY, JSON.stringify(state.saved));
+}
+
+function getSavedItemsSorted() {
+  return Object.values(state.saved).sort((a, b) => new Date(b.date) - new Date(a.date));
+}
+
+function activeItems() {
+  return state.savedFilterActive ? getSavedItemsSorted() : state.items;
 }
 
 function orderCategories(categories) {
@@ -217,9 +259,11 @@ function renderWaterlineMarker() {
 function renderEmptyMessage() {
   const empty = document.createElement('p');
   empty.className = 'empty';
-  empty.textContent = state.items.length === 0
-    ? 'nenhum item disponível.'
-    : 'nada encontrado para essa busca.';
+  if (activeItems().length === 0) {
+    empty.textContent = state.savedFilterActive ? 'nenhum item salvo.' : 'nenhum item disponível.';
+  } else {
+    empty.textContent = 'nada encontrado para essa busca.';
+  }
   return empty;
 }
 
@@ -233,10 +277,11 @@ function render() {
   } else {
     renderStream(currentQuery());
   }
+  syncSelectionAfterRender();
 }
 
 function renderStream(query) {
-  const filtered = filterItems(state.items, query);
+  const filtered = filterItems(activeItems(), query);
   const animateEntrance = !state.initialRenderDone;
   streamEl.innerHTML = '';
 
@@ -264,7 +309,7 @@ function renderStream(query) {
   streamEl.appendChild(fragment);
   state.initialRenderDone = true;
 
-  if (query) {
+  if (query || state.savedFilterActive) {
     disconnectObserver();
     closureEl.classList.remove('is-visible');
   } else {
@@ -276,7 +321,7 @@ function renderDashboard(query) {
   disconnectObserver();
   closureEl.classList.remove('is-visible');
 
-  const filtered = filterItems(state.items, query);
+  const filtered = filterItems(activeItems(), query);
   const animateEntrance = !state.initialRenderDone;
   streamEl.innerHTML = '';
   state.initialRenderDone = true;
@@ -323,7 +368,7 @@ function renderDashboardCover(categories, groups, animateEntrance) {
 
   const grid = document.createElement('div');
   grid.className = 'dashboard-cover';
-  const featuredIndex = Math.floor(Math.random() * categories.length);
+  const featuredIndex = hashString(state.generatedAt || '') % categories.length;
   categories.forEach((category, index) => {
     const item = groups.get(category)[0];
     if (!item) return;
@@ -401,7 +446,35 @@ function renderDashboardCard(item, { hero = false, cover = false, featured = fal
   date.className = 'dashboard-card-date';
   date.textContent = formatDateShort(item.date);
 
-  meta.append(source, date);
+  const saveBtn = document.createElement('button');
+  saveBtn.type = 'button';
+  saveBtn.className = 'save-btn' + (isSaved(item.link) ? ' is-saved' : '');
+  const saveLabel = isSaved(item.link) ? 'remover dos salvos' : 'salvar';
+  saveBtn.title = saveLabel;
+  saveBtn.setAttribute('aria-label', saveLabel);
+  saveBtn.textContent = isSaved(item.link) ? '★' : '☆';
+  saveBtn.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    toggleSaved(item);
+    const anchor = captureScrollAnchor();
+    render();
+    restoreScrollAnchor(anchor);
+  });
+
+  const copyBtn = document.createElement('button');
+  copyBtn.type = 'button';
+  copyBtn.className = 'copy-link-btn';
+  copyBtn.title = 'copiar link';
+  copyBtn.setAttribute('aria-label', 'copiar link');
+  copyBtn.textContent = '⧉';
+  copyBtn.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    copyLink(item.link, copyBtn);
+  });
+
+  meta.append(source, date, saveBtn, copyBtn);
 
   card.append(title, meta);
 
@@ -445,6 +518,22 @@ function renderItem(item, animateIndex) {
   date.className = 'item-date';
   date.textContent = formatDate(item.date);
 
+  const saveBtn = document.createElement('button');
+  saveBtn.type = 'button';
+  saveBtn.className = 'save-btn' + (isSaved(item.link) ? ' is-saved' : '');
+  const saveLabel = isSaved(item.link) ? 'remover dos salvos' : 'salvar';
+  saveBtn.title = saveLabel;
+  saveBtn.setAttribute('aria-label', saveLabel);
+  saveBtn.textContent = isSaved(item.link) ? '★' : '☆';
+  saveBtn.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    toggleSaved(item);
+    const anchor = captureScrollAnchor();
+    render();
+    restoreScrollAnchor(anchor);
+  });
+
   const copyBtn = document.createElement('button');
   copyBtn.type = 'button';
   copyBtn.className = 'copy-link-btn';
@@ -457,7 +546,7 @@ function renderItem(item, animateIndex) {
     copyLink(item.link, copyBtn);
   });
 
-  meta.append(date, copyBtn);
+  meta.append(date, saveBtn, copyBtn);
 
   const title = document.createElement('h2');
   title.className = 'item-title';
@@ -618,7 +707,39 @@ sidebarToggleEl.addEventListener('click', () => {
 });
 
 document.addEventListener('keydown', (event) => {
-  if (event.key === 'Escape') setSidebarOpen(false);
+  const active = document.activeElement;
+  const isInteractive = !!active && (
+    ['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON', 'A'].includes(active.tagName) ||
+    active.isContentEditable
+  );
+
+  if (event.key === '/') {
+    if (active !== searchEl) {
+      event.preventDefault();
+      searchEl.focus();
+    }
+    return;
+  }
+
+  if (event.key === 'Escape') {
+    setSidebarOpen(false);
+    if (active === searchEl) active.blur();
+    clearSelection();
+    return;
+  }
+
+  if (isInteractive) return;
+
+  if (event.key === 'j' || event.key === 'ArrowDown') {
+    event.preventDefault();
+    moveSelection(1);
+  } else if (event.key === 'k' || event.key === 'ArrowUp') {
+    event.preventDefault();
+    moveSelection(-1);
+  } else if (event.key === 'o' || event.key === 'Enter') {
+    event.preventDefault();
+    openSelected();
+  }
 });
 
 document.addEventListener('click', (event) => {
@@ -697,6 +818,55 @@ function restoreScrollAnchor(anchor) {
   const el = streamEl.querySelector(`[data-link="${cssEscape(anchor.link)}"]`);
   if (!el) return;
   window.scrollBy(0, el.getBoundingClientRect().top - anchor.offset);
+}
+
+function getNavigableItems() {
+  return [...streamEl.querySelectorAll('[data-link]')];
+}
+
+function setSelection(link) {
+  if (state.selectedLink) {
+    const prevEl = streamEl.querySelector(`[data-link="${cssEscape(state.selectedLink)}"]`);
+    if (prevEl) prevEl.classList.remove('is-selected');
+  }
+  state.selectedLink = link;
+  const el = streamEl.querySelector(`[data-link="${cssEscape(link)}"]`);
+  if (el) {
+    el.classList.add('is-selected');
+    el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
+}
+
+function clearSelection() {
+  if (!state.selectedLink) return;
+  const el = streamEl.querySelector(`[data-link="${cssEscape(state.selectedLink)}"]`);
+  if (el) el.classList.remove('is-selected');
+  state.selectedLink = null;
+}
+
+function moveSelection(delta) {
+  const navItems = getNavigableItems();
+  if (navItems.length === 0) return;
+  const currentIndex = navItems.findIndex((el) => el.dataset.link === state.selectedLink);
+  const nextIndex = currentIndex === -1
+    ? (delta > 0 ? 0 : navItems.length - 1)
+    : Math.min(Math.max(currentIndex + delta, 0), navItems.length - 1);
+  setSelection(navItems[nextIndex].dataset.link);
+}
+
+function openSelected() {
+  if (!state.selectedLink) return;
+  window.open(state.selectedLink, '_blank', 'noopener,noreferrer');
+}
+
+function syncSelectionAfterRender() {
+  if (!state.selectedLink) return;
+  const el = streamEl.querySelector(`[data-link="${cssEscape(state.selectedLink)}"]`);
+  if (el) {
+    el.classList.add('is-selected');
+  } else {
+    state.selectedLink = null;
+  }
 }
 
 function applyReaderData(data) {
@@ -789,6 +959,25 @@ function setViewMode(mode) {
 updateViewToggleButton(state.viewMode);
 viewToggleEl.addEventListener('click', () => {
   setViewMode(state.viewMode === 'dashboard' ? 'river' : 'dashboard');
+});
+
+function updateSavedToggleButton(active) {
+  savedToggleEl.classList.toggle('is-active', active);
+  const label = active ? 'ver todos os itens' : 'ver itens salvos';
+  savedToggleEl.setAttribute('aria-label', label);
+  savedToggleEl.setAttribute('aria-pressed', String(active));
+  savedToggleEl.title = label;
+}
+
+function setSavedFilterActive(active) {
+  state.savedFilterActive = active;
+  updateSavedToggleButton(active);
+  render();
+}
+
+updateSavedToggleButton(state.savedFilterActive);
+savedToggleEl.addEventListener('click', () => {
+  setSavedFilterActive(!state.savedFilterActive);
 });
 
 searchEl.addEventListener('input', () => {

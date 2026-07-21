@@ -226,7 +226,8 @@ main,
 }
 
 .theme-toggle-btn,
-.view-toggle-btn {
+.view-toggle-btn,
+.saved-toggle-btn {
   border: none;
   background: none;
   cursor: pointer;
@@ -238,12 +239,14 @@ main,
 }
 
 .theme-toggle-btn:hover,
-.view-toggle-btn:hover {
+.view-toggle-btn:hover,
+.saved-toggle-btn:hover {
   opacity: 1;
   color: var(--fg);
 }
 
-.view-toggle-btn.is-active {
+.view-toggle-btn.is-active,
+.saved-toggle-btn.is-active {
   opacity: 1;
   color: var(--accent);
 }
@@ -391,6 +394,7 @@ main {
 }
 
 .item {
+  position: relative;
   padding: 1.85rem 0;
   animation: item-enter 500ms cubic-bezier(0.4, 0, 0.2, 1) both;
 }
@@ -401,6 +405,20 @@ main {
 
 .item:not(.is-new) {
   opacity: 0.78;
+}
+
+.item.is-selected::before {
+  content: "";
+  position: absolute;
+  left: -1.25rem;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--accent);
+}
+
+.item.is-selected {
+  background: color-mix(in srgb, var(--accent) 5%, transparent);
 }
 
 .item-meta {
@@ -437,8 +455,8 @@ main {
   color: var(--muted);
 }
 
-.copy-link-btn {
-  margin-left: auto;
+.copy-link-btn,
+.save-btn {
   border: none;
   background: none;
   cursor: pointer;
@@ -451,8 +469,14 @@ main {
   transition: opacity 150ms ease, color 150ms ease, background 150ms ease;
 }
 
+.save-btn {
+  margin-left: auto;
+}
+
 .copy-link-btn:hover,
-.copy-link-btn:focus-visible {
+.copy-link-btn:focus-visible,
+.save-btn:hover,
+.save-btn:focus-visible {
   opacity: 1;
   color: var(--fg);
   background: color-mix(in srgb, var(--fg) 8%, transparent);
@@ -461,6 +485,20 @@ main {
 .copy-link-btn.copied {
   opacity: 1;
   color: var(--accent);
+}
+
+.save-btn.is-saved {
+  opacity: 1;
+  color: var(--accent);
+}
+
+.dashboard-card-meta .save-btn,
+.dashboard-card-meta .copy-link-btn {
+  opacity: 0.5;
+}
+
+.dashboard-card-meta .save-btn {
+  margin-left: 0;
 }
 
 .item-title {
@@ -652,6 +690,11 @@ main {
 
 .dashboard-card.is-new {
   background: color-mix(in srgb, var(--accent) 6%, var(--bg));
+}
+
+.dashboard-card.is-selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent);
 }
 
 .dashboard-card-meta {
