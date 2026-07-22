@@ -67,6 +67,13 @@ function decodeXml(buffer) {
   }
 }
 
+// Some feeds behind Cloudflare (e.g. Le Monde Diplomatique, New Scientist,
+// Quatro Cinco Um, io9) fetch fine from a residential connection but return
+// zero items when this runs in GitHub Actions — Cloudflare's bot protection
+// tends to challenge/block traffic from cloud datacenter IP ranges even with
+// a normal browser User-Agent. This is a known, accepted limitation (not a
+// bug to chase): those feeds just won't reliably appear via the automated
+// build, though the OPML entry is kept since it works locally.
 async function fetchFeedItems(feed) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);

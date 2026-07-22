@@ -5,7 +5,7 @@ const CATEGORY_ORDER_KEY = 'reader:categoryOrder';
 const SAVED_KEY = 'reader:saved';
 const REFRESH_INTERVAL_MINUTES = 30;
 const POLL_INTERVAL_MS = 120000;
-const DASHBOARD_ITEMS_PER_CATEGORY = 8;
+const DASHBOARD_ITEMS_PER_CATEGORY = 12;
 const DEFAULT_CATEGORY_ORDER = ['Brasil', 'Mundo', 'Tecnologia', 'Ciência', 'Futurismo', 'Cultura', 'Jogos', 'Ensaios'];
 
 const SOURCE_PALETTE = [
