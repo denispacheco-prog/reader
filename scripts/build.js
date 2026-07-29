@@ -10,6 +10,7 @@ const OPML_PATH = path.join(ROOT, 'feeds.opml');
 const OUTPUT_PATH = path.join(ROOT, 'reader.json');
 const WINDOW_DAYS = 7;
 const FETCH_TIMEOUT_MS = 10000;
+const FETCH_CONCURRENCY = 20;
 const SUMMARY_MAX_LENGTH = 500;
 const FETCH_USER_AGENT =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
@@ -123,6 +124,22 @@ function normalizeItem(item, sourceName, category) {
   };
 }
 
+async function mapWithConcurrency(items, limit, fn) {
+  const results = new Array(items.length);
+  let nextIndex = 0;
+
+  async function worker() {
+    while (nextIndex < items.length) {
+      const current = nextIndex++;
+      results[current] = await fn(items[current]);
+    }
+  }
+
+  const workers = Array.from({ length: Math.min(limit, items.length) }, worker);
+  await Promise.all(workers);
+  return results;
+}
+
 function dedupeByLink(items) {
   const byLink = new Map();
   for (const item of items) {
@@ -145,7 +162,7 @@ async function main() {
   }
 
   console.log(`[build] buscando ${feeds.length} feed(s)...`);
-  const results = await Promise.all(feeds.map(fetchFeedItems));
+  const results = await mapWithConcurrency(feeds, FETCH_CONCURRENCY, fetchFeedItems);
   const allItems = results.flat();
 
   const deduped = dedupeByLink(allItems);
