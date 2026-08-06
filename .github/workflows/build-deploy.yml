@@ -2,7 +2,7 @@ name: Build and deploy reader
 
 on:
   schedule:
-    - cron: '*/10 * * * *'
+    - cron: '*/30 * * * *'
   workflow_dispatch: {}
   push:
     branches: [main]
