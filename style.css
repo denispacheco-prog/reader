@@ -506,6 +506,27 @@ main {
   margin-left: 0;
 }
 
+@media (hover: hover) {
+  .copy-link-btn,
+  .save-btn,
+  .dashboard-card-meta .save-btn,
+  .dashboard-card-meta .copy-link-btn {
+    opacity: 0;
+  }
+
+  .item:hover .copy-link-btn,
+  .item:hover .save-btn,
+  .dashboard-card:hover .copy-link-btn,
+  .dashboard-card:hover .save-btn {
+    opacity: 0.4;
+  }
+}
+
+.save-btn.is-saved,
+.copy-link-btn.copied {
+  opacity: 1 !important;
+}
+
 .item-title {
   font-family: var(--font-serif);
   font-size: 1.55rem;
