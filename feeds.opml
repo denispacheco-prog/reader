@@ -70,6 +70,7 @@
       <outline text="NYT — Science" title="NYT — Science" type="rss" xmlUrl="https://www.nytimes.com/services/xml/rss/nyt/Science.xml" htmlUrl="https://www.nytimes.com/section/science"/>
       <outline text="Phys.org" title="Phys.org" type="rss" xmlUrl="https://phys.org/rss-feed/" htmlUrl="https://phys.org/"/>
       <outline text="Quanta Magazine" title="Quanta Magazine" type="rss" xmlUrl="https://www.quantamagazine.org/feed/" htmlUrl="https://www.quantamagazine.org/"/>
+      <outline text="RathBiotaClan" title="RathBiotaClan" type="rss" xmlUrl="https://www.rathbiotaclan.com/feed/" htmlUrl="https://www.rathbiotaclan.com/"/>
       <outline text="Retraction Watch" title="Retraction Watch" type="rss" xmlUrl="https://retractionwatch.com/feed/" htmlUrl="https://retractionwatch.com/"/>
       <outline text="Revista Pesquisa FAPESP" title="Revista Pesquisa FAPESP" type="rss" xmlUrl="https://revistapesquisa.fapesp.br/feed/" htmlUrl="https://revistapesquisa.fapesp.br/"/>
       <outline text="ScienceAlert" title="ScienceAlert" type="rss" xmlUrl="https://feeds.feedburner.com/sciencealert-latestnews" htmlUrl="https://www.sciencealert.com/"/>
