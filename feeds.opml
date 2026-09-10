@@ -21,19 +21,26 @@
       <outline text="Axios" title="Axios" type="rss" xmlUrl="https://www.axios.com/feeds/feed.rss" htmlUrl="https://www.axios.com/"/>
       <outline text="BBC Brasil — Internacional" title="BBC Brasil — Internacional" type="rss" xmlUrl="https://feeds.bbci.co.uk/portuguese/internacional/rss.xml" htmlUrl="https://www.bbc.com/portuguese/topics/cz74k717pw5t"/>
       <outline text="BBC News" title="BBC News" type="rss" xmlUrl="https://feeds.bbci.co.uk/news/rss.xml" htmlUrl="https://www.bbc.com/news"/>
-      <outline text="BBC News — Asia" title="BBC News — Asia" type="rss" xmlUrl="https://feeds.bbci.co.uk/news/world/asia/rss.xml" htmlUrl="https://www.bbc.com/news/world/asia"/>
       <outline text="Bellingcat" title="Bellingcat" type="rss" xmlUrl="https://www.bellingcat.com/feed/" htmlUrl="https://www.bellingcat.com/"/>
       <outline text="Carbon Brief" title="Carbon Brief" type="rss" xmlUrl="https://www.carbonbrief.org/feed/" htmlUrl="https://www.carbonbrief.org/"/>
       <outline text="Folha de S.Paulo — Mundo" title="Folha de S.Paulo — Mundo" type="rss" xmlUrl="https://feeds.folha.uol.com.br/mundo/rss091.xml" htmlUrl="https://www1.folha.uol.com.br/mundo/"/>
       <outline text="NPR" title="NPR" type="rss" xmlUrl="https://www.npr.org/rss/rss.php?id=1007" htmlUrl="https://www.npr.org/"/>
-      <outline text="Nikkei Asia" title="Nikkei Asia" type="rss" xmlUrl="https://asia.nikkei.com/rss/feed/nar" htmlUrl="https://asia.nikkei.com/"/>
       <outline text="NYT — Top Stories" title="NYT — Top Stories" type="rss" xmlUrl="https://www.nytimes.com/services/xml/rss/nyt/HomePage.xml" htmlUrl="https://www.nytimes.com/"/>
       <outline text="Rest of World" title="Rest of World" type="rss" xmlUrl="https://restofworld.org/feed/" htmlUrl="https://restofworld.org/"/>
-      <outline text="South China Morning Post" title="South China Morning Post" type="rss" xmlUrl="https://www.scmp.com/rss/91/feed" htmlUrl="https://www.scmp.com/"/>
       <outline text="The Guardian — World" title="The Guardian — World" type="rss" xmlUrl="https://www.theguardian.com/world/rss" htmlUrl="https://www.theguardian.com/world"/>
-      <outline text="The Japan Times" title="The Japan Times" type="rss" xmlUrl="https://feeds.feedburner.com/japantimes" htmlUrl="https://www.japantimes.co.jp/"/>
       <outline text="The Markup" title="The Markup" type="rss" xmlUrl="https://themarkup.org/feeds/rss.xml" htmlUrl="https://themarkup.org/"/>
       <outline text="Vox" title="Vox" type="rss" xmlUrl="https://www.vox.com/rss/index.xml" htmlUrl="https://www.vox.com/"/>
+    </outline>
+    <outline text="Ásia" title="Ásia">
+      <outline text="BBC News — Asia" title="BBC News — Asia" type="rss" xmlUrl="https://feeds.bbci.co.uk/news/world/asia/rss.xml" htmlUrl="https://www.bbc.com/news/world/asia"/>
+      <outline text="Hong Kong Free Press" title="Hong Kong Free Press" type="rss" xmlUrl="https://hongkongfp.com/feed/" htmlUrl="https://hongkongfp.com/"/>
+      <outline text="Nikkei Asia" title="Nikkei Asia" type="rss" xmlUrl="https://asia.nikkei.com/rss/feed/nar" htmlUrl="https://asia.nikkei.com/"/>
+      <outline text="Sixth Tone" title="Sixth Tone" type="rss" xmlUrl="https://www.sixthtone.com/rss" htmlUrl="https://www.sixthtone.com/"/>
+      <outline text="South China Morning Post" title="South China Morning Post" type="rss" xmlUrl="https://www.scmp.com/rss/91/feed" htmlUrl="https://www.scmp.com/"/>
+      <outline text="Taipei Times" title="Taipei Times" type="rss" xmlUrl="https://www.taipeitimes.com/xml/index.rss" htmlUrl="https://www.taipeitimes.com/"/>
+      <outline text="The Japan Times" title="The Japan Times" type="rss" xmlUrl="https://feeds.feedburner.com/japantimes" htmlUrl="https://www.japantimes.co.jp/"/>
+      <outline text="The Korea Times" title="The Korea Times" type="rss" xmlUrl="https://www.koreatimes.co.kr/www/rss/rss.xml" htmlUrl="https://www.koreatimes.co.kr/"/>
+      <outline text="Yonhap News Agency" title="Yonhap News Agency" type="rss" xmlUrl="https://en.yna.co.kr/RSS/news.xml" htmlUrl="https://en.yna.co.kr/"/>
     </outline>
     <outline text="Tecnologia" title="Tecnologia">
       <outline text="404 Media" title="404 Media" type="rss" xmlUrl="https://www.404media.co/rss/" htmlUrl="https://www.404media.co/"/>

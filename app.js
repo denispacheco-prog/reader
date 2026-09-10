@@ -35,6 +35,7 @@ function hueFor(name) {
 const CATEGORY_COLORS = {
   'Brasil': '#008300',
   'Mundo': '#1baf7a',
+  'Ásia': '#c08a1e',
   'Tecnologia': '#2a78d6',
   'Ciência': '#0891b2',
   'Futurismo': '#74b9ff',
