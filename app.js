@@ -6,6 +6,7 @@ const SAVED_KEY = 'reader:saved';
 const REFRESH_INTERVAL_MINUTES = 30;
 const POLL_INTERVAL_MS = 120000;
 const DASHBOARD_ITEMS_PER_CATEGORY = 12;
+const DASHBOARD_SOURCE_CAP = 4;
 const DEFAULT_CATEGORY_ORDER = ['Brasil', 'Mundo', 'Tecnologia', 'Ciência', 'Futurismo', 'Cultura', 'Jogos', 'Ensaios'];
 
 const SOURCE_PALETTE = [
@@ -385,6 +386,30 @@ function renderDashboardCover(categories, groups, animateEntrance) {
   return section;
 }
 
+function diversifyDashboardItems(items, limit, sourceCap) {
+  const selected = [];
+  const overflow = [];
+  const sourceCounts = new Map();
+
+  for (const item of items) {
+    if (selected.length >= limit) break;
+    const count = sourceCounts.get(item.source) || 0;
+    if (count < sourceCap) {
+      selected.push(item);
+      sourceCounts.set(item.source, count + 1);
+    } else {
+      overflow.push(item);
+    }
+  }
+
+  for (const item of overflow) {
+    if (selected.length >= limit) break;
+    selected.push(item);
+  }
+
+  return selected.sort((a, b) => new Date(b.date) - new Date(a.date));
+}
+
 function renderDashboardSection(category, items, animateEntrance) {
   const section = document.createElement('section');
   section.className = 'dashboard-section';
@@ -394,7 +419,7 @@ function renderDashboardSection(category, items, animateEntrance) {
   heading.textContent = category;
   heading.style.setProperty('--cat-hue', categoryColor(category));
 
-  const [heroItem, ...restItems] = items.slice(0, DASHBOARD_ITEMS_PER_CATEGORY);
+  const [heroItem, ...restItems] = diversifyDashboardItems(items, DASHBOARD_ITEMS_PER_CATEGORY, DASHBOARD_SOURCE_CAP);
   const hero = renderDashboardCard(heroItem, { hero: true, animate: animateEntrance });
 
   const grid = document.createElement('div');
