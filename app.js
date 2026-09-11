@@ -9,6 +9,15 @@ const DASHBOARD_ITEMS_PER_CATEGORY = 12;
 const DASHBOARD_SOURCE_CAP = 4;
 const DEFAULT_CATEGORY_ORDER = ['Brasil', 'Mundo', 'Tecnologia', 'Ciência', 'Futurismo', 'Cultura', 'Jogos', 'Ensaios'];
 
+const CLOSURE_MESSAGES = [
+  'você está em dia.',
+  'tudo lido, por enquanto.',
+  'nada de novo — por agora.',
+  'o rio segue, mas você já viu tudo.',
+  'fim da correnteza de hoje.',
+  'sem novidades. até a próxima leva.',
+];
+
 const SOURCE_PALETTE = [
   '#e87ba4',
   '#0891b2',
@@ -31,6 +40,11 @@ function hashString(str) {
 
 function hueFor(name) {
   return SOURCE_PALETTE[hashString(name) % SOURCE_PALETTE.length];
+}
+
+function closureMessageForToday() {
+  const dayKey = new Date().toISOString().slice(0, 10);
+  return CLOSURE_MESSAGES[hashString(dayKey) % CLOSURE_MESSAGES.length];
 }
 
 const CATEGORY_COLORS = {
@@ -782,6 +796,7 @@ function disconnectObserver() {
 }
 
 function setupAmbientClosure(items) {
+  closureEl.textContent = closureMessageForToday();
   disconnectObserver();
 
   const newItems = items.filter(isNew);
