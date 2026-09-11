@@ -444,19 +444,6 @@ function renderDashboardCard(item, { hero = false, cover = false, featured = fal
   card.style.setProperty('--cat-hue', sourceColor(item.source, item.category));
   card.dataset.link = item.link;
 
-  if (cover && item.image) {
-    const image = document.createElement('img');
-    image.className = 'dashboard-card-image';
-    image.src = item.image;
-    image.alt = '';
-    image.loading = 'lazy';
-    image.decoding = 'async';
-    image.addEventListener('error', () => {
-      image.remove();
-    });
-    card.append(image);
-  }
-
   if ((hero || cover) && item.category) {
     const kicker = document.createElement('p');
     kicker.className = 'dashboard-card-kicker';

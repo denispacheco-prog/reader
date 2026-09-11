@@ -710,15 +710,6 @@ main {
   color: color-mix(in srgb, var(--cat-hue, var(--muted)) 85%, var(--muted));
 }
 
-.dashboard-card--cover .dashboard-card-image {
-  display: block;
-  width: 100%;
-  height: 110px;
-  object-fit: cover;
-  border-radius: 6px;
-  margin: 0 0 0.6rem;
-}
-
 .dashboard-card:hover {
   background: color-mix(in srgb, var(--fg) 5%, var(--bg));
 }
