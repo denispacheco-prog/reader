@@ -12,6 +12,7 @@ const WINDOW_DAYS = 7;
 const FETCH_TIMEOUT_MS = 10000;
 const FETCH_CONCURRENCY = 20;
 const SUMMARY_MAX_LENGTH = 500;
+const IMG_SRC_REGEX = /<img[^>]+src=["']([^"']+)["']/i;
 const FETCH_USER_AGENT =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
 
@@ -102,6 +103,20 @@ async function fetchFeedItems(feed) {
   }
 }
 
+function extractImage(item) {
+  const enclosureUrl = item.enclosure?.url;
+  if (enclosureUrl && (!item.enclosure.type || item.enclosure.type.startsWith('image/'))) {
+    return enclosureUrl;
+  }
+
+  const match = (item.content || '').match(IMG_SRC_REGEX);
+  if (match && /^https?:\/\//i.test(match[1])) {
+    return match[1];
+  }
+
+  return null;
+}
+
 function normalizeItem(item, sourceName, category) {
   const link = item.link;
   const rawDate = item.isoDate || item.pubDate;
@@ -121,6 +136,7 @@ function normalizeItem(item, sourceName, category) {
     category,
     date: date.toISOString(),
     summary,
+    image: extractImage(item) || null,
   };
 }
 
