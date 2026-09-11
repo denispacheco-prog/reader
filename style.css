@@ -710,11 +710,10 @@ main {
   color: color-mix(in srgb, var(--cat-hue, var(--muted)) 85%, var(--muted));
 }
 
-.dashboard-card--hero .dashboard-card-image,
 .dashboard-card--cover .dashboard-card-image {
   display: block;
   width: 100%;
-  aspect-ratio: 16 / 9;
+  height: 110px;
   object-fit: cover;
   border-radius: 6px;
   margin: 0 0 0.6rem;
