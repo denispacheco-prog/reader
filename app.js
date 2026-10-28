@@ -15,14 +15,17 @@ const PAGE_SIZE = 50;
 const MIN_COLUMN_WIDTH = 320;
 const MAX_COLUMN_WIDTH = 440;
 const LOAD_MORE_THRESHOLD_PX = 600;
-const ADDED_CATEGORIES_KEY = 'reader:addedCategories';
+const ADDED_COLUMNS_KEY = 'reader:addedColumns';
+const LEGACY_ADDED_CATEGORIES_KEY = 'reader:addedCategories';
+const HOME_ITEMS_PER_COLUMN = 2;
 const DEFAULT_CATEGORY_ORDER = ['Brasil', 'São Paulo', 'Mundo', 'Tecnologia', 'Ciência', 'Futurismo', 'Cultura', 'Jogos', 'Ensaios'];
 
-// Categories introduced after the deck launched. Decks that already have
-// saved columns get each one inserted once (after `after`); removing the
-// column afterwards sticks.
-const ADDED_CATEGORIES = [
-  { category: 'São Paulo', after: 'Brasil' },
+// Columns introduced after the deck launched. Decks that already have saved
+// columns get each one inserted once, right after the column `after` (or
+// first, when there is no `after`); removing it afterwards sticks.
+const ADDED_COLUMNS = [
+  { type: 'category', value: 'São Paulo', after: 'category:Brasil' },
+  { type: 'home' },
 ];
 
 const SOURCE_PALETTE = [
@@ -278,27 +281,88 @@ function defaultColumns() {
   const legacyOrder = readJson(LEGACY_CATEGORY_ORDER_KEY);
   const order = Array.isArray(legacyOrder) && legacyOrder.length ? legacyOrder : DEFAULT_CATEGORY_ORDER;
   const categories = orderCategories(availableCategories(), order);
-  return [...categories.map((category) => makeColumn('category', category)), makeColumn('saved')];
+  return [
+    makeColumn('home'),
+    ...categories.map((category) => makeColumn('category', category)),
+    makeColumn('saved'),
+  ];
 }
 
-function applyAddedCategories() {
-  const stored = readJson(ADDED_CATEGORIES_KEY);
+function applyAddedColumns() {
+  const stored = readJson(ADDED_COLUMNS_KEY);
   const applied = new Set(Array.isArray(stored) ? stored : []);
+  const legacy = readJson(LEGACY_ADDED_CATEGORIES_KEY);
+  if (Array.isArray(legacy)) {
+    legacy.forEach((category) => applied.add(columnId({ type: 'category', value: category })));
+    storageRemove(LEGACY_ADDED_CATEGORIES_KEY);
+  }
   const available = availableCategories();
   let changed = false;
 
-  ADDED_CATEGORIES.forEach(({ category, after }) => {
-    if (applied.has(category) || !available.includes(category)) return;
-    applied.add(category);
-    const col = makeColumn('category', category);
+  ADDED_COLUMNS.forEach(({ type, value, after }) => {
+    const col = makeColumn(type, value);
+    if (applied.has(col.id)) return;
+    if (type === 'category' && !available.includes(value)) return;
+    applied.add(col.id);
     if (state.columns.some((c) => c.id === col.id)) return;
-    const anchor = state.columns.findIndex((c) => c.type === 'category' && c.value === after);
-    state.columns.splice(anchor === -1 ? 0 : anchor + 1, 0, col);
+    const anchor = after ? state.columns.findIndex((c) => c.id === after) : -1;
+    state.columns.splice(anchor + 1, 0, col);
     changed = true;
   });
 
-  storageSet(ADDED_CATEGORIES_KEY, JSON.stringify([...applied]));
+  storageSet(ADDED_COLUMNS_KEY, JSON.stringify([...applied]));
   if (changed) saveColumns();
+}
+
+// The home column: the newest items of every other column (saved excluded),
+// in deck order, preferring different outlets and never repeating a story.
+// Stories are matched by title too, since sibling feeds (e.g. two Folha
+// sections) publish the same piece under different links.
+function homeSections() {
+  const used = new Set();
+  return state.columns
+    .filter((col) => col.type !== 'home' && col.type !== 'saved')
+    .map((col) => {
+      const items = pickHighlights(itemsForColumn(col), HOME_ITEMS_PER_COLUMN, used);
+      items.forEach((item) => {
+        used.add(item.link);
+        used.add(titleKey(item));
+      });
+      return { col, items };
+    })
+    .filter((section) => section.items.length > 0);
+}
+
+function titleKey(item) {
+  return `title:${item.title.toLowerCase().replace(/\s+/g, ' ').trim()}`;
+}
+
+// "Folha de S.Paulo — Mundo" and "Folha de S.Paulo — Cotidiano" are one outlet
+function outletOf(source) {
+  return source.split(' — ')[0];
+}
+
+function pickHighlights(items, count, used) {
+  const picked = [];
+  const outlets = new Set();
+  const taken = new Set(used);
+  const take = (item) => {
+    picked.push(item);
+    outlets.add(outletOf(item.source));
+    taken.add(item.link);
+    taken.add(titleKey(item));
+  };
+  const isTaken = (item) => taken.has(item.link) || taken.has(titleKey(item));
+
+  for (const item of items) {
+    if (picked.length === count) break;
+    if (!isTaken(item) && !outlets.has(outletOf(item.source))) take(item);
+  }
+  for (const item of items) {
+    if (picked.length === count) break;
+    if (!isTaken(item)) take(item);
+  }
+  return picked.sort((a, b) => new Date(b.date) - new Date(a.date));
 }
 
 function matchesQuery(item, query) {
@@ -355,6 +419,8 @@ function columnInfo(col) {
       return { title: `“${col.value}”`, subtitle: 'busca', icon: '⌕' };
     case 'saved':
       return { title: 'Salvos', subtitle: 'itens salvos', icon: '★' };
+    case 'home':
+      return { title: 'Início', subtitle: 'destaques de cada coluna', icon: '◈' };
     default:
       return { title: 'Tudo', subtitle: 'todas as fontes', icon: '≡' };
   }
@@ -685,6 +751,7 @@ function captureColumnAnchor(view) {
   const body = view.bodyEl;
   if (body.scrollTop < 8) return null;
   for (const card of view.listEl.children) {
+    if (!card.dataset.link) continue;
     if (card.offsetTop + card.offsetHeight > body.scrollTop) {
       return { link: card.dataset.link, offset: card.offsetTop - body.scrollTop };
     }
@@ -692,8 +759,24 @@ function captureColumnAnchor(view) {
   return null;
 }
 
+function renderHomeHeading(col) {
+  const info = columnInfo(col);
+  const heading = el('button', 'home-heading');
+  heading.type = 'button';
+  heading.dataset.columnId = col.id;
+  heading.title = `ir para a coluna ${info.title}`;
+  const icon = el('span', 'home-heading-icon', info.icon);
+  if (info.tint) {
+    icon.style.setProperty('--tint', info.tint);
+    icon.classList.add('has-tint');
+  }
+  heading.append(icon, el('span', 'home-heading-title', info.title), el('span', 'home-heading-more', 'ver coluna →'));
+  return heading;
+}
+
 function renderColumnBody(view, { fromUpdate = false } = {}) {
-  const items = itemsForColumn(view.col);
+  const sections = view.col.type === 'home' ? homeSections() : null;
+  const items = sections ? sections.flatMap((section) => section.items) : itemsForColumn(view.col);
   const anchor = fromUpdate ? captureColumnAnchor(view) : null;
 
   let newCount = 0;
@@ -701,7 +784,8 @@ function renderColumnBody(view, { fromUpdate = false } = {}) {
     newCount = items.filter((item) => !view.knownLinks.has(item.link)).length;
   }
 
-  if (!fromUpdate) view.limit = PAGE_SIZE;
+  if (sections) view.limit = items.length;
+  else if (!fromUpdate) view.limit = PAGE_SIZE;
   else view.limit = Math.max(PAGE_SIZE, view.limit + newCount);
 
   view.items = items;
@@ -709,11 +793,27 @@ function renderColumnBody(view, { fromUpdate = false } = {}) {
   view.cardByLink = new Map();
 
   const fragment = document.createDocumentFragment();
-  items.slice(0, view.limit).forEach((item) => {
+  const appendCard = (item) => {
     const card = renderCard(item, view.col);
     view.cardByLink.set(item.link, card);
     fragment.append(card);
-  });
+    return card;
+  };
+  if (sections) {
+    sections.forEach((section) => {
+      const { tint } = columnInfo(section.col);
+      fragment.append(renderHomeHeading(section.col));
+      section.items.forEach((item) => {
+        const card = appendCard(item);
+        if (tint) {
+          card.style.setProperty('--tint', tint);
+          card.classList.add('has-tint');
+        }
+      });
+    });
+  } else {
+    items.slice(0, view.limit).forEach(appendCard);
+  }
   view.listEl.replaceChildren(fragment);
   updateFooter(view);
 
@@ -734,8 +834,9 @@ function renderColumnBody(view, { fromUpdate = false } = {}) {
 
 function renderDeck() {
   if (!state.columns) state.columns = defaultColumns();
-  applyAddedCategories();
+  applyAddedColumns();
 
+  const signature = state.columns.map((col) => col.id).join('|');
   const previous = state.views;
   state.views = new Map();
   const nodes = [];
@@ -751,6 +852,14 @@ function renderDeck() {
     state.views.set(col.id, view);
     nodes.push(view.el);
   });
+
+  // the home column mirrors the deck, so rebuild it when columns change
+  if (signature !== state.columnSignature) {
+    state.views.forEach((view) => {
+      if (view.col.type === 'home' && previous.has(view.col.id)) renderColumnBody(view);
+    });
+    state.columnSignature = signature;
+  }
 
   if (nodes.length === 0) {
     const empty = el('div', 'deck-empty');
@@ -915,6 +1024,12 @@ function copyLink(link, btn) {
 }
 
 deckEl.addEventListener('click', (event) => {
+  const heading = event.target.closest('.home-heading');
+  if (heading) {
+    focusColumn(state.views.get(heading.dataset.columnId));
+    return;
+  }
+
   const card = event.target.closest('.card');
   if (!card) return;
   const link = card.dataset.link;
@@ -1129,6 +1244,7 @@ function renderAddPanel() {
 
   const grid = el('div', 'add-grid');
   grid.append(
+    addOptionButton({ label: 'Início', detail: `${HOME_ITEMS_PER_COLUMN} destaques de cada coluna`, icon: '◈', type: 'home' }),
     addOptionButton({ label: 'Tudo', detail: 'todas as fontes juntas', icon: '≡', type: 'all' }),
     addOptionButton({ label: 'Salvos', detail: 'itens marcados com ☆', icon: '★', type: 'saved' }),
   );

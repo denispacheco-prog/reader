@@ -613,6 +613,87 @@ button {
   background: var(--card-hover);
 }
 
+/* home column: each block's cards get a faint wash of its column's tone */
+.card.has-tint {
+  background: color-mix(in srgb, var(--tint) 8%, transparent);
+}
+
+.card.has-tint:hover {
+  background: color-mix(in srgb, var(--tint) 14%, transparent);
+}
+
+:root[data-theme="light"] .card.has-tint {
+  background: color-mix(in srgb, var(--tint) 14%, transparent);
+}
+
+:root[data-theme="light"] .card.has-tint:hover {
+  background: color-mix(in srgb, var(--tint) 22%, transparent);
+}
+
+.home-heading {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 14px 8px 15px;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  background: var(--column-bg);
+  text-align: left;
+  cursor: pointer;
+}
+
+.home-heading-icon {
+  width: 18px;
+  text-align: center;
+  font-size: 15px;
+  line-height: 1;
+  color: var(--muted);
+  font-family: var(--font-sans), "Segoe UI Symbol", "Apple Symbols", "Noto Sans Symbols 2", sans-serif;
+}
+
+.home-heading-icon.has-tint {
+  color: var(--tint);
+}
+
+:root[data-theme="light"] .home-heading-icon.has-tint {
+  color: color-mix(in srgb, var(--tint), #000 40%);
+}
+
+.home-heading-title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.home-heading-more {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--muted);
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.home-heading:hover .home-heading-more,
+.home-heading:focus-visible .home-heading-more {
+  opacity: 1;
+}
+
+.home-heading:hover .home-heading-title,
+.home-heading:focus-visible .home-heading-title {
+  color: var(--fg);
+}
+
+.home-heading:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
 /* unseen items: a small dot after the timestamp, like an unread email */
 .card.is-unseen .card-time::after {
   content: "";

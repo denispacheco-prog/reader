@@ -169,6 +169,19 @@ function dedupeByLink(items) {
   return [...byLink.values()];
 }
 
+// Sibling feeds (e.g. two Folha sections) often carry the same story under
+// different links. Keep one copy per headline within each category; expects
+// items sorted newest first, so the newest copy wins.
+function dedupeByTitle(items) {
+  const seen = new Set();
+  return items.filter((item) => {
+    const key = `${item.category}|${item.title.toLowerCase().replace(/\s+/g, ' ').trim()}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 function withinWindow(items, windowDays) {
   const cutoff = Date.now() - windowDays * 24 * 60 * 60 * 1000;
   return items.filter((item) => new Date(item.date).getTime() >= cutoff);
@@ -187,8 +200,9 @@ async function main() {
   const allItems = results.flat();
 
   const deduped = dedupeByLink(allItems);
-  const recent = withinWindow(deduped, WINDOW_DAYS);
-  recent.sort((a, b) => new Date(b.date) - new Date(a.date));
+  const windowed = withinWindow(deduped, WINDOW_DAYS);
+  windowed.sort((a, b) => new Date(b.date) - new Date(a.date));
+  const recent = dedupeByTitle(windowed);
 
   const reader = {
     generatedAt: new Date().toISOString(),
@@ -198,7 +212,9 @@ async function main() {
   };
 
   await writeFile(OUTPUT_PATH, JSON.stringify(reader, null, 2), 'utf-8');
-  console.log(`[build] reader.json gerado com ${recent.length} item(ns).`);
+  console.log(
+    `[build] reader.json gerado com ${recent.length} item(ns) (${windowed.length - recent.length} manchete(s) repetida(s) removida(s)).`,
+  );
 }
 
 main().catch((err) => {
