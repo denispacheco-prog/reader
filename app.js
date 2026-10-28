@@ -7,18 +7,26 @@ const LEGACY_CATEGORY_ORDER_KEY = 'reader:categoryOrder';
 const POLL_INTERVAL_MS = 5 * 60 * 1000;
 const PAGE_SIZE = 50;
 const LOAD_MORE_THRESHOLD_PX = 600;
-const DEFAULT_CATEGORY_ORDER = ['Brasil', 'Mundo', 'Tecnologia', 'Ciência', 'Futurismo', 'Cultura', 'Jogos', 'Ensaios'];
+const ADDED_CATEGORIES_KEY = 'reader:addedCategories';
+const DEFAULT_CATEGORY_ORDER = ['Brasil', 'São Paulo', 'Mundo', 'Tecnologia', 'Ciência', 'Futurismo', 'Cultura', 'Jogos', 'Ensaios'];
+
+// Categories introduced after the deck launched. Decks that already have
+// saved columns get each one inserted once (after `after`); removing the
+// column afterwards sticks.
+const ADDED_CATEGORIES = [
+  { category: 'São Paulo', after: 'Brasil' },
+];
 
 const SOURCE_PALETTE = [
-  '#e87ba4',
-  '#0891b2',
-  '#eda100',
-  '#1baf7a',
-  '#4a3aa7',
-  '#74b9ff',
-  '#008300',
-  '#2a78d6',
-  '#eb6834',
+  '#f5a6c8',
+  '#8ad8d3',
+  '#f3d27e',
+  '#8fd19e',
+  '#d1a6ec',
+  '#94bdf5',
+  '#f4a09c',
+  '#b9b3f6',
+  '#f7bc8c',
 ];
 
 function hashString(str) {
@@ -33,17 +41,38 @@ function hueFor(name) {
   return SOURCE_PALETTE[hashString(name) % SOURCE_PALETTE.length];
 }
 
+// Pastel tones, one distinct hue per category; avatars use dark initials.
 const CATEGORY_COLORS = {
-  'Brasil': '#008300',
-  'Mundo': '#1baf7a',
-  'Ásia': '#c08a1e',
-  'Tecnologia': '#2a78d6',
-  'Ciência': '#0891b2',
-  'Futurismo': '#74b9ff',
-  'Cultura': '#c2255c',
-  'Jogos': '#4a3aa7',
-  'Ensaios': '#eb6834',
+  'Brasil': '#8fd19e',
+  'São Paulo': '#b8c2cf',
+  'Mundo': '#f4a09c',
+  'Ásia': '#f3d27e',
+  'Tecnologia': '#94bdf5',
+  'Ciência': '#8ad8d3',
+  'Futurismo': '#b9b3f6',
+  'Cultura': '#f5a6c8',
+  'Jogos': '#d1a6ec',
+  'Ensaios': '#f7bc8c',
 };
+
+// Neutral glyphs that identify category columns (header + rail). ︎ asks
+// for the text presentation so they stay gray instead of becoming emoji.
+const CATEGORY_SYMBOLS = {
+  'Brasil': '⚑︎',
+  'São Paulo': '⌂',
+  'Mundo': '◎',
+  'Ásia': '◑',
+  'Tecnologia': '⌘',
+  'Ciência': '⚛︎',
+  'Futurismo': '✦',
+  'Cultura': '♫︎',
+  'Jogos': '♟︎',
+  'Ensaios': '¶',
+};
+
+function categorySymbol(name) {
+  return CATEGORY_SYMBOLS[canonicalCategory(name)] || '◆';
+}
 
 const CATEGORY_ALIASES = {
   'Cultura & Entretenimento': 'Cultura',
@@ -57,7 +86,7 @@ function categoryColor(name) {
   return CATEGORY_COLORS[canonicalCategory(name)] || hueFor(name);
 }
 
-const SHADE_STEPS = [0, 0.22, -0.18, 0.4, -0.32, 0.12];
+const SHADE_STEPS = [0, 0.14, -0.1, 0.24, -0.18, 0.07];
 
 function shadeColor(hex, ratio) {
   const target = ratio >= 0 ? 255 : 0;
@@ -91,6 +120,8 @@ const themeToggleEl = document.getElementById('theme-toggle');
 const addDialogEl = document.getElementById('add-dialog');
 const addDialogCloseEl = document.getElementById('add-dialog-close');
 const addPanelEl = document.getElementById('add-panel');
+const railColumnsEl = document.getElementById('rail-columns');
+const compactLayout = window.matchMedia('(max-width: 640px)');
 
 const state = {
   items: [],
@@ -102,6 +133,8 @@ const state = {
   query: '',
   views: new Map(),
   addTab: 'category',
+  draggedColumnId: null,
+  visibilityObserver: null,
 };
 
 // --- storage ---------------------------------------------------------------
@@ -231,6 +264,26 @@ function defaultColumns() {
   return [...categories.map((category) => makeColumn('category', category)), makeColumn('saved')];
 }
 
+function applyAddedCategories() {
+  const stored = readJson(ADDED_CATEGORIES_KEY);
+  const applied = new Set(Array.isArray(stored) ? stored : []);
+  const available = availableCategories();
+  let changed = false;
+
+  ADDED_CATEGORIES.forEach(({ category, after }) => {
+    if (applied.has(category) || !available.includes(category)) return;
+    applied.add(category);
+    const col = makeColumn('category', category);
+    if (state.columns.some((c) => c.id === col.id)) return;
+    const anchor = state.columns.findIndex((c) => c.type === 'category' && c.value === after);
+    state.columns.splice(anchor === -1 ? 0 : anchor + 1, 0, col);
+    changed = true;
+  });
+
+  storageSet(ADDED_CATEGORIES_KEY, JSON.stringify([...applied]));
+  if (changed) saveColumns();
+}
+
 function matchesQuery(item, query) {
   const haystack = `${item.title} ${item.source} ${item.category || ''} ${item.summary}`.toLowerCase();
   return haystack.includes(query);
@@ -270,13 +323,12 @@ function feedCategory(source) {
 function columnInfo(col) {
   switch (col.type) {
     case 'category':
-      return { title: col.value, subtitle: 'categoria', color: categoryColor(col.value), icon: '#' };
+      return { title: col.value, subtitle: 'categoria', icon: categorySymbol(col.value) };
     case 'feed': {
       const category = feedCategory(col.value);
       return {
         title: col.value,
         subtitle: category ? `fonte · ${category}` : 'fonte',
-        color: sourceColor(col.value, category),
         icon: sourceInitial(col.value),
         round: true,
       };
@@ -326,6 +378,18 @@ function moveColumn(id, delta) {
   focusColumn(state.views.get(id));
 }
 
+function moveColumnBefore(id, beforeId) {
+  if (id === beforeId) return;
+  const index = state.columns.findIndex((col) => col.id === id);
+  if (index === -1) return;
+  const [col] = state.columns.splice(index, 1);
+  const target = beforeId ? state.columns.findIndex((c) => c.id === beforeId) : -1;
+  state.columns.splice(target === -1 ? state.columns.length : target, 0, col);
+  saveColumns();
+  renderDeck();
+  focusColumn(state.views.get(id));
+}
+
 function markColumnSeen(id) {
   const col = state.columns.find((c) => c.id === id);
   if (!col) return;
@@ -335,6 +399,8 @@ function markColumnSeen(id) {
   if (view) {
     view.col = col;
     view.cardByLink.forEach((card) => card.classList.remove('is-unseen'));
+    view.hasUnseen = false;
+    updateRailItem(view);
   }
 }
 
@@ -634,6 +700,8 @@ function renderColumnBody(view, { fromUpdate = false } = {}) {
   updateFooter(view);
 
   view.subtitleEl.textContent = `${view.baseSubtitle} · ${items.length}`;
+  view.hasUnseen = items.some((item) => isUnseen(item, view.col));
+  updateRailItem(view);
 
   if (anchor) {
     const card = view.cardByLink.get(anchor.link);
@@ -648,6 +716,7 @@ function renderColumnBody(view, { fromUpdate = false } = {}) {
 
 function renderDeck() {
   if (!state.columns) state.columns = defaultColumns();
+  applyAddedCategories();
 
   const previous = state.views;
   state.views = new Map();
@@ -676,7 +745,112 @@ function renderDeck() {
   }
 
   deckEl.replaceChildren(...nodes);
+  renderRailColumns();
+  observeColumnVisibility();
 }
+
+// --- rail column list ------------------------------------------------------
+
+function renderRailColumns() {
+  const nodes = state.columns.map((col) => {
+    const view = state.views.get(col.id);
+    const info = columnInfo(col);
+    const item = el('button', 'rail-col');
+    item.type = 'button';
+    item.draggable = true;
+    item.dataset.columnId = col.id;
+    item.setAttribute('role', 'listitem');
+    item.title = `${info.title} — clique para ir, arraste para reordenar`;
+    item.setAttribute('aria-label', info.title);
+    item.append(renderColumnIcon(info), el('span', 'rail-col-dot'));
+    view.railEl = item;
+    updateRailItem(view);
+    return item;
+  });
+  railColumnsEl.replaceChildren(...nodes);
+}
+
+function updateRailItem(view) {
+  if (!view.railEl) return;
+  view.railEl.classList.toggle('has-unseen', Boolean(view.hasUnseen));
+}
+
+function observeColumnVisibility() {
+  if (state.visibilityObserver) state.visibilityObserver.disconnect();
+  state.visibilityObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      const view = state.views.get(entry.target.dataset.columnId);
+      if (view && view.railEl) view.railEl.classList.toggle('is-in-view', entry.isIntersecting);
+    });
+  }, { root: deckEl, threshold: 0.6 });
+  state.views.forEach((view) => state.visibilityObserver.observe(view.el));
+}
+
+function clearDropMarkers() {
+  railColumnsEl.querySelectorAll('.drop-before, .drop-after').forEach((node) => {
+    node.classList.remove('drop-before', 'drop-after');
+  });
+}
+
+// Returns the rail item the dragged column should land before (null = end),
+// based on which half of the hovered item the pointer is over.
+function railDropTarget(event) {
+  const horizontal = compactLayout.matches;
+  const items = [...railColumnsEl.querySelectorAll('.rail-col')];
+  for (const item of items) {
+    const rect = item.getBoundingClientRect();
+    const middle = horizontal ? rect.left + rect.width / 2 : rect.top + rect.height / 2;
+    if ((horizontal ? event.clientX : event.clientY) < middle) return item;
+  }
+  return null;
+}
+
+railColumnsEl.addEventListener('click', (event) => {
+  const item = event.target.closest('.rail-col');
+  if (item) focusColumn(state.views.get(item.dataset.columnId));
+});
+
+railColumnsEl.addEventListener('dragstart', (event) => {
+  const item = event.target.closest('.rail-col');
+  if (!item) return;
+  state.draggedColumnId = item.dataset.columnId;
+  event.dataTransfer.effectAllowed = 'move';
+  event.dataTransfer.setData('text/plain', item.dataset.columnId);
+  requestAnimationFrame(() => item.classList.add('is-dragging'));
+});
+
+railColumnsEl.addEventListener('dragover', (event) => {
+  if (!state.draggedColumnId) return;
+  event.preventDefault();
+  event.dataTransfer.dropEffect = 'move';
+  clearDropMarkers();
+  const target = railDropTarget(event);
+  if (target) {
+    target.classList.add('drop-before');
+  } else if (railColumnsEl.lastElementChild) {
+    railColumnsEl.lastElementChild.classList.add('drop-after');
+  }
+});
+
+railColumnsEl.addEventListener('dragleave', (event) => {
+  if (!railColumnsEl.contains(event.relatedTarget)) clearDropMarkers();
+});
+
+railColumnsEl.addEventListener('drop', (event) => {
+  if (!state.draggedColumnId) return;
+  event.preventDefault();
+  const target = railDropTarget(event);
+  const id = state.draggedColumnId;
+  state.draggedColumnId = null;
+  clearDropMarkers();
+  moveColumnBefore(id, target ? target.dataset.columnId : null);
+});
+
+railColumnsEl.addEventListener('dragend', () => {
+  state.draggedColumnId = null;
+  clearDropMarkers();
+  railColumnsEl.querySelectorAll('.is-dragging').forEach((node) => node.classList.remove('is-dragging'));
+});
 
 function refreshAllColumns({ fromUpdate = false } = {}) {
   state.views.forEach((view) => renderColumnBody(view, { fromUpdate }));
@@ -855,8 +1029,7 @@ function renderAddPanel() {
       grid.append(addOptionButton({
         label: category,
         detail: `${n} ${n === 1 ? 'fonte' : 'fontes'}`,
-        color: categoryColor(category),
-        icon: '#',
+        icon: categorySymbol(category),
         type: 'category',
         value: category,
       }));
@@ -881,7 +1054,6 @@ function renderAddPanel() {
           .map((feed) => addOptionButton({
             label: feed.title,
             detail: feed.category,
-            color: sourceColor(feed.title, feed.category),
             icon: sourceInitial(feed.title),
             round: true,
             type: 'feed',

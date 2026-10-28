@@ -16,6 +16,10 @@
       <outline text="Revista piauí" title="Revista piauí" type="rss" xmlUrl="https://piaui.folha.uol.com.br/feed/" htmlUrl="https://piaui.folha.uol.com.br/"/>
       <outline text="Sumaúma" title="Sumaúma" type="rss" xmlUrl="https://sumauma.com/feed/" htmlUrl="https://sumauma.com/"/>
     </outline>
+    <outline text="São Paulo" title="São Paulo">
+      <outline text="g1 São Paulo" title="g1 São Paulo" type="rss" xmlUrl="https://g1.globo.com/rss/g1/sp/sao-paulo/" htmlUrl="https://g1.globo.com/sp/sao-paulo/"/>
+      <outline text="Diário do Transporte" title="Diário do Transporte" type="rss" xmlUrl="https://diariodotransporte.com.br/feed/" htmlUrl="https://diariodotransporte.com.br/"/>
+    </outline>
     <outline text="Mundo" title="Mundo">
       <outline text="Al Jazeera English" title="Al Jazeera English" type="rss" xmlUrl="https://www.aljazeera.com/xml/rss/all.xml" htmlUrl="https://www.aljazeera.com/"/>
       <outline text="Axios" title="Axios" type="rss" xmlUrl="https://www.axios.com/feeds/feed.rss" htmlUrl="https://www.axios.com/"/>

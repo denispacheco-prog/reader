@@ -97,6 +97,122 @@ button {
   flex: 1;
 }
 
+.rail-divider {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 1px;
+  margin: 6px 0;
+  background: var(--border);
+}
+
+.rail-columns {
+  flex: 0 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.rail-col {
+  position: relative;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  cursor: grab;
+  transition: background 0.15s, opacity 0.15s;
+}
+
+.rail-col:active {
+  cursor: grabbing;
+}
+
+.rail-col .column-icon {
+  width: 34px;
+  height: 34px;
+  font-size: 18px;
+  transition: color 0.15s, background 0.15s;
+}
+
+.rail-col:hover .column-icon,
+.rail-col:focus-visible .column-icon {
+  color: var(--fg);
+}
+
+.rail-col:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+/* columns currently on screen get a quiet bar on the rail's left edge */
+.rail-col::before {
+  content: "";
+  position: absolute;
+  left: -8px;
+  top: 10px;
+  bottom: 10px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: transparent;
+  transition: background 0.15s;
+}
+
+.rail-col.is-in-view::before {
+  background: var(--muted);
+}
+
+.rail-col.is-in-view .column-icon {
+  color: var(--fg);
+}
+
+.rail-col-dot {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 2px solid var(--rail-bg);
+  background: var(--accent);
+  opacity: 0;
+}
+
+.rail-col.has-unseen .rail-col-dot {
+  opacity: 1;
+}
+
+.rail-col.is-dragging {
+  opacity: 0.35;
+}
+
+.rail-col.drop-before::after,
+.rail-col.drop-after::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  height: 3px;
+  border-radius: 3px;
+  background: var(--accent);
+}
+
+.rail-col.drop-before::after {
+  top: -4px;
+}
+
+.rail-col.drop-after::after {
+  bottom: -4px;
+}
+
 .rail-btn {
   display: grid;
   place-items: center;
@@ -275,8 +391,10 @@ button {
   border-radius: 8px;
   background: var(--card-hover);
   color: var(--muted);
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 700;
+  line-height: 1;
+  font-family: var(--font-sans), "Segoe UI Symbol", "Apple Symbols", "Noto Sans Symbols 2", sans-serif;
 }
 
 .column-icon.has-color {
@@ -407,9 +525,8 @@ button {
 .card {
   display: flex;
   gap: 10px;
-  padding: 12px 14px 8px 12px;
+  padding: 12px 14px 8px 15px;
   border-bottom: 1px solid var(--border);
-  border-left: 3px solid transparent;
   cursor: pointer;
   transition: background 0.12s;
 }
@@ -418,9 +535,16 @@ button {
   background: var(--card-hover);
 }
 
-.card.is-unseen {
-  border-left-color: var(--accent);
-  background: var(--accent-soft);
+/* unseen items: a small dot after the timestamp, like an unread email */
+.card.is-unseen .card-time::after {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-left: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  vertical-align: 0.15em;
 }
 
 .card-avatar {
@@ -430,7 +554,7 @@ button {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  color: #fff;
+  color: #1f2328;
   font-size: 15px;
   font-weight: 700;
 }
@@ -700,13 +824,56 @@ button {
   }
 
   .rail-logo,
-  .rail-spacer {
+  .rail-spacer,
+  .rail-divider {
     display: none;
   }
 
+  .rail-columns {
+    flex: 1 1 auto;
+    min-width: 0;
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0 4px;
+  }
+
+  .rail-col::before {
+    left: 10px;
+    right: 10px;
+    top: auto;
+    bottom: -6px;
+    width: auto;
+    height: 3px;
+    border-radius: 3px 3px 0 0;
+  }
+
+  .rail-col.drop-before::after,
+  .rail-col.drop-after::after {
+    top: 6px;
+    bottom: 6px;
+    left: auto;
+    right: auto;
+    width: 3px;
+    height: auto;
+  }
+
+  .rail-col.drop-before::after {
+    left: -4px;
+  }
+
+  .rail-col.drop-after::after {
+    right: -4px;
+  }
+
   .rail-status {
-    margin: 0;
-    max-width: 64px;
+    display: none;
+  }
+
+  .rail-btn {
+    width: 38px;
+    height: 38px;
+    flex: 0 0 auto;
   }
 
   .search-pop {
