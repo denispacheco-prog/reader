@@ -58,6 +58,25 @@ function decodeXmlEntities(str) {
     .replace(/&apos;/g, "'");
 }
 
+const HTML_ENTITIES = {
+  amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ',
+  hellip: '…', mdash: '—', ndash: '–',
+  lsquo: '‘', rsquo: '’', ldquo: '“', rdquo: '”', laquo: '«', raquo: '»',
+};
+
+// Some feeds double-encode their titles (e.g. "it&#8217;ll", "&amp;#038;"),
+// so entities survive XML parsing; decode up to two levels.
+function decodeHtmlEntities(str) {
+  const decodeOnce = (s) => s.replace(/&(#\d+|#x[0-9a-f]+|[a-z]+);/gi, (match, code) => {
+    if (code[0] === '#') {
+      const point = code[1].toLowerCase() === 'x' ? parseInt(code.slice(2), 16) : parseInt(code.slice(1), 10);
+      return Number.isFinite(point) && point > 0 && point <= 0x10ffff ? String.fromCodePoint(point) : match;
+    }
+    return HTML_ENTITIES[code.toLowerCase()] ?? match;
+  });
+  return decodeOnce(decodeOnce(str));
+}
+
 function decodeXml(buffer) {
   const preview = Buffer.from(buffer.slice(0, 200)).toString('latin1');
   const match = preview.match(/encoding=["']([^"']+)["']/i);
@@ -114,10 +133,10 @@ function normalizeItem(item, sourceName, category) {
   }
 
   const summaryRaw = item.contentSnippet || item.summary || item.content || '';
-  const summary = summaryRaw.trim().slice(0, SUMMARY_MAX_LENGTH);
+  const summary = decodeHtmlEntities(summaryRaw).trim().slice(0, SUMMARY_MAX_LENGTH);
 
   return {
-    title: (item.title || '(sem título)').trim(),
+    title: decodeHtmlEntities(item.title || '(sem título)').trim(),
     link,
     source: sourceName,
     category,

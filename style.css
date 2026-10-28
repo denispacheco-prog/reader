@@ -140,11 +140,26 @@ button {
   width: 34px;
   height: 34px;
   font-size: 18px;
-  transition: color 0.15s, background 0.15s;
+  opacity: 0.7;
+  transition: color 0.15s, background 0.15s, opacity 0.15s;
+}
+
+/* category/feed columns: only the glyph takes the pastel tone */
+.rail-col .column-icon.has-tint {
+  color: var(--tint);
+}
+
+:root[data-theme="light"] .rail-col .column-icon.has-tint {
+  color: color-mix(in srgb, var(--tint), #000 40%);
 }
 
 .rail-col:hover .column-icon,
 .rail-col:focus-visible .column-icon {
+  opacity: 1;
+}
+
+.rail-col:hover .column-icon:not(.has-tint),
+.rail-col:focus-visible .column-icon:not(.has-tint) {
   color: var(--fg);
 }
 
@@ -171,6 +186,10 @@ button {
 }
 
 .rail-col.is-in-view .column-icon {
+  opacity: 1;
+}
+
+.rail-col.is-in-view .column-icon:not(.has-tint) {
   color: var(--fg);
 }
 
@@ -282,6 +301,45 @@ button {
   white-space: normal;
 }
 
+/* --- fullscreen: rail auto-hides, revealed from the left edge ------------- */
+
+.rail-hotzone {
+  display: none;
+}
+
+@media (min-width: 641px) {
+  :root[data-fullscreen] .rail-hotzone {
+    display: block;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 10px;
+    z-index: 39;
+  }
+
+  :root[data-fullscreen] .rail {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: var(--rail-width);
+    z-index: 40;
+    transform: translateX(-100%);
+    /* linger a moment before hiding so a sloppy mouse doesn't make it flicker */
+    transition: transform 0.2s ease 0.35s, box-shadow 0.2s ease 0.35s;
+  }
+
+  :root[data-fullscreen] .rail:hover,
+  :root[data-fullscreen] .rail:has(:focus-visible),
+  :root[data-fullscreen] .rail-hotzone:hover + .rail,
+  :root[data-fullscreen][data-rail-pinned] .rail {
+    transform: none;
+    box-shadow: var(--shadow);
+    transition-delay: 0s;
+  }
+}
+
 /* --- search -------------------------------------------------------------- */
 
 .search-pop {
@@ -324,6 +382,8 @@ button {
   overflow-x: auto;
   overflow-y: hidden;
   scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: 8px;
   scrollbar-color: var(--border) transparent;
 }
 
@@ -358,6 +418,7 @@ button {
   border: 1px solid var(--border);
   border-radius: 10px;
   overflow: hidden;
+  scroll-snap-align: start;
 }
 
 .column.is-flash {

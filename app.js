@@ -6,6 +6,8 @@ const LEGACY_WATERLINE_KEY = 'reader:waterline';
 const LEGACY_CATEGORY_ORDER_KEY = 'reader:categoryOrder';
 const POLL_INTERVAL_MS = 5 * 60 * 1000;
 const PAGE_SIZE = 50;
+const MIN_COLUMN_WIDTH = 320;
+const MAX_COLUMN_WIDTH = 440;
 const LOAD_MORE_THRESHOLD_PX = 600;
 const ADDED_CATEGORIES_KEY = 'reader:addedCategories';
 const DEFAULT_CATEGORY_ORDER = ['Brasil', 'São Paulo', 'Mundo', 'Tecnologia', 'Ciência', 'Futurismo', 'Cultura', 'Jogos', 'Ensaios'];
@@ -323,13 +325,14 @@ function feedCategory(source) {
 function columnInfo(col) {
   switch (col.type) {
     case 'category':
-      return { title: col.value, subtitle: 'categoria', icon: categorySymbol(col.value) };
+      return { title: col.value, subtitle: 'categoria', icon: categorySymbol(col.value), tint: categoryColor(col.value) };
     case 'feed': {
       const category = feedCategory(col.value);
       return {
         title: col.value,
         subtitle: category ? `fonte · ${category}` : 'fonte',
         icon: sourceInitial(col.value),
+        tint: sourceColor(col.value, category),
         round: true,
       };
     }
@@ -762,7 +765,12 @@ function renderRailColumns() {
     item.setAttribute('role', 'listitem');
     item.title = `${info.title} — clique para ir, arraste para reordenar`;
     item.setAttribute('aria-label', info.title);
-    item.append(renderColumnIcon(info), el('span', 'rail-col-dot'));
+    const icon = renderColumnIcon(info);
+    if (info.tint) {
+      icon.style.setProperty('--tint', info.tint);
+      icon.classList.add('has-tint');
+    }
+    item.append(icon, el('span', 'rail-col-dot'));
     view.railEl = item;
     updateRailItem(view);
     return item;
@@ -932,6 +940,7 @@ document.addEventListener('click', (event) => {
 
 function setSearchOpen(open) {
   searchPopEl.hidden = !open;
+  document.documentElement.toggleAttribute('data-rail-pinned', open);
   searchToggleEl.setAttribute('aria-expanded', String(open));
   searchToggleEl.classList.toggle('is-active', open || Boolean(state.query));
   if (open) searchEl.focus();
@@ -1221,6 +1230,36 @@ async function loadReader() {
 }
 
 refreshEl.addEventListener('click', () => checkForUpdates({ manual: true }));
+
+// --- layout ----------------------------------------------------------------
+
+// Size columns so a whole number of them fits the deck, instead of a fixed
+// width that leaves the last one cut off on smaller screens.
+function fitColumns() {
+  const style = getComputedStyle(deckEl);
+  const gap = parseFloat(style.columnGap) || 0;
+  const available = deckEl.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+  const count = Math.max(1, Math.floor((available + gap) / (MIN_COLUMN_WIDTH + gap)));
+  const width = Math.min(MAX_COLUMN_WIDTH, (available - gap * (count - 1)) / count);
+  deckEl.style.setProperty('--column-width', `${width}px`);
+}
+
+new ResizeObserver(fitColumns).observe(deckEl);
+
+// In fullscreen (F11 or the Fullscreen API) the rail tucks away and slides
+// back in when the mouse touches the left edge (see style.css).
+const fullscreenQuery = window.matchMedia('(display-mode: fullscreen)');
+
+function updateFullscreen() {
+  const browserFullscreen = window.outerWidth >= screen.width && window.outerHeight >= screen.height;
+  const fullscreen = Boolean(document.fullscreenElement) || fullscreenQuery.matches || browserFullscreen;
+  document.documentElement.toggleAttribute('data-fullscreen', fullscreen);
+}
+
+window.addEventListener('resize', updateFullscreen);
+document.addEventListener('fullscreenchange', updateFullscreen);
+fullscreenQuery.addEventListener('change', updateFullscreen);
+updateFullscreen();
 
 // --- theme -----------------------------------------------------------------
 
