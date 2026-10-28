@@ -260,6 +260,23 @@ button {
   background: var(--accent-soft);
 }
 
+#github-token {
+  font-size: 17px;
+  filter: grayscale(1);
+  opacity: 0.6;
+}
+
+#github-token.is-active {
+  filter: none;
+  opacity: 1;
+}
+
+#github-token.has-error {
+  filter: none;
+  opacity: 1;
+  background: color-mix(in srgb, var(--danger) 20%, transparent);
+}
+
 #add-column {
   background: var(--accent);
   color: var(--accent-fg);

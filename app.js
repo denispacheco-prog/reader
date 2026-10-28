@@ -5,6 +5,12 @@ const SEEN_KEY = 'reader:seenCutoff';
 const LEGACY_WATERLINE_KEY = 'reader:waterline';
 const LEGACY_CATEGORY_ORDER_KEY = 'reader:categoryOrder';
 const POLL_INTERVAL_MS = 5 * 60 * 1000;
+const TOKEN_KEY = 'reader:githubToken';
+const LAST_DISPATCH_KEY = 'reader:lastDispatch';
+const DISPATCH_URL = 'https://api.github.com/repos/denispacheco-prog/reader/actions/workflows/build-deploy.yml/dispatches';
+const STALE_AFTER_MS = 10 * 60 * 1000;
+const MANUAL_STALE_AFTER_MS = 2 * 60 * 1000;
+const FOLLOW_UP_CHECKS_MS = [75000, 150000, 240000];
 const PAGE_SIZE = 50;
 const MIN_COLUMN_WIDTH = 320;
 const MAX_COLUMN_WIDTH = 440;
@@ -119,6 +125,7 @@ const searchEl = document.getElementById('search');
 const refreshEl = document.getElementById('refresh');
 const refreshStatusEl = document.getElementById('refresh-status');
 const themeToggleEl = document.getElementById('theme-toggle');
+const githubTokenEl = document.getElementById('github-token');
 const addDialogEl = document.getElementById('add-dialog');
 const addDialogCloseEl = document.getElementById('add-dialog-close');
 const addPanelEl = document.getElementById('add-panel');
@@ -154,6 +161,14 @@ function storageSet(key, value) {
     localStorage.setItem(key, value);
   } catch (err) {
     console.error('[app] falha ao salvar no navegador:', err);
+  }
+}
+
+function storageRemove(key) {
+  try {
+    localStorage.removeItem(key);
+  } catch (err) {
+    console.error('[app] falha ao limpar o navegador:', err);
   }
 }
 
@@ -1176,23 +1191,109 @@ async function checkForUpdates({ manual = false } = {}) {
   if (fetching) return;
   fetching = true;
   refreshEl.classList.add('is-spinning');
+  let fresh = false;
   try {
-    const response = await fetch('reader.json', { cache: 'no-store' });
+    const response = await fetch(`reader.json?t=${Date.now()}`, { cache: 'no-store' });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const data = await response.json();
-    if (data.generatedAt && data.generatedAt === state.generatedAt) {
-      if (manual) flashStatus('sem novidades');
-      return;
+    if (!data.generatedAt || data.generatedAt !== state.generatedAt) {
+      applyReaderData(data);
+      fresh = true;
     }
-    applyReaderData(data);
   } catch (err) {
     if (manual) flashStatus('erro');
     console.error('[app] falha ao verificar atualização:', err);
+    return;
   } finally {
     fetching = false;
     refreshEl.classList.remove('is-spinning');
   }
+
+  if (fresh) clearFollowUps();
+  const dispatch = await maybeTriggerBuild({ manual });
+  if (!manual) return;
+  if (dispatch === 'sent') flashStatus('buscando feeds…');
+  else if (dispatch === 'error') flashStatus('token inválido');
+  else if (!fresh) flashStatus('sem novidades');
 }
+
+// GitHub's own cron for free repos runs hours late, so when the data is stale
+// and this browser has a token, ask GitHub to run the build right away
+// (workflow_dispatch) and re-check a few times while it deploys.
+let followUpTimers = [];
+
+function clearFollowUps() {
+  followUpTimers.forEach(clearTimeout);
+  followUpTimers = [];
+}
+
+async function maybeTriggerBuild({ manual = false } = {}) {
+  const token = storageGet(TOKEN_KEY);
+  if (!token || !state.generatedAt) return 'skipped';
+
+  const now = Date.now();
+  const minAge = manual ? MANUAL_STALE_AFTER_MS : STALE_AFTER_MS;
+  const lastDispatch = Number(storageGet(LAST_DISPATCH_KEY)) || 0;
+  if (now - new Date(state.generatedAt).getTime() < minAge || now - lastDispatch < minAge) {
+    return 'skipped';
+  }
+
+  storageSet(LAST_DISPATCH_KEY, String(now));
+  try {
+    const response = await fetch(DISPATCH_URL, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ ref: 'main' }),
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  } catch (err) {
+    console.error('[app] falha ao pedir um build ao GitHub:', err);
+    githubTokenEl.classList.add('has-error');
+    updateTokenButton();
+    return 'error';
+  }
+
+  githubTokenEl.classList.remove('has-error');
+  updateTokenButton();
+  clearFollowUps();
+  followUpTimers = FOLLOW_UP_CHECKS_MS.map((ms) => setTimeout(checkForUpdates, ms));
+  return 'sent';
+}
+
+function updateTokenButton() {
+  const hasToken = Boolean(storageGet(TOKEN_KEY));
+  const hasError = githubTokenEl.classList.contains('has-error');
+  githubTokenEl.classList.toggle('is-active', hasToken && !hasError);
+  let label = 'configurar token do GitHub para a página pedir dados novos quando estiverem velhos';
+  if (hasToken) {
+    label = hasError
+      ? 'o GitHub recusou o token — clique para trocar ou remover'
+      : 'atualização sob demanda ativada — clique para trocar ou remover o token';
+  }
+  githubTokenEl.title = label;
+  githubTokenEl.setAttribute('aria-label', label);
+}
+
+githubTokenEl.addEventListener('click', () => {
+  const token = window.prompt(
+    'cole um token do GitHub (fine-grained) com permissão "Actions: Read and write" no repositório "reader". deixe em branco e confirme para remover deste navegador.',
+  );
+  if (token === null) return;
+  const trimmed = token.trim();
+  if (trimmed) storageSet(TOKEN_KEY, trimmed);
+  else storageRemove(TOKEN_KEY);
+  storageRemove(LAST_DISPATCH_KEY);
+  githubTokenEl.classList.remove('has-error');
+  updateTokenButton();
+  if (trimmed) checkForUpdates({ manual: true });
+});
+
+updateTokenButton();
 
 let flashTimer = null;
 function flashStatus(text) {
@@ -1207,9 +1308,10 @@ function flashStatus(text) {
 
 async function loadReader() {
   try {
-    const response = await fetch('reader.json', { cache: 'no-store' });
+    const response = await fetch(`reader.json?t=${Date.now()}`, { cache: 'no-store' });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     applyReaderData(await response.json(), { initial: true });
+    maybeTriggerBuild();
   } catch (err) {
     const error = el('p', 'deck-loading', 'não foi possível carregar o Reader. rode "node scripts/build.js" e sirva a pasta com um servidor estático.');
     deckEl.replaceChildren(error);
