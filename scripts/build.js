@@ -32,10 +32,12 @@ function parseOpml(xml) {
     const titleMatch = tag.match(/\btitle="([^"]*)"/) || tag.match(/\btext="([^"]*)"/);
     const title = titleMatch ? decodeXmlEntities(titleMatch[1]) : null;
     const xmlUrlMatch = tag.match(/\bxmlUrl="([^"]*)"/);
+    const htmlUrlMatch = tag.match(/\bhtmlUrl="([^"]*)"/);
 
     if (xmlUrlMatch) {
       feeds.push({
         xmlUrl: decodeXmlEntities(xmlUrlMatch[1]),
+        htmlUrl: htmlUrlMatch ? decodeXmlEntities(htmlUrlMatch[1]) : null,
         title: title || xmlUrlMatch[1],
         category: categoryStack[categoryStack.length - 1] || null,
       });
@@ -172,6 +174,7 @@ async function main() {
   const reader = {
     generatedAt: new Date().toISOString(),
     windowDays: WINDOW_DAYS,
+    feeds: feeds.map(({ title, category, htmlUrl }) => ({ title, category, htmlUrl })),
     items: recent,
   };
 

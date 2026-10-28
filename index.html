@@ -2,102 +2,77 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Reader</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📰</text></svg>" />
   <link rel="stylesheet" href="style.css" />
-  <meta id="theme-color-meta" name="theme-color" content="#faf9f6" />
+  <meta id="theme-color-meta" name="theme-color" content="#0b0f14" />
   <script>
     (function () {
       try {
-        var theme = localStorage.getItem('reader:theme');
-        var resolved = theme === 'light' || theme === 'dark'
-          ? theme
-          : (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-        if (theme === 'light' || theme === 'dark') {
-          document.documentElement.dataset.theme = theme;
-        }
-        var meta = document.getElementById('theme-color-meta');
-        if (meta) meta.setAttribute('content', resolved === 'dark' ? '#221f1c' : '#faf9f6');
-
-        if (localStorage.getItem('reader:view') === 'dashboard') {
-          document.documentElement.dataset.view = 'dashboard';
+        if (localStorage.getItem('reader:theme') === 'light') {
+          document.documentElement.dataset.theme = 'light';
+          var meta = document.getElementById('theme-color-meta');
+          if (meta) meta.setAttribute('content', '#e9edf1');
         }
       } catch (err) {}
     })();
   </script>
 </head>
 <body>
-  <button
-    id="sidebar-toggle"
-    class="sidebar-toggle-btn"
-    type="button"
-    aria-label="mostrar feeds"
-    aria-expanded="false"
-    aria-controls="sidebar"
-  >☰</button>
+  <div class="app">
+    <nav class="rail" aria-label="ações">
+      <div class="rail-logo" title="Reader" aria-hidden="true">📰</div>
 
-  <aside id="sidebar" class="sidebar" aria-hidden="true">
-    <div class="sidebar-header">feeds</div>
-    <ul id="sidebar-feed-list" class="sidebar-feed-list"></ul>
-  </aside>
+      <button id="add-column" class="rail-btn" type="button" title="adicionar coluna" aria-label="adicionar coluna">＋</button>
+      <button id="search-toggle" class="rail-btn" type="button" title="buscar em todas as colunas (/)" aria-label="buscar em todas as colunas" aria-expanded="false" aria-controls="search-pop">⌕</button>
 
-  <header class="site-header">
-    <div class="site-header-row">
-      <h1 class="site-title">📰 Reader</h1>
-      <div class="site-header-actions">
-        <input
-          id="search"
-          class="search-input"
-          type="search"
-          placeholder="Busca..."
-          autocomplete="off"
-        />
-        <a
-          class="feeds-link"
-          href="https://github.com/denispacheco-prog/reader/edit/main/feeds.opml"
-          target="_blank"
-          rel="noopener noreferrer"
-          title="gerenciar feeds no GitHub"
-          aria-label="gerenciar feeds no GitHub"
-        >⚙</a>
-        <button
-          id="saved-toggle"
-          class="saved-toggle-btn"
-          type="button"
-          aria-label="ver itens salvos"
-          aria-pressed="false"
-          title="itens salvos"
-        >☆</button>
-        <button
-          id="view-toggle"
-          class="view-toggle-btn"
-          type="button"
-          aria-label="alternar para modo mosaico"
-          aria-pressed="false"
-          title="modo mosaico"
-        >▦</button>
-        <button id="theme-toggle" class="theme-toggle-btn" type="button" aria-label="alternar tema"></button>
-      </div>
+      <div class="rail-spacer"></div>
+
+      <button id="refresh" class="rail-btn" type="button" title="atualizar agora" aria-label="atualizar agora">↻</button>
+      <span id="refresh-status" class="rail-status" aria-live="polite"></span>
+      <a
+        class="rail-btn"
+        href="https://github.com/denispacheco-prog/reader/edit/main/feeds.opml"
+        target="_blank"
+        rel="noopener noreferrer"
+        title="gerenciar feeds no GitHub"
+        aria-label="gerenciar feeds no GitHub"
+      >⚙</a>
+      <button id="theme-toggle" class="rail-btn" type="button" aria-label="alternar tema"></button>
+    </nav>
+
+    <div id="search-pop" class="search-pop" hidden>
+      <input
+        id="search"
+        class="search-input"
+        type="search"
+        placeholder="Buscar em todas as colunas..."
+        autocomplete="off"
+        aria-label="buscar em todas as colunas"
+      />
     </div>
-    <nav id="category-menu" class="category-menu" aria-label="filtrar por categoria"></nav>
-  </header>
 
-  <main id="stream" aria-live="polite">
-    <p class="loading">carregando...</p>
-  </main>
+    <main id="deck" class="deck" aria-label="colunas">
+      <p class="deck-loading">carregando...</p>
+    </main>
+  </div>
 
-  <p id="ambient-closure" class="ambient-closure">
-    você está em dia.
-  </p>
-
-  <button
-    id="back-to-top"
-    class="back-to-top-btn"
-    type="button"
-    aria-label="voltar ao topo"
-    title="voltar ao topo"
-  >↑</button>
+  <dialog id="add-dialog" class="add-dialog" aria-labelledby="add-dialog-title">
+    <div class="add-dialog-inner">
+      <header class="add-dialog-header">
+        <h2 id="add-dialog-title">Adicionar coluna</h2>
+        <button id="add-dialog-close" class="icon-btn" type="button" aria-label="fechar">✕</button>
+      </header>
+      <div class="add-tabs" role="tablist">
+        <button class="add-tab" type="button" role="tab" data-tab="category">Categoria</button>
+        <button class="add-tab" type="button" role="tab" data-tab="feed">Fonte</button>
+        <button class="add-tab" type="button" role="tab" data-tab="search">Busca</button>
+        <button class="add-tab" type="button" role="tab" data-tab="other">Outras</button>
+      </div>
+      <div id="add-panel" class="add-panel" role="tabpanel"></div>
+    </div>
+  </dialog>
 
   <script type="module" src="app.js"></script>
 </body>

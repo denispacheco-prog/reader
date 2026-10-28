@@ -1,22 +1,13 @@
-const WATERLINE_KEY = 'reader:waterline';
 const THEME_KEY = 'reader:theme';
-const VIEW_KEY = 'reader:view';
-const CATEGORY_ORDER_KEY = 'reader:categoryOrder';
 const SAVED_KEY = 'reader:saved';
-const REFRESH_INTERVAL_MINUTES = 30;
-const POLL_INTERVAL_MS = 120000;
-const DASHBOARD_ITEMS_PER_CATEGORY = 12;
-const DASHBOARD_SOURCE_CAP = 4;
+const COLUMNS_KEY = 'reader:columns';
+const SEEN_KEY = 'reader:seenCutoff';
+const LEGACY_WATERLINE_KEY = 'reader:waterline';
+const LEGACY_CATEGORY_ORDER_KEY = 'reader:categoryOrder';
+const POLL_INTERVAL_MS = 5 * 60 * 1000;
+const PAGE_SIZE = 50;
+const LOAD_MORE_THRESHOLD_PX = 600;
 const DEFAULT_CATEGORY_ORDER = ['Brasil', 'Mundo', 'Tecnologia', 'Ciência', 'Futurismo', 'Cultura', 'Jogos', 'Ensaios'];
-
-const CLOSURE_MESSAGES = [
-  'você está em dia.',
-  'tudo lido, por enquanto.',
-  'nada de novo — por agora.',
-  'o rio segue, mas você já viu tudo.',
-  'fim da correnteza de hoje.',
-  'sem novidades. até a próxima leva.',
-];
 
 const SOURCE_PALETTE = [
   '#e87ba4',
@@ -40,11 +31,6 @@ function hashString(str) {
 
 function hueFor(name) {
   return SOURCE_PALETTE[hashString(name) % SOURCE_PALETTE.length];
-}
-
-function closureMessageForToday() {
-  const dayKey = new Date().toISOString().slice(0, 10);
-  return CLOSURE_MESSAGES[hashString(dayKey) % CLOSURE_MESSAGES.length];
 }
 
 const CATEGORY_COLORS = {
@@ -89,63 +75,92 @@ function sourceColor(name, category) {
   return shadeColor(categoryColor(category), step);
 }
 
-const streamEl = document.getElementById('stream');
-const closureEl = document.getElementById('ambient-closure');
+function sourceInitial(name) {
+  const match = name.match(/[\p{L}\p{N}]/u);
+  return match ? match[0].toUpperCase() : '•';
+}
+
+const deckEl = document.getElementById('deck');
+const addColumnEl = document.getElementById('add-column');
+const searchToggleEl = document.getElementById('search-toggle');
+const searchPopEl = document.getElementById('search-pop');
 const searchEl = document.getElementById('search');
+const refreshEl = document.getElementById('refresh');
+const refreshStatusEl = document.getElementById('refresh-status');
 const themeToggleEl = document.getElementById('theme-toggle');
-const sidebarEl = document.getElementById('sidebar');
-const sidebarToggleEl = document.getElementById('sidebar-toggle');
-const sidebarListEl = document.getElementById('sidebar-feed-list');
-const siteTitleEl = document.querySelector('.site-title');
-const backToTopEl = document.getElementById('back-to-top');
-const categoryMenuEl = document.getElementById('category-menu');
-const viewToggleEl = document.getElementById('view-toggle');
-const savedToggleEl = document.getElementById('saved-toggle');
+const addDialogEl = document.getElementById('add-dialog');
+const addDialogCloseEl = document.getElementById('add-dialog-close');
+const addPanelEl = document.getElementById('add-panel');
 
 const state = {
   items: [],
-  waterlineDate: readWaterline(),
-  observer: null,
-  initialRenderDone: false,
-  sourceFilter: null,
-  categoryFilter: null,
+  feeds: [],
   generatedAt: null,
-  viewMode: readViewMode(),
-  categoryOrder: readCategoryOrder(),
-  draggedCategory: null,
-  selectedLink: null,
+  columns: readColumns(),
   saved: readSaved(),
-  savedFilterActive: false,
+  seenCutoff: readSeenCutoff(),
+  query: '',
+  views: new Map(),
+  addTab: 'category',
 };
 
-function readWaterline() {
-  const stored = localStorage.getItem(WATERLINE_KEY);
-  if (!stored) return null;
-  const date = new Date(stored);
-  return Number.isNaN(date.getTime()) ? null : date;
-}
+// --- storage ---------------------------------------------------------------
 
-function readViewMode() {
-  return localStorage.getItem(VIEW_KEY) === 'dashboard' ? 'dashboard' : 'river';
-}
-
-function readCategoryOrder() {
+function storageGet(key) {
   try {
-    const stored = JSON.parse(localStorage.getItem(CATEGORY_ORDER_KEY));
-    return Array.isArray(stored) ? stored.filter((c) => typeof c === 'string') : null;
+    return localStorage.getItem(key);
   } catch (err) {
     return null;
   }
 }
 
-function readSaved() {
+function storageSet(key, value) {
   try {
-    const stored = JSON.parse(localStorage.getItem(SAVED_KEY));
-    return stored && typeof stored === 'object' && !Array.isArray(stored) ? stored : {};
+    localStorage.setItem(key, value);
   } catch (err) {
-    return {};
+    console.error('[app] falha ao salvar no navegador:', err);
   }
 }
+
+function readJson(key) {
+  try {
+    return JSON.parse(storageGet(key));
+  } catch (err) {
+    return null;
+  }
+}
+
+function readColumns() {
+  const stored = readJson(COLUMNS_KEY);
+  if (!Array.isArray(stored)) return null;
+  return stored
+    .filter((col) => col && typeof col.type === 'string')
+    .map((col) => ({ ...col, id: columnId(col) }));
+}
+
+function saveColumns() {
+  storageSet(COLUMNS_KEY, JSON.stringify(state.columns));
+}
+
+function readSaved() {
+  const stored = readJson(SAVED_KEY);
+  return stored && typeof stored === 'object' && !Array.isArray(stored) ? stored : {};
+}
+
+function readSeenCutoff() {
+  const stored = storageGet(SEEN_KEY) || storageGet(LEGACY_WATERLINE_KEY);
+  if (!stored) return null;
+  const date = new Date(stored);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function saveSeenCutoff() {
+  const newest = state.items[0];
+  if (!newest) return;
+  storageSet(SEEN_KEY, newest.date);
+}
+
+// --- saved -----------------------------------------------------------------
 
 function isSaved(link) {
   return Object.prototype.hasOwnProperty.call(state.saved, link);
@@ -164,20 +179,42 @@ function toggleSaved(item) {
       summary: item.summary,
     };
   }
-  localStorage.setItem(SAVED_KEY, JSON.stringify(state.saved));
+  storageSet(SAVED_KEY, JSON.stringify(state.saved));
 }
 
 function getSavedItemsSorted() {
   return Object.values(state.saved).sort((a, b) => new Date(b.date) - new Date(a.date));
 }
 
-function activeItems() {
-  return state.savedFilterActive ? getSavedItemsSorted() : state.items;
+function findItem(link) {
+  return state.items.find((item) => item.link === link) || state.saved[link] || null;
 }
 
-function orderCategories(categories) {
-  const base = state.categoryOrder && state.categoryOrder.length ? state.categoryOrder : DEFAULT_CATEGORY_ORDER;
-  const baseCanonical = base.map(canonicalCategory);
+// --- columns ---------------------------------------------------------------
+
+function columnId(col) {
+  return `${col.type}:${col.value || ''}`;
+}
+
+function makeColumn(type, value) {
+  const col = value ? { type, value } : { type };
+  col.id = columnId(col);
+  return col;
+}
+
+function availableCategories() {
+  const categories = new Set();
+  state.feeds.forEach((feed) => {
+    if (feed.category) categories.add(feed.category);
+  });
+  state.items.forEach((item) => {
+    if (item.category) categories.add(item.category);
+  });
+  return [...categories];
+}
+
+function orderCategories(categories, order) {
+  const baseCanonical = order.map(canonicalCategory);
   const known = categories
     .filter((category) => baseCanonical.includes(canonicalCategory(category)))
     .sort((a, b) => baseCanonical.indexOf(canonicalCategory(a)) - baseCanonical.indexOf(canonicalCategory(b)));
@@ -187,39 +224,139 @@ function orderCategories(categories) {
   return [...known, ...unknown];
 }
 
-function moveCategory(order, category, targetCategory) {
-  const next = order.filter((c) => c !== category);
-  const targetIndex = next.indexOf(targetCategory);
-  next.splice(targetIndex === -1 ? next.length : targetIndex, 0, category);
-  return next;
+function defaultColumns() {
+  const legacyOrder = readJson(LEGACY_CATEGORY_ORDER_KEY);
+  const order = Array.isArray(legacyOrder) && legacyOrder.length ? legacyOrder : DEFAULT_CATEGORY_ORDER;
+  const categories = orderCategories(availableCategories(), order);
+  return [...categories.map((category) => makeColumn('category', category)), makeColumn('saved')];
 }
 
-function isNew(item) {
-  return state.waterlineDate !== null && new Date(item.date) > state.waterlineDate;
+function matchesQuery(item, query) {
+  const haystack = `${item.title} ${item.source} ${item.category || ''} ${item.summary}`.toLowerCase();
+  return haystack.includes(query);
 }
 
-function filterItems(items, query) {
-  let result = state.sourceFilter
-    ? items.filter((item) => item.source === state.sourceFilter)
-    : items;
-
-  if (state.categoryFilter) {
-    result = result.filter((item) => item.category === state.categoryFilter);
+function itemsForColumn(col) {
+  let items;
+  switch (col.type) {
+    case 'saved':
+      items = getSavedItemsSorted();
+      break;
+    case 'category':
+      items = state.items.filter((item) => canonicalCategory(item.category) === canonicalCategory(col.value));
+      break;
+    case 'feed':
+      items = state.items.filter((item) => item.source === col.value);
+      break;
+    case 'search': {
+      const term = col.value.toLowerCase();
+      items = state.items.filter((item) => matchesQuery(item, term));
+      break;
+    }
+    default:
+      items = state.items;
   }
 
-  if (query) {
-    result = result.filter((item) => {
-      const haystack = `${item.title} ${item.source} ${item.category || ''} ${item.summary}`.toLowerCase();
-      return haystack.includes(query);
-    });
-  }
+  return state.query ? items.filter((item) => matchesQuery(item, state.query)) : items;
+}
 
-  return result;
+function feedCategory(source) {
+  const feed = state.feeds.find((f) => f.title === source);
+  if (feed) return feed.category;
+  const item = state.items.find((i) => i.source === source);
+  return item ? item.category : null;
+}
+
+function columnInfo(col) {
+  switch (col.type) {
+    case 'category':
+      return { title: col.value, subtitle: 'categoria', color: categoryColor(col.value), icon: '#' };
+    case 'feed': {
+      const category = feedCategory(col.value);
+      return {
+        title: col.value,
+        subtitle: category ? `fonte · ${category}` : 'fonte',
+        color: sourceColor(col.value, category),
+        icon: sourceInitial(col.value),
+        round: true,
+      };
+    }
+    case 'search':
+      return { title: `“${col.value}”`, subtitle: 'busca', icon: '⌕' };
+    case 'saved':
+      return { title: 'Salvos', subtitle: 'itens salvos', icon: '★' };
+    default:
+      return { title: 'Tudo', subtitle: 'todas as fontes', icon: '≡' };
+  }
+}
+
+function emptyMessage(col) {
+  if (state.query) return 'nada com essa busca nesta coluna.';
+  if (col.type === 'saved') return 'nenhum item salvo ainda. use ☆ nos cards para guardar.';
+  return 'nada por aqui nos últimos dias.';
+}
+
+function addColumn(type, value) {
+  const col = makeColumn(type, value);
+  const existing = state.views.get(col.id);
+  if (existing) {
+    focusColumn(existing);
+    return;
+  }
+  state.columns.push(col);
+  saveColumns();
+  renderDeck();
+  focusColumn(state.views.get(col.id));
+}
+
+function removeColumn(id) {
+  state.columns = state.columns.filter((col) => col.id !== id);
+  saveColumns();
+  renderDeck();
+}
+
+function moveColumn(id, delta) {
+  const index = state.columns.findIndex((col) => col.id === id);
+  const target = index + delta;
+  if (index === -1 || target < 0 || target >= state.columns.length) return;
+  const [col] = state.columns.splice(index, 1);
+  state.columns.splice(target, 0, col);
+  saveColumns();
+  renderDeck();
+  focusColumn(state.views.get(id));
+}
+
+function markColumnSeen(id) {
+  const col = state.columns.find((c) => c.id === id);
+  if (!col) return;
+  col.seenAt = new Date().toISOString();
+  saveColumns();
+  const view = state.views.get(id);
+  if (view) {
+    view.col = col;
+    view.cardByLink.forEach((card) => card.classList.remove('is-unseen'));
+  }
+}
+
+function focusColumn(view) {
+  if (!view) return;
+  view.el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+  view.el.classList.remove('is-flash');
+  void view.el.offsetWidth;
+  view.el.classList.add('is-flash');
+}
+
+// --- rendering -------------------------------------------------------------
+
+function isUnseen(item, col) {
+  const cutoffs = [state.seenCutoff, col.seenAt ? new Date(col.seenAt) : null].filter(Boolean);
+  if (cutoffs.length === 0) return false;
+  const cutoff = Math.max(...cutoffs.map((d) => d.getTime()));
+  return new Date(item.date).getTime() > cutoff;
 }
 
 function formatDate(isoDate) {
-  const date = new Date(isoDate);
-  return date.toLocaleDateString('pt-BR', {
+  return new Date(isoDate).toLocaleDateString('pt-BR', {
     day: '2-digit',
     month: 'short',
     hour: '2-digit',
@@ -227,383 +364,345 @@ function formatDate(isoDate) {
   });
 }
 
-function formatDateShort(isoDate) {
+function relativeTime(isoDate) {
+  const minutes = Math.floor((Date.now() - new Date(isoDate).getTime()) / 60000);
+  if (minutes < 1) return 'agora';
+  if (minutes < 60) return `${minutes} min`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} h`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days} d`;
   const date = new Date(isoDate);
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = date.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '');
-  return `${day} ${month}`;
+  return `${String(date.getDate()).padStart(2, '0')} ${date.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '')}`;
 }
 
-function formatUpdatedAt(isoDate) {
-  const time = new Date(isoDate).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-  const label = dayLabel(isoDate);
-  return label === 'hoje' ? `atualizado às ${time}` : `atualizado ${label} às ${time}`;
+function el(tag, className, text) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (text !== undefined) node.textContent = text;
+  return node;
 }
 
-function startOfDay(date) {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
-}
-
-function dayLabel(isoDate) {
-  const date = new Date(isoDate);
-  const today = startOfDay(new Date());
-  const diffDays = Math.round((today - startOfDay(date)) / 86400000);
-
-  if (diffDays === 0) return 'hoje';
-  if (diffDays === 1) return 'ontem';
-  return date.toLocaleDateString('pt-BR', {
-    day: '2-digit',
-    month: 'long',
-    year: date.getFullYear() !== today.getFullYear() ? 'numeric' : undefined,
-  });
-}
-
-function renderDateHeading(label) {
-  const heading = document.createElement('h3');
-  heading.className = 'stream-date-heading';
-  heading.textContent = label;
-  return heading;
-}
-
-function renderWaterlineMarker() {
-  const marker = document.createElement('div');
-  marker.className = 'waterline-marker';
-  marker.textContent = 'lido anteriormente';
-  return marker;
-}
-
-function renderEmptyMessage() {
-  const empty = document.createElement('p');
-  empty.className = 'empty';
-  if (activeItems().length === 0) {
-    empty.textContent = state.savedFilterActive ? 'nenhum item salvo.' : 'nenhum item disponível.';
-  } else {
-    empty.textContent = 'nada encontrado para essa busca.';
+function renderColumnIcon(info) {
+  const icon = el('span', 'column-icon', info.icon);
+  if (info.color) {
+    icon.style.background = info.color;
+    icon.classList.add('has-color');
   }
-  return empty;
+  if (info.round) icon.classList.add('is-round');
+  return icon;
 }
 
-function currentQuery() {
-  return searchEl.value.trim().toLowerCase();
-}
-
-function render() {
-  if (state.viewMode === 'dashboard') {
-    renderDashboard(currentQuery());
-  } else {
-    renderStream(currentQuery());
-  }
-  syncSelectionAfterRender();
-}
-
-function renderStream(query) {
-  const filtered = filterItems(activeItems(), query);
-  const animateEntrance = !state.initialRenderDone;
-  streamEl.innerHTML = '';
-
-  if (filtered.length === 0) {
-    streamEl.appendChild(renderEmptyMessage());
-    disconnectObserver();
-    closureEl.classList.remove('is-visible');
-    state.initialRenderDone = true;
-    return;
-  }
-
-  const fragment = document.createDocumentFragment();
-  let lastDayLabel = null;
-  filtered.forEach((item, index) => {
-    const label = dayLabel(item.date);
-    if (label !== lastDayLabel) {
-      fragment.appendChild(renderDateHeading(label));
-      lastDayLabel = label;
-    }
-    if (index > 0 && isNew(filtered[index - 1]) && !isNew(item)) {
-      fragment.appendChild(renderWaterlineMarker());
-    }
-    fragment.appendChild(renderItem(item, animateEntrance ? index : null));
-  });
-  streamEl.appendChild(fragment);
-  state.initialRenderDone = true;
-
-  if (query || state.savedFilterActive) {
-    disconnectObserver();
-    closureEl.classList.remove('is-visible');
-  } else {
-    setupAmbientClosure(filtered);
-  }
-}
-
-function renderDashboard(query) {
-  disconnectObserver();
-  closureEl.classList.remove('is-visible');
-
-  const filtered = filterItems(activeItems(), query);
-  const animateEntrance = !state.initialRenderDone;
-  streamEl.innerHTML = '';
-  state.initialRenderDone = true;
-
-  if (filtered.length === 0) {
-    streamEl.appendChild(renderEmptyMessage());
-    return;
-  }
-
-  const groups = new Map();
-  filtered.forEach((item) => {
-    const category = item.category || 'Outros';
-    if (!groups.has(category)) groups.set(category, []);
-    groups.get(category).push(item);
-  });
-
-  const categories = orderCategories([...groups.keys()]);
-
-  const fragment = document.createDocumentFragment();
-  if (categories.length > 1) {
-    fragment.appendChild(renderDashboardCover(categories, groups, animateEntrance));
-  }
-  categories.forEach((category) => {
-    fragment.appendChild(renderDashboardSection(category, groups.get(category), animateEntrance));
-  });
-  streamEl.appendChild(fragment);
-}
-
-function renderDashboardCover(categories, groups, animateEntrance) {
-  const section = document.createElement('section');
-  section.className = 'dashboard-section dashboard-cover-section';
-
-  const heading = document.createElement('h2');
-  heading.className = 'dashboard-section-title';
-  heading.textContent = 'Capa';
-  section.append(heading);
-
-  if (state.generatedAt) {
-    const updated = document.createElement('p');
-    updated.className = 'dashboard-cover-updated';
-    updated.textContent = formatUpdatedAt(state.generatedAt);
-    section.append(updated);
-  }
-
-  const grid = document.createElement('div');
-  grid.className = 'dashboard-cover';
-  const featuredIndex = hashString(state.generatedAt || '') % categories.length;
-  categories.forEach((category, index) => {
-    const item = groups.get(category)[0];
-    if (!item) return;
-    grid.appendChild(renderDashboardCard(item, {
-      cover: true,
-      featured: index === featuredIndex,
-      animate: animateEntrance,
-      delay: Math.min(index, 8) * 30,
-    }));
-  });
-
-  section.append(grid);
-  return section;
-}
-
-function diversifyDashboardItems(items, limit, sourceCap) {
-  const selected = [];
-  const overflow = [];
-  const sourceCounts = new Map();
-
-  for (const item of items) {
-    if (selected.length >= limit) break;
-    const count = sourceCounts.get(item.source) || 0;
-    if (count < sourceCap) {
-      selected.push(item);
-      sourceCounts.set(item.source, count + 1);
-    } else {
-      overflow.push(item);
-    }
-  }
-
-  for (const item of overflow) {
-    if (selected.length >= limit) break;
-    selected.push(item);
-  }
-
-  return selected.sort((a, b) => new Date(b.date) - new Date(a.date));
-}
-
-function renderDashboardSection(category, items, animateEntrance) {
-  const section = document.createElement('section');
-  section.className = 'dashboard-section';
-
-  const heading = document.createElement('h2');
-  heading.className = 'dashboard-section-title';
-  heading.textContent = category;
-  heading.style.setProperty('--cat-hue', categoryColor(category));
-
-  const [heroItem, ...restItems] = diversifyDashboardItems(items, DASHBOARD_ITEMS_PER_CATEGORY, DASHBOARD_SOURCE_CAP);
-  const hero = renderDashboardCard(heroItem, { hero: true, animate: animateEntrance });
-
-  const grid = document.createElement('div');
-  grid.className = 'dashboard-grid';
-  restItems.forEach((item, index) => {
-    grid.appendChild(renderDashboardCard(item, { animate: animateEntrance, delay: Math.min(index, 8) * 30 }));
-  });
-
-  section.append(heading, hero, grid);
-  return section;
-}
-
-function renderDashboardCard(item, { hero = false, cover = false, featured = false, animate = false, delay = 0 } = {}) {
-  const card = document.createElement('article');
-  card.className = 'dashboard-card'
-    + (hero ? ' dashboard-card--hero' : '')
-    + (cover ? ' dashboard-card--cover' : '')
-    + (cover && featured ? ' dashboard-card--cover-featured' : '')
-    + (isNew(item) ? ' is-new' : '')
-    + (animate ? '' : ' no-enter-anim');
-  if (animate) card.style.animationDelay = `${delay}ms`;
-  card.style.setProperty('--cat-hue', sourceColor(item.source, item.category));
+function renderCard(item, col) {
+  const card = el('article', 'card');
   card.dataset.link = item.link;
+  if (isUnseen(item, col)) card.classList.add('is-unseen');
 
-  if ((hero || cover) && item.category) {
-    const kicker = document.createElement('p');
-    kicker.className = 'dashboard-card-kicker';
-    kicker.textContent = item.category;
-    kicker.style.setProperty('--cat-hue', categoryColor(item.category));
-    card.append(kicker);
+  const avatar = el('span', 'card-avatar', sourceInitial(item.source));
+  avatar.style.background = sourceColor(item.source, item.category);
+  avatar.setAttribute('aria-hidden', 'true');
+
+  const main = el('div', 'card-main');
+
+  const meta = el('div', 'card-meta');
+  const source = el('button', 'card-source', item.source);
+  source.type = 'button';
+  source.title = `abrir coluna de ${item.source}`;
+  const time = el('time', 'card-time', relativeTime(item.date));
+  time.dateTime = item.date;
+  time.title = formatDate(item.date);
+  meta.append(source, el('span', 'card-dot', '·'), time);
+
+  const title = el('a', 'card-title', item.title);
+  title.href = item.link;
+  title.target = '_blank';
+  title.rel = 'noopener noreferrer';
+
+  main.append(meta, title);
+
+  if (item.summary) {
+    main.append(el('p', 'card-summary', item.summary));
   }
 
-  const title = document.createElement(hero ? 'h2' : 'h3');
-  title.className = 'dashboard-card-title';
-  const link = document.createElement('a');
-  link.href = item.link;
-  link.target = '_blank';
-  link.rel = 'noopener noreferrer';
-  link.textContent = item.title;
-  title.appendChild(link);
+  const actions = el('div', 'card-actions');
+  const save = el('button', 'card-action card-save');
+  save.type = 'button';
+  updateSaveButton(save, isSaved(item.link));
+  const copy = el('button', 'card-action card-copy', '⧉');
+  copy.type = 'button';
+  copy.title = 'copiar link';
+  copy.setAttribute('aria-label', 'copiar link');
+  actions.append(save, copy);
+  main.append(actions);
 
-  const meta = document.createElement('p');
-  meta.className = 'dashboard-card-meta';
-
-  const source = document.createElement('span');
-  source.className = 'dashboard-card-source';
-  source.textContent = item.source;
-
-  const date = document.createElement('span');
-  date.className = 'dashboard-card-date';
-  date.textContent = formatDateShort(item.date);
-
-  const saveBtn = document.createElement('button');
-  saveBtn.type = 'button';
-  saveBtn.className = 'save-btn' + (isSaved(item.link) ? ' is-saved' : '');
-  const saveLabel = isSaved(item.link) ? 'remover dos salvos' : 'salvar';
-  saveBtn.title = saveLabel;
-  saveBtn.setAttribute('aria-label', saveLabel);
-  saveBtn.textContent = isSaved(item.link) ? '★' : '☆';
-  saveBtn.addEventListener('click', (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    toggleSaved(item);
-    const anchor = captureScrollAnchor();
-    render();
-    restoreScrollAnchor(anchor);
-  });
-
-  const copyBtn = document.createElement('button');
-  copyBtn.type = 'button';
-  copyBtn.className = 'copy-link-btn';
-  copyBtn.title = 'copiar link';
-  copyBtn.setAttribute('aria-label', 'copiar link');
-  copyBtn.textContent = '⧉';
-  copyBtn.addEventListener('click', (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    copyLink(item.link, copyBtn);
-  });
-
-  meta.append(source, date, saveBtn, copyBtn);
-
-  card.append(title, meta);
-
-  if ((hero || cover) && item.summary) {
-    const summary = document.createElement('p');
-    summary.className = 'dashboard-card-summary';
-    summary.textContent = item.summary;
-    card.append(summary);
-  }
-
+  card.append(avatar, main);
   return card;
 }
 
-function renderItem(item, animateIndex) {
-  const el = document.createElement('article');
-  el.className = 'item' + (isNew(item) ? ' is-new' : '') + (animateIndex === null ? ' no-enter-anim' : '');
-  if (animateIndex !== null) {
-    el.style.animationDelay = `${Math.min(animateIndex, 8) * 40}ms`;
-  }
-  el.dataset.link = item.link;
-
-  const meta = document.createElement('p');
-  meta.className = 'item-meta';
-
-  const source = document.createElement('span');
-  source.className = 'item-source';
-  source.textContent = item.source;
-  source.style.setProperty('--cat-hue', sourceColor(item.source, item.category));
-
-  meta.append(source);
-
-  if (item.category) {
-    const category = document.createElement('span');
-    category.className = 'item-category';
-    category.textContent = item.category;
-    category.style.setProperty('--cat-hue', categoryColor(item.category));
-    meta.append(category);
-  }
-
-  const date = document.createElement('span');
-  date.className = 'item-date';
-  date.textContent = formatDate(item.date);
-
-  const saveBtn = document.createElement('button');
-  saveBtn.type = 'button';
-  saveBtn.className = 'save-btn' + (isSaved(item.link) ? ' is-saved' : '');
-  const saveLabel = isSaved(item.link) ? 'remover dos salvos' : 'salvar';
-  saveBtn.title = saveLabel;
-  saveBtn.setAttribute('aria-label', saveLabel);
-  saveBtn.textContent = isSaved(item.link) ? '★' : '☆';
-  saveBtn.addEventListener('click', (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    toggleSaved(item);
-    const anchor = captureScrollAnchor();
-    render();
-    restoreScrollAnchor(anchor);
-  });
-
-  const copyBtn = document.createElement('button');
-  copyBtn.type = 'button';
-  copyBtn.className = 'copy-link-btn';
-  copyBtn.title = 'copiar link';
-  copyBtn.setAttribute('aria-label', 'copiar link');
-  copyBtn.textContent = '⧉';
-  copyBtn.addEventListener('click', (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    copyLink(item.link, copyBtn);
-  });
-
-  meta.append(date, saveBtn, copyBtn);
-
-  const title = document.createElement('h2');
-  title.className = 'item-title';
-  const link = document.createElement('a');
-  link.href = item.link;
-  link.target = '_blank';
-  link.rel = 'noopener noreferrer';
-  link.textContent = item.title;
-  title.appendChild(link);
-
-  const summary = document.createElement('p');
-  summary.className = 'item-summary';
-  summary.textContent = item.summary;
-
-  el.append(meta, title, summary);
-  return el;
+function updateSaveButton(btn, saved) {
+  btn.textContent = saved ? '★' : '☆';
+  btn.classList.toggle('is-active', saved);
+  const label = saved ? 'remover dos salvos' : 'salvar';
+  btn.title = label;
+  btn.setAttribute('aria-label', label);
 }
+
+function createColumnView(col) {
+  const info = columnInfo(col);
+  const section = el('section', 'column');
+  section.dataset.columnId = col.id;
+  section.setAttribute('aria-label', info.title);
+
+  const header = el('header', 'column-header');
+  const heading = el('div', 'column-heading');
+  const titleEl = el('h2', 'column-title', info.title);
+  titleEl.title = info.title;
+  const subtitleEl = el('span', 'column-subtitle', info.subtitle);
+  heading.append(titleEl, subtitleEl);
+
+  const menuBtn = el('button', 'icon-btn column-menu-btn', '⋯');
+  menuBtn.type = 'button';
+  menuBtn.title = 'opções da coluna';
+  menuBtn.setAttribute('aria-label', 'opções da coluna');
+  menuBtn.setAttribute('aria-expanded', 'false');
+
+  const menu = el('div', 'column-menu');
+  menu.hidden = true;
+  const menuActions = [
+    ['left', '← mover para a esquerda'],
+    ['right', 'mover para a direita →'],
+    ['seen', 'marcar como visto'],
+    ['top', 'voltar ao topo'],
+    ['remove', 'remover coluna'],
+  ];
+  menuActions.forEach(([action, label]) => {
+    const btn = el('button', 'column-menu-item', label);
+    btn.type = 'button';
+    btn.dataset.action = action;
+    if (action === 'remove') btn.classList.add('is-danger');
+    menu.append(btn);
+  });
+
+  header.append(renderColumnIcon(info), heading, menuBtn, menu);
+
+  const pill = el('button', 'new-pill');
+  pill.type = 'button';
+  pill.hidden = true;
+
+  const body = el('div', 'column-body');
+  const list = el('div', 'column-list');
+  const footer = el('div', 'column-footer');
+  body.append(list, footer);
+
+  section.append(header, pill, body);
+
+  const view = {
+    col,
+    el: section,
+    bodyEl: body,
+    listEl: list,
+    footerEl: footer,
+    subtitleEl,
+    menuEl: menu,
+    menuBtn,
+    pillEl: pill,
+    baseSubtitle: info.subtitle,
+    items: [],
+    limit: PAGE_SIZE,
+    knownLinks: new Set(),
+    cardByLink: new Map(),
+    pendingNew: 0,
+  };
+
+  menuBtn.addEventListener('click', (event) => {
+    event.stopPropagation();
+    setMenuOpen(view, menu.hidden);
+  });
+
+  menu.addEventListener('click', (event) => {
+    const btn = event.target.closest('[data-action]');
+    if (!btn) return;
+    setMenuOpen(view, false);
+    const action = btn.dataset.action;
+    if (action === 'left') moveColumn(col.id, -1);
+    else if (action === 'right') moveColumn(col.id, 1);
+    else if (action === 'seen') markColumnSeen(col.id);
+    else if (action === 'top') scrollColumnToTop(view);
+    else if (action === 'remove') removeColumn(col.id);
+  });
+
+  pill.addEventListener('click', () => scrollColumnToTop(view));
+
+  body.addEventListener('scroll', () => onColumnScroll(view), { passive: true });
+
+  return view;
+}
+
+function setMenuOpen(view, open) {
+  closeAllMenus(view);
+  view.menuEl.hidden = !open;
+  view.menuBtn.setAttribute('aria-expanded', String(open));
+}
+
+function closeAllMenus(except) {
+  state.views.forEach((view) => {
+    if (view === except) return;
+    view.menuEl.hidden = true;
+    view.menuBtn.setAttribute('aria-expanded', 'false');
+  });
+}
+
+function scrollColumnToTop(view) {
+  view.bodyEl.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function onColumnScroll(view) {
+  const body = view.bodyEl;
+  if (body.scrollTop < 8 && view.pendingNew > 0) {
+    view.pendingNew = 0;
+    updatePill(view);
+  }
+  if (
+    view.limit < view.items.length &&
+    body.scrollTop + body.clientHeight > body.scrollHeight - LOAD_MORE_THRESHOLD_PX
+  ) {
+    appendNextPage(view);
+  }
+}
+
+function appendNextPage(view) {
+  const next = view.items.slice(view.limit, view.limit + PAGE_SIZE);
+  view.limit += next.length;
+  const fragment = document.createDocumentFragment();
+  next.forEach((item) => {
+    const card = renderCard(item, view.col);
+    view.cardByLink.set(item.link, card);
+    fragment.append(card);
+  });
+  view.listEl.append(fragment);
+  updateFooter(view);
+}
+
+function updateFooter(view) {
+  view.footerEl.textContent = '';
+  if (view.items.length === 0) {
+    view.footerEl.append(el('p', 'column-empty', emptyMessage(view.col)));
+  } else if (view.limit >= view.items.length) {
+    view.footerEl.append(el('p', 'column-end', 'fim da coluna'));
+  }
+}
+
+function updatePill(view) {
+  view.pillEl.hidden = view.pendingNew === 0;
+  view.pillEl.textContent = `↑ ${view.pendingNew} ${view.pendingNew === 1 ? 'novo' : 'novos'}`;
+}
+
+function captureColumnAnchor(view) {
+  const body = view.bodyEl;
+  if (body.scrollTop < 8) return null;
+  for (const card of view.listEl.children) {
+    if (card.offsetTop + card.offsetHeight > body.scrollTop) {
+      return { link: card.dataset.link, offset: card.offsetTop - body.scrollTop };
+    }
+  }
+  return null;
+}
+
+function renderColumnBody(view, { fromUpdate = false } = {}) {
+  const items = itemsForColumn(view.col);
+  const anchor = fromUpdate ? captureColumnAnchor(view) : null;
+
+  let newCount = 0;
+  if (fromUpdate && view.knownLinks.size > 0) {
+    newCount = items.filter((item) => !view.knownLinks.has(item.link)).length;
+  }
+
+  if (!fromUpdate) view.limit = PAGE_SIZE;
+  else view.limit = Math.max(PAGE_SIZE, view.limit + newCount);
+
+  view.items = items;
+  view.knownLinks = new Set(items.map((item) => item.link));
+  view.cardByLink = new Map();
+
+  const fragment = document.createDocumentFragment();
+  items.slice(0, view.limit).forEach((item) => {
+    const card = renderCard(item, view.col);
+    view.cardByLink.set(item.link, card);
+    fragment.append(card);
+  });
+  view.listEl.replaceChildren(fragment);
+  updateFooter(view);
+
+  view.subtitleEl.textContent = `${view.baseSubtitle} · ${items.length}`;
+
+  if (anchor) {
+    const card = view.cardByLink.get(anchor.link);
+    if (card) view.bodyEl.scrollTop = card.offsetTop - anchor.offset;
+    view.pendingNew += newCount;
+  } else if (!fromUpdate) {
+    view.bodyEl.scrollTop = 0;
+    view.pendingNew = 0;
+  }
+  updatePill(view);
+}
+
+function renderDeck() {
+  if (!state.columns) state.columns = defaultColumns();
+
+  const previous = state.views;
+  state.views = new Map();
+  const nodes = [];
+
+  state.columns.forEach((col) => {
+    let view = previous.get(col.id);
+    if (view) {
+      view.col = col;
+    } else {
+      view = createColumnView(col);
+      renderColumnBody(view);
+    }
+    state.views.set(col.id, view);
+    nodes.push(view.el);
+  });
+
+  if (nodes.length === 0) {
+    const empty = el('div', 'deck-empty');
+    empty.append(el('p', null, 'nenhuma coluna no deck.'));
+    const btn = el('button', 'deck-empty-btn', '＋ adicionar coluna');
+    btn.type = 'button';
+    btn.addEventListener('click', openAddDialog);
+    empty.append(btn);
+    nodes.push(empty);
+  }
+
+  deckEl.replaceChildren(...nodes);
+}
+
+function refreshAllColumns({ fromUpdate = false } = {}) {
+  state.views.forEach((view) => renderColumnBody(view, { fromUpdate }));
+}
+
+function refreshSavedColumns() {
+  state.views.forEach((view) => {
+    if (view.col.type === 'saved') renderColumnBody(view, { fromUpdate: true });
+  });
+}
+
+function syncSaveButtons(link) {
+  const saved = isSaved(link);
+  state.views.forEach((view) => {
+    const card = view.cardByLink.get(link);
+    if (card) updateSaveButton(card.querySelector('.card-save'), saved);
+  });
+}
+
+function updateRelativeTimes() {
+  deckEl.querySelectorAll('time.card-time').forEach((time) => {
+    time.textContent = relativeTime(time.dateTime);
+  });
+}
+
+// --- deck interactions -----------------------------------------------------
 
 function copyLink(link, btn) {
   navigator.clipboard.writeText(link).then(() => {
@@ -618,347 +717,343 @@ function copyLink(link, btn) {
   });
 }
 
-function renderSidebar(items) {
-  const sourceCategories = new Map();
-  items.forEach((item) => {
-    if (!sourceCategories.has(item.source)) sourceCategories.set(item.source, item.category);
-  });
+deckEl.addEventListener('click', (event) => {
+  const card = event.target.closest('.card');
+  if (!card) return;
+  const link = card.dataset.link;
 
-  const sources = [...sourceCategories.keys()].sort((a, b) =>
-    a.localeCompare(b, 'pt-BR', { sensitivity: 'base' })
-  );
-
-  sidebarListEl.innerHTML = '';
-
-  const allLi = document.createElement('li');
-  const allBtn = document.createElement('button');
-  allBtn.type = 'button';
-  allBtn.className = 'sidebar-feed-btn sidebar-feed-btn--all' + (state.sourceFilter === null ? ' is-active' : '');
-  allBtn.textContent = 'todos os feeds';
-  allBtn.addEventListener('click', () => {
-    state.sourceFilter = null;
-    renderSidebar(state.items);
-    render();
-  });
-  allLi.append(allBtn);
-  sidebarListEl.append(allLi);
-
-  sources.forEach((source) => {
-    const li = document.createElement('li');
-
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'sidebar-feed-btn' + (state.sourceFilter === source ? ' is-active' : '');
-    btn.style.setProperty('--cat-hue', sourceColor(source, sourceCategories.get(source)));
-
-    const dot = document.createElement('span');
-    dot.className = 'sidebar-feed-dot';
-
-    const name = document.createElement('span');
-    name.className = 'sidebar-feed-name';
-    name.textContent = source;
-
-    btn.append(dot, name);
-    btn.addEventListener('click', () => {
-      state.sourceFilter = state.sourceFilter === source ? null : source;
-      renderSidebar(state.items);
-      render();
-    });
-
-    li.append(btn);
-    sidebarListEl.append(li);
-  });
-}
-
-function renderCategoryMenu(items) {
-  const categories = orderCategories([...new Set(items.map((item) => item.category).filter(Boolean))]);
-  state.categoryOrder = categories;
-
-  categoryMenuEl.innerHTML = '';
-
-  const allBtn = document.createElement('button');
-  allBtn.type = 'button';
-  allBtn.className = 'category-menu-btn' + (state.categoryFilter === null ? ' is-active' : '');
-  allBtn.textContent = 'todas';
-  allBtn.addEventListener('click', () => {
-    state.categoryFilter = null;
-    renderCategoryMenu(state.items);
-    render();
-  });
-  categoryMenuEl.append(allBtn);
-
-  categories.forEach((category) => {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.draggable = true;
-    btn.className = 'category-menu-btn' + (state.categoryFilter === category ? ' is-active' : '');
-    btn.textContent = category;
-    btn.style.setProperty('--cat-hue', categoryColor(category));
-    btn.addEventListener('click', () => {
-      state.categoryFilter = state.categoryFilter === category ? null : category;
-      renderCategoryMenu(state.items);
-      render();
-    });
-
-    btn.addEventListener('dragstart', (event) => {
-      state.draggedCategory = category;
-      event.dataTransfer.effectAllowed = 'move';
-      event.dataTransfer.setData('text/plain', category);
-      btn.classList.add('is-dragging');
-    });
-    btn.addEventListener('dragend', () => {
-      btn.classList.remove('is-dragging');
-      state.draggedCategory = null;
-    });
-    btn.addEventListener('dragover', (event) => {
-      if (!state.draggedCategory || state.draggedCategory === category) return;
-      event.preventDefault();
-      event.dataTransfer.dropEffect = 'move';
-      btn.classList.add('drag-over');
-    });
-    btn.addEventListener('dragleave', () => {
-      btn.classList.remove('drag-over');
-    });
-    btn.addEventListener('drop', (event) => {
-      event.preventDefault();
-      btn.classList.remove('drag-over');
-      const dragged = state.draggedCategory;
-      if (!dragged || dragged === category) return;
-      const newOrder = moveCategory(state.categoryOrder, dragged, category);
-      state.categoryOrder = newOrder;
-      localStorage.setItem(CATEGORY_ORDER_KEY, JSON.stringify(newOrder));
-      renderCategoryMenu(state.items);
-      render();
-    });
-
-    categoryMenuEl.append(btn);
-  });
-}
-
-function setSidebarOpen(open) {
-  sidebarEl.classList.toggle('is-open', open);
-  sidebarToggleEl.classList.toggle('is-open', open);
-  sidebarEl.setAttribute('aria-hidden', String(!open));
-  sidebarToggleEl.setAttribute('aria-expanded', String(open));
-}
-
-sidebarToggleEl.addEventListener('click', () => {
-  setSidebarOpen(!sidebarEl.classList.contains('is-open'));
-});
-
-document.addEventListener('keydown', (event) => {
-  const active = document.activeElement;
-  const isInteractive = !!active && (
-    ['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON', 'A'].includes(active.tagName) ||
-    active.isContentEditable
-  );
-
-  if (event.key === '/') {
-    if (active !== searchEl) {
-      event.preventDefault();
-      searchEl.focus();
-    }
+  if (event.target.closest('.card-save')) {
+    const item = findItem(link);
+    if (!item) return;
+    toggleSaved(item);
+    syncSaveButtons(link);
+    refreshSavedColumns();
     return;
   }
 
-  if (event.key === 'Escape') {
-    setSidebarOpen(false);
-    if (active === searchEl) active.blur();
-    clearSelection();
+  if (event.target.closest('.card-copy')) {
+    copyLink(link, event.target.closest('.card-copy'));
     return;
   }
 
-  if (isInteractive) return;
-
-  if (event.key === 'j' || event.key === 'ArrowDown') {
-    event.preventDefault();
-    moveSelection(1);
-  } else if (event.key === 'k' || event.key === 'ArrowUp') {
-    event.preventDefault();
-    moveSelection(-1);
-  } else if (event.key === 'o' || event.key === 'Enter') {
-    event.preventDefault();
-    openSelected();
+  const source = event.target.closest('.card-source');
+  if (source) {
+    addColumn('feed', source.textContent);
+    return;
   }
+
+  if (event.target.closest('a')) return;
+  if (window.getSelection().toString()) return;
+  window.open(link, '_blank', 'noopener,noreferrer');
 });
 
 document.addEventListener('click', (event) => {
-  if (!sidebarEl.classList.contains('is-open')) return;
-  if (sidebarEl.contains(event.target) || sidebarToggleEl.contains(event.target)) return;
-  setSidebarOpen(false);
+  if (!event.target.closest('.column-menu, .column-menu-btn')) closeAllMenus();
+  if (!searchPopEl.hidden && !event.target.closest('#search-pop, #search-toggle')) {
+    if (!state.query) setSearchOpen(false);
+  }
 });
 
-function disconnectObserver() {
-  if (state.observer) {
-    state.observer.disconnect();
-    state.observer = null;
-  }
+// --- search ----------------------------------------------------------------
+
+function setSearchOpen(open) {
+  searchPopEl.hidden = !open;
+  searchToggleEl.setAttribute('aria-expanded', String(open));
+  searchToggleEl.classList.toggle('is-active', open || Boolean(state.query));
+  if (open) searchEl.focus();
 }
 
-function setupAmbientClosure(items) {
-  closureEl.textContent = closureMessageForToday();
-  disconnectObserver();
+let searchDebounce = null;
+searchEl.addEventListener('input', () => {
+  clearTimeout(searchDebounce);
+  searchDebounce = setTimeout(() => {
+    state.query = searchEl.value.trim().toLowerCase();
+    searchToggleEl.classList.toggle('is-active', true);
+    refreshAllColumns();
+  }, 150);
+});
 
-  const newItems = items.filter(isNew);
+searchEl.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') {
+    searchEl.value = '';
+    state.query = '';
+    refreshAllColumns();
+    setSearchOpen(false);
+    searchToggleEl.focus();
+  }
+});
 
-  if (newItems.length === 0) {
-    closureEl.classList.add('is-visible');
+searchToggleEl.addEventListener('click', () => setSearchOpen(searchPopEl.hidden));
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') closeAllMenus();
+  if (event.key !== '/' || event.ctrlKey || event.metaKey || event.altKey) return;
+  const tag = document.activeElement && document.activeElement.tagName;
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || addDialogEl.open) return;
+  event.preventDefault();
+  setSearchOpen(true);
+});
+
+// --- add column dialog -----------------------------------------------------
+
+function hasColumn(type, value) {
+  return state.views.has(columnId(value ? { type, value } : { type }));
+}
+
+function addOptionButton({ label, detail, color, icon, round, type, value }) {
+  const btn = el('button', 'add-option');
+  btn.type = 'button';
+  const iconEl = el('span', 'column-icon', icon);
+  if (color) {
+    iconEl.style.background = color;
+    iconEl.classList.add('has-color');
+  }
+  if (round) iconEl.classList.add('is-round');
+  const text = el('span', 'add-option-text');
+  text.append(el('span', 'add-option-label', label));
+  if (detail) text.append(el('span', 'add-option-detail', detail));
+  btn.append(iconEl, text);
+
+  if (hasColumn(type, value)) {
+    btn.classList.add('is-present');
+    btn.append(el('span', 'add-option-badge', 'no deck'));
+  }
+
+  btn.addEventListener('click', () => {
+    addDialogEl.close();
+    addColumn(type, value);
+  });
+  return btn;
+}
+
+function feedsForPicker() {
+  if (state.feeds.length) return state.feeds;
+  const seen = new Map();
+  state.items.forEach((item) => {
+    if (!seen.has(item.source)) seen.set(item.source, { title: item.source, category: item.category });
+  });
+  return [...seen.values()];
+}
+
+function renderAddPanel() {
+  addDialogEl.querySelectorAll('.add-tab').forEach((tab) => {
+    const active = tab.dataset.tab === state.addTab;
+    tab.classList.toggle('is-active', active);
+    tab.setAttribute('aria-selected', String(active));
+  });
+
+  addPanelEl.replaceChildren();
+
+  if (state.addTab === 'category') {
+    const counts = new Map();
+    feedsForPicker().forEach((feed) => {
+      if (feed.category) counts.set(feed.category, (counts.get(feed.category) || 0) + 1);
+    });
+    const grid = el('div', 'add-grid');
+    orderCategories(availableCategories(), DEFAULT_CATEGORY_ORDER).forEach((category) => {
+      const n = counts.get(category) || 0;
+      grid.append(addOptionButton({
+        label: category,
+        detail: `${n} ${n === 1 ? 'fonte' : 'fontes'}`,
+        color: categoryColor(category),
+        icon: '#',
+        type: 'category',
+        value: category,
+      }));
+    });
+    addPanelEl.append(grid);
     return;
   }
 
-  closureEl.classList.remove('is-visible');
-  const lastNew = newItems[newItems.length - 1];
-  const targetEl = streamEl.querySelector(`[data-link="${cssEscape(lastNew.link)}"]`);
-  if (!targetEl) return;
+  if (state.addTab === 'feed') {
+    const filter = el('input', 'add-input');
+    filter.type = 'search';
+    filter.placeholder = 'Filtrar fontes...';
+    filter.autocomplete = 'off';
+    const list = el('div', 'add-list');
+    const feeds = [...feedsForPicker()].sort((a, b) => a.title.localeCompare(b.title, 'pt-BR', { sensitivity: 'base' }));
 
-  state.observer = new IntersectionObserver(
-    ([entry]) => {
-      if (entry.isIntersecting) {
-        closureEl.classList.remove('is-visible');
-      } else if (entry.boundingClientRect.top < 0) {
-        closureEl.classList.add('is-visible');
+    const renderList = () => {
+      const term = filter.value.trim().toLowerCase();
+      list.replaceChildren(
+        ...feeds
+          .filter((feed) => !term || `${feed.title} ${feed.category || ''}`.toLowerCase().includes(term))
+          .map((feed) => addOptionButton({
+            label: feed.title,
+            detail: feed.category,
+            color: sourceColor(feed.title, feed.category),
+            icon: sourceInitial(feed.title),
+            round: true,
+            type: 'feed',
+            value: feed.title,
+          })),
+      );
+      if (!list.children.length) list.append(el('p', 'column-empty', 'nenhuma fonte encontrada.'));
+    };
+
+    filter.addEventListener('input', renderList);
+    renderList();
+    addPanelEl.append(filter, list);
+    filter.focus();
+    return;
+  }
+
+  if (state.addTab === 'search') {
+    const row = el('div', 'add-search-row');
+    const input = el('input', 'add-input');
+    input.type = 'text';
+    input.placeholder = 'Termo, ex.: eleições, nintendo, IA...';
+    input.autocomplete = 'off';
+    const submit = el('button', 'add-submit', 'Adicionar');
+    submit.type = 'button';
+    const commit = () => {
+      const term = input.value.trim();
+      if (!term) {
+        input.focus();
+        return;
       }
-    },
-    { threshold: 0 }
+      addDialogEl.close();
+      addColumn('search', term);
+    };
+    submit.addEventListener('click', commit);
+    input.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        commit();
+      }
+    });
+    row.append(input, submit);
+    addPanelEl.append(
+      row,
+      el('p', 'add-hint', 'A coluna mostra os itens de todas as fontes cujo título, fonte ou resumo contém o termo.'),
+    );
+    input.focus();
+    return;
+  }
+
+  const grid = el('div', 'add-grid');
+  grid.append(
+    addOptionButton({ label: 'Tudo', detail: 'todas as fontes juntas', icon: '≡', type: 'all' }),
+    addOptionButton({ label: 'Salvos', detail: 'itens marcados com ☆', icon: '★', type: 'saved' }),
   );
-  state.observer.observe(targetEl);
+  addPanelEl.append(grid);
 }
 
-function cssEscape(value) {
-  return window.CSS && CSS.escape ? CSS.escape(value) : value.replace(/["\\]/g, '\\$&');
+function openAddDialog() {
+  renderAddPanel();
+  addDialogEl.showModal();
 }
 
-function saveWaterline() {
-  if (state.items.length === 0) return;
-  const newest = state.items[0];
-  localStorage.setItem(WATERLINE_KEY, newest.date);
-}
+addDialogEl.querySelectorAll('.add-tab').forEach((tab) => {
+  tab.addEventListener('click', () => {
+    state.addTab = tab.dataset.tab;
+    renderAddPanel();
+  });
+});
+
+addDialogCloseEl.addEventListener('click', () => addDialogEl.close());
+addDialogEl.addEventListener('click', (event) => {
+  if (event.target === addDialogEl) addDialogEl.close();
+});
+addColumnEl.addEventListener('click', openAddDialog);
+
+// --- data ------------------------------------------------------------------
 
 function updateRefreshStatus() {
-  if (!state.generatedAt) return;
-
-  const nextRefresh = new Date(state.generatedAt).getTime() + REFRESH_INTERVAL_MINUTES * 60000;
-  const minutesLeft = Math.ceil((nextRefresh - Date.now()) / 60000);
-
-  siteTitleEl.title = minutesLeft > 0
-    ? `atualiza em ~${minutesLeft} min`
-    : 'atualização a caminho';
-}
-
-function captureScrollAnchor() {
-  if (window.scrollY <= 0) return null;
-  const anchorEl = [...streamEl.querySelectorAll('[data-link]')].find(
-    (el) => el.getBoundingClientRect().bottom > 0
-  );
-  if (!anchorEl) return null;
-  return { link: anchorEl.dataset.link, offset: anchorEl.getBoundingClientRect().top };
-}
-
-function restoreScrollAnchor(anchor) {
-  if (!anchor) return;
-  const el = streamEl.querySelector(`[data-link="${cssEscape(anchor.link)}"]`);
-  if (!el) return;
-  window.scrollBy(0, el.getBoundingClientRect().top - anchor.offset);
-}
-
-function getNavigableItems() {
-  return [...streamEl.querySelectorAll('[data-link]')];
-}
-
-function setSelection(link) {
-  if (state.selectedLink) {
-    const prevEl = streamEl.querySelector(`[data-link="${cssEscape(state.selectedLink)}"]`);
-    if (prevEl) prevEl.classList.remove('is-selected');
+  if (!state.generatedAt) {
+    refreshStatusEl.textContent = '';
+    return;
   }
-  state.selectedLink = link;
-  const el = streamEl.querySelector(`[data-link="${cssEscape(link)}"]`);
-  if (el) {
-    el.classList.add('is-selected');
-    el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-  }
+  const label = relativeTime(state.generatedAt);
+  refreshStatusEl.textContent = label;
+  const full = `atualizado ${label === 'agora' ? 'agora' : `há ${label}`} (${formatDate(state.generatedAt)})`;
+  refreshStatusEl.title = full;
+  refreshEl.title = `atualizar agora — ${full}`;
 }
 
-function clearSelection() {
-  if (!state.selectedLink) return;
-  const el = streamEl.querySelector(`[data-link="${cssEscape(state.selectedLink)}"]`);
-  if (el) el.classList.remove('is-selected');
-  state.selectedLink = null;
-}
-
-function moveSelection(delta) {
-  const navItems = getNavigableItems();
-  if (navItems.length === 0) return;
-  const currentIndex = navItems.findIndex((el) => el.dataset.link === state.selectedLink);
-  const nextIndex = currentIndex === -1
-    ? (delta > 0 ? 0 : navItems.length - 1)
-    : Math.min(Math.max(currentIndex + delta, 0), navItems.length - 1);
-  setSelection(navItems[nextIndex].dataset.link);
-}
-
-function openSelected() {
-  if (!state.selectedLink) return;
-  window.open(state.selectedLink, '_blank', 'noopener,noreferrer');
-}
-
-function syncSelectionAfterRender() {
-  if (!state.selectedLink) return;
-  const el = streamEl.querySelector(`[data-link="${cssEscape(state.selectedLink)}"]`);
-  if (el) {
-    el.classList.add('is-selected');
-  } else {
-    state.selectedLink = null;
-  }
-}
-
-function applyReaderData(data) {
-  const anchor = captureScrollAnchor();
+function applyReaderData(data, { initial = false } = {}) {
   state.items = data.items || [];
+  state.feeds = data.feeds || [];
   state.generatedAt = data.generatedAt || null;
-  renderSidebar(state.items);
-  renderCategoryMenu(state.items);
-  render();
+
+  if (state.seenCutoff === null && state.items[0]) {
+    state.seenCutoff = new Date(state.items[0].date);
+    saveSeenCutoff();
+  }
+
+  if (initial) {
+    renderDeck();
+  } else {
+    refreshAllColumns({ fromUpdate: true });
+  }
   updateRefreshStatus();
-  restoreScrollAnchor(anchor);
 }
 
-async function checkForUpdates() {
+let fetching = false;
+
+async function checkForUpdates({ manual = false } = {}) {
+  if (fetching) return;
+  fetching = true;
+  refreshEl.classList.add('is-spinning');
   try {
     const response = await fetch('reader.json', { cache: 'no-store' });
-    if (!response.ok) return;
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const data = await response.json();
-    if (data.generatedAt && data.generatedAt === state.generatedAt) return;
+    if (data.generatedAt && data.generatedAt === state.generatedAt) {
+      if (manual) flashStatus('sem novidades');
+      return;
+    }
     applyReaderData(data);
   } catch (err) {
+    if (manual) flashStatus('erro');
     console.error('[app] falha ao verificar atualização:', err);
+  } finally {
+    fetching = false;
+    refreshEl.classList.remove('is-spinning');
   }
+}
+
+let flashTimer = null;
+function flashStatus(text) {
+  clearTimeout(flashTimer);
+  refreshStatusEl.textContent = text;
+  refreshStatusEl.classList.add('is-flash');
+  flashTimer = setTimeout(() => {
+    refreshStatusEl.classList.remove('is-flash');
+    updateRefreshStatus();
+  }, 2000);
 }
 
 async function loadReader() {
   try {
-    const response = await fetch('reader.json');
+    const response = await fetch('reader.json', { cache: 'no-store' });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const data = await response.json();
-    applyReaderData(data);
-    setInterval(updateRefreshStatus, 60000);
-    setInterval(checkForUpdates, POLL_INTERVAL_MS);
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') checkForUpdates();
-    });
+    applyReaderData(await response.json(), { initial: true });
   } catch (err) {
-    streamEl.innerHTML = '';
-    const error = document.createElement('p');
-    error.className = 'empty';
-    error.textContent = 'não foi possível carregar o Reader. rode "node scripts/build.js" e sirva a pasta com um servidor estático.';
-    streamEl.appendChild(error);
+    const error = el('p', 'deck-loading', 'não foi possível carregar o Reader. rode "node scripts/build.js" e sirva a pasta com um servidor estático.');
+    deckEl.replaceChildren(error);
     console.error('[app] falha ao carregar reader.json:', err);
+    return;
   }
+
+  setInterval(() => {
+    updateRefreshStatus();
+    updateRelativeTimes();
+  }, 60000);
+  setInterval(checkForUpdates, POLL_INTERVAL_MS);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') checkForUpdates();
+    else saveSeenCutoff();
+  });
+  window.addEventListener('pagehide', saveSeenCutoff);
 }
 
+refreshEl.addEventListener('click', () => checkForUpdates({ manual: true }));
+
+// --- theme -----------------------------------------------------------------
+
 function getEffectiveTheme() {
-  return (
-    document.documentElement.dataset.theme ||
-    (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-  );
+  return document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
 }
 
 function updateThemeToggleButton(theme) {
@@ -968,74 +1063,18 @@ function updateThemeToggleButton(theme) {
   themeToggleEl.title = label;
 
   const themeColorMeta = document.getElementById('theme-color-meta');
-  if (themeColorMeta) themeColorMeta.setAttribute('content', theme === 'dark' ? '#221f1c' : '#faf9f6');
+  if (themeColorMeta) themeColorMeta.setAttribute('content', theme === 'dark' ? '#0b0f14' : '#e9edf1');
 }
 
 function toggleTheme() {
   const next = getEffectiveTheme() === 'dark' ? 'light' : 'dark';
-  document.documentElement.dataset.theme = next;
-  localStorage.setItem(THEME_KEY, next);
+  if (next === 'light') document.documentElement.dataset.theme = 'light';
+  else delete document.documentElement.dataset.theme;
+  storageSet(THEME_KEY, next);
   updateThemeToggleButton(next);
 }
 
 updateThemeToggleButton(getEffectiveTheme());
 themeToggleEl.addEventListener('click', toggleTheme);
-
-function updateViewToggleButton(mode) {
-  viewToggleEl.classList.toggle('is-active', mode === 'dashboard');
-  const label = mode === 'dashboard' ? 'voltar ao modo lista' : 'alternar para modo mosaico';
-  viewToggleEl.setAttribute('aria-label', label);
-  viewToggleEl.setAttribute('aria-pressed', String(mode === 'dashboard'));
-  viewToggleEl.title = label;
-}
-
-function setViewMode(mode) {
-  state.viewMode = mode;
-  document.documentElement.dataset.view = mode;
-  localStorage.setItem(VIEW_KEY, mode);
-  updateViewToggleButton(mode);
-  render();
-}
-
-updateViewToggleButton(state.viewMode);
-viewToggleEl.addEventListener('click', () => {
-  setViewMode(state.viewMode === 'dashboard' ? 'river' : 'dashboard');
-});
-
-function updateSavedToggleButton(active) {
-  savedToggleEl.classList.toggle('is-active', active);
-  const label = active ? 'ver todos os itens' : 'ver itens salvos';
-  savedToggleEl.setAttribute('aria-label', label);
-  savedToggleEl.setAttribute('aria-pressed', String(active));
-  savedToggleEl.title = label;
-}
-
-function setSavedFilterActive(active) {
-  state.savedFilterActive = active;
-  updateSavedToggleButton(active);
-  render();
-}
-
-updateSavedToggleButton(state.savedFilterActive);
-savedToggleEl.addEventListener('click', () => {
-  setSavedFilterActive(!state.savedFilterActive);
-});
-
-searchEl.addEventListener('input', () => {
-  render();
-});
-
-backToTopEl.addEventListener('click', () => {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-});
-
-window.addEventListener('scroll', () => {
-  backToTopEl.classList.toggle('is-visible', window.scrollY > 600);
-}, { passive: true });
-
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'hidden') saveWaterline();
-});
-window.addEventListener('pagehide', saveWaterline);
 
 loadReader();
