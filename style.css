@@ -304,6 +304,7 @@ button {
 }
 
 .rail-status {
+  font-variant-numeric: tabular-nums;
   font-size: 11px;
   color: var(--muted);
   text-align: center;
@@ -500,6 +501,7 @@ button {
 }
 
 .column-subtitle {
+  font-variant-numeric: tabular-nums;
   font-size: 12px;
   color: var(--muted);
 }
@@ -601,33 +603,47 @@ button {
 /* --- card ---------------------------------------------------------------- */
 
 .card {
+  position: relative;
   display: flex;
   gap: 10px;
   padding: 12px 14px 8px 15px;
-  border-bottom: 1px solid var(--border);
   cursor: pointer;
   transition: background 0.12s;
+}
+
+/* divider inset past the avatar (15px padding + 36px avatar + 10px gap) */
+.card::after {
+  content: "";
+  position: absolute;
+  left: 61px;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--border);
 }
 
 .card:hover {
   background: var(--card-hover);
 }
 
-/* home column: each block's cards get a faint wash of its column's tone */
+/* home column: each block's cards get a wash of its column's tone that fades
+   out to the right, plus a thin bar that runs down the block's left edge */
 .card.has-tint {
-  background: color-mix(in srgb, var(--tint) 8%, transparent);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--tint) 12%, transparent), transparent 70%);
+  box-shadow: inset 2px 0 0 var(--tint);
 }
 
 .card.has-tint:hover {
-  background: color-mix(in srgb, var(--tint) 14%, transparent);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--tint) 18%, transparent), transparent 70%);
 }
 
 :root[data-theme="light"] .card.has-tint {
-  background: color-mix(in srgb, var(--tint) 14%, transparent);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--tint) 18%, transparent), transparent 70%);
+  box-shadow: inset 2px 0 0 color-mix(in srgb, var(--tint), #000 15%);
 }
 
 :root[data-theme="light"] .card.has-tint:hover {
-  background: color-mix(in srgb, var(--tint) 22%, transparent);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--tint) 26%, transparent), transparent 70%);
 }
 
 .home-heading {
@@ -713,9 +729,15 @@ button {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  color: #1f2328;
+  background: color-mix(in srgb, var(--tint) 22%, transparent);
+  color: var(--tint);
   font-size: 15px;
   font-weight: 700;
+}
+
+:root[data-theme="light"] .card-avatar {
+  background: color-mix(in srgb, var(--tint) 35%, transparent);
+  color: color-mix(in srgb, var(--tint), #000 45%);
 }
 
 .card-main {
@@ -751,6 +773,7 @@ button {
 }
 
 .card-time {
+  font-variant-numeric: tabular-nums;
   flex: 0 0 auto;
   white-space: nowrap;
 }
@@ -760,6 +783,7 @@ button {
   margin-top: 2px;
   font-weight: 600;
   line-height: 1.3;
+  letter-spacing: -0.01em;
   color: var(--fg);
   text-decoration: none;
   overflow-wrap: anywhere;

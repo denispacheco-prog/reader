@@ -549,7 +549,7 @@ function renderCard(item, col) {
   if (isUnseen(item, col)) card.classList.add('is-unseen');
 
   const avatar = el('span', 'card-avatar', sourceInitial(item.source));
-  avatar.style.background = sourceColor(item.source, item.category);
+  avatar.style.setProperty('--tint', sourceColor(item.source, item.category));
   avatar.setAttribute('aria-hidden', 'true');
 
   const main = el('div', 'card-main');
