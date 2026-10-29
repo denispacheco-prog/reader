@@ -566,9 +566,12 @@ function createColumnView(col) {
   section.setAttribute('aria-label', info.title);
 
   const header = el('header', 'column-header');
-  const heading = el('div', 'column-heading');
-  const titleEl = el('h2', 'column-title', info.title);
-  titleEl.title = info.title;
+  const heading = el('button', 'column-heading');
+  heading.type = 'button';
+  heading.title = `${info.title} — voltar ao topo`;
+  const titleEl = el('span', 'column-title', info.title);
+  titleEl.setAttribute('role', 'heading');
+  titleEl.setAttribute('aria-level', '2');
   const subtitleEl = el('span', 'column-subtitle', info.subtitle);
   heading.append(titleEl, subtitleEl);
 
@@ -642,6 +645,7 @@ function createColumnView(col) {
   });
 
   pill.addEventListener('click', () => scrollColumnToTop(view));
+  heading.addEventListener('click', () => scrollColumnToTop(view));
 
   body.addEventListener('scroll', () => onColumnScroll(view), { passive: true });
 
