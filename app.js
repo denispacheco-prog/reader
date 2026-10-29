@@ -1,8 +1,6 @@
 const THEME_KEY = 'reader:theme';
 const SAVED_KEY = 'reader:saved';
 const COLUMNS_KEY = 'reader:columns';
-const SEEN_KEY = 'reader:seenCutoff';
-const LEGACY_WATERLINE_KEY = 'reader:waterline';
 const LEGACY_CATEGORY_ORDER_KEY = 'reader:categoryOrder';
 const POLL_INTERVAL_MS = 5 * 60 * 1000;
 const TOKEN_KEY = 'reader:githubToken';
@@ -141,7 +139,6 @@ const state = {
   generatedAt: null,
   columns: readColumns(),
   saved: readSaved(),
-  seenCutoff: readSeenCutoff(),
   query: '',
   views: new Map(),
   addTab: 'category',
@@ -198,19 +195,6 @@ function saveColumns() {
 function readSaved() {
   const stored = readJson(SAVED_KEY);
   return stored && typeof stored === 'object' && !Array.isArray(stored) ? stored : {};
-}
-
-function readSeenCutoff() {
-  const stored = storageGet(SEEN_KEY) || storageGet(LEGACY_WATERLINE_KEY);
-  if (!stored) return null;
-  const date = new Date(stored);
-  return Number.isNaN(date.getTime()) ? null : date;
-}
-
-function saveSeenCutoff() {
-  const newest = state.items[0];
-  if (!newest) return;
-  storageSet(SEEN_KEY, newest.date);
 }
 
 // --- saved -----------------------------------------------------------------
@@ -474,20 +458,6 @@ function moveColumnBefore(id, beforeId) {
   focusColumn(state.views.get(id));
 }
 
-function markColumnSeen(id) {
-  const col = state.columns.find((c) => c.id === id);
-  if (!col) return;
-  col.seenAt = new Date().toISOString();
-  saveColumns();
-  const view = state.views.get(id);
-  if (view) {
-    view.col = col;
-    view.cardByLink.forEach((card) => card.classList.remove('is-unseen'));
-    view.hasUnseen = false;
-    updateRailItem(view);
-  }
-}
-
 function focusColumn(view) {
   if (!view) return;
   view.el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
@@ -497,13 +467,6 @@ function focusColumn(view) {
 }
 
 // --- rendering -------------------------------------------------------------
-
-function isUnseen(item, col) {
-  const cutoffs = [state.seenCutoff, col.seenAt ? new Date(col.seenAt) : null].filter(Boolean);
-  if (cutoffs.length === 0) return false;
-  const cutoff = Math.max(...cutoffs.map((d) => d.getTime()));
-  return new Date(item.date).getTime() > cutoff;
-}
 
 function formatDate(isoDate) {
   return new Date(isoDate).toLocaleDateString('pt-BR', {
@@ -546,7 +509,6 @@ function renderColumnIcon(info) {
 function renderCard(item, col) {
   const card = el('article', 'card');
   card.dataset.link = item.link;
-  if (isUnseen(item, col)) card.classList.add('is-unseen');
 
   const avatar = el('span', 'card-avatar', sourceInitial(item.source));
   avatar.style.setProperty('--tint', sourceColor(item.source, item.category));
@@ -621,7 +583,6 @@ function createColumnView(col) {
   const menuActions = [
     ['left', '← mover para a esquerda'],
     ['right', 'mover para a direita →'],
-    ['seen', 'marcar como visto'],
     ['top', 'voltar ao topo'],
     ['remove', 'remover coluna'],
   ];
@@ -676,7 +637,6 @@ function createColumnView(col) {
     const action = btn.dataset.action;
     if (action === 'left') moveColumn(col.id, -1);
     else if (action === 'right') moveColumn(col.id, 1);
-    else if (action === 'seen') markColumnSeen(col.id);
     else if (action === 'top') scrollColumnToTop(view);
     else if (action === 'remove') removeColumn(col.id);
   });
@@ -818,8 +778,6 @@ function renderColumnBody(view, { fromUpdate = false } = {}) {
   updateFooter(view);
 
   view.subtitleEl.textContent = `${view.baseSubtitle} · ${items.length}`;
-  view.hasUnseen = items.some((item) => isUnseen(item, view.col));
-  updateRailItem(view);
 
   if (anchor) {
     const card = view.cardByLink.get(anchor.link);
@@ -894,17 +852,11 @@ function renderRailColumns() {
       icon.style.setProperty('--tint', info.tint);
       icon.classList.add('has-tint');
     }
-    item.append(icon, el('span', 'rail-col-dot'));
+    item.append(icon);
     view.railEl = item;
-    updateRailItem(view);
     return item;
   });
   railColumnsEl.replaceChildren(...nodes);
-}
-
-function updateRailItem(view) {
-  if (!view.railEl) return;
-  view.railEl.classList.toggle('has-unseen', Boolean(view.hasUnseen));
 }
 
 function observeColumnVisibility() {
@@ -1288,11 +1240,6 @@ function applyReaderData(data, { initial = false } = {}) {
   state.feeds = data.feeds || [];
   state.generatedAt = data.generatedAt || null;
 
-  if (state.seenCutoff === null && state.items[0]) {
-    state.seenCutoff = new Date(state.items[0].date);
-    saveSeenCutoff();
-  }
-
   if (initial) {
     renderDeck();
   } else {
@@ -1442,9 +1389,7 @@ async function loadReader() {
   setInterval(checkForUpdates, POLL_INTERVAL_MS);
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') checkForUpdates();
-    else saveSeenCutoff();
   });
-  window.addEventListener('pagehide', saveSeenCutoff);
 }
 
 refreshEl.addEventListener('click', () => checkForUpdates({ manual: true }));

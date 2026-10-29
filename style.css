@@ -193,22 +193,6 @@ button {
   color: var(--fg);
 }
 
-.rail-col-dot {
-  position: absolute;
-  top: 3px;
-  right: 3px;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  border: 2px solid var(--rail-bg);
-  background: var(--accent);
-  opacity: 0;
-}
-
-.rail-col.has-unseen .rail-col-dot {
-  opacity: 1;
-}
-
 .rail-col.is-dragging {
   opacity: 0.35;
 }
@@ -708,18 +692,6 @@ button {
 .home-heading:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: -2px;
-}
-
-/* unseen items: a small dot after the timestamp, like an unread email */
-.card.is-unseen .card-time::after {
-  content: "";
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  margin-left: 6px;
-  border-radius: 50%;
-  background: var(--accent);
-  vertical-align: 0.15em;
 }
 
 .card-avatar {
