@@ -9,6 +9,8 @@ const ROOT = path.resolve(__dirname, '..');
 const OPML_PATH = path.join(ROOT, 'feeds.opml');
 const OUTPUT_PATH = path.join(ROOT, 'reader.json');
 const WINDOW_DAYS = 7;
+// Personal blogs post far less often than news sites; 7 days would empty them.
+const CATEGORY_WINDOW_DAYS = { Blogs: 30 };
 const FETCH_TIMEOUT_MS = 10000;
 const FETCH_CONCURRENCY = 20;
 const SUMMARY_MAX_LENGTH = 500;
@@ -198,9 +200,9 @@ function dedupeByTitle(items) {
   });
 }
 
-function withinWindow(items, windowDays) {
-  const cutoff = Date.now() - windowDays * 24 * 60 * 60 * 1000;
-  return items.filter((item) => new Date(item.date).getTime() >= cutoff);
+function withinWindow(items) {
+  const cutoffFor = (category) => Date.now() - (CATEGORY_WINDOW_DAYS[category] ?? WINDOW_DAYS) * 24 * 60 * 60 * 1000;
+  return items.filter((item) => new Date(item.date).getTime() >= cutoffFor(item.category));
 }
 
 async function main() {
@@ -216,7 +218,7 @@ async function main() {
   const allItems = results.flat();
 
   const deduped = dedupeByLink(allItems);
-  const windowed = withinWindow(deduped, WINDOW_DAYS);
+  const windowed = withinWindow(deduped);
   windowed.sort((a, b) => new Date(b.date) - new Date(a.date));
   const recent = dedupeByTitle(windowed);
 

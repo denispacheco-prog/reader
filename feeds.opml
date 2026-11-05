@@ -71,7 +71,6 @@
       <outline text="MIT Technology Review — Brasil" title="MIT Technology Review — Brasil" type="rss" xmlUrl="https://mittechreview.com.br/feed/" htmlUrl="https://mittechreview.com.br/"/>
       <outline text="NYT — Technology" title="NYT — Technology" type="rss" xmlUrl="https://www.nytimes.com/services/xml/rss/nyt/Technology.xml" htmlUrl="https://www.nytimes.com/section/technology"/>
       <outline text="Olhar Digital" title="Olhar Digital" type="rss" xmlUrl="https://olhardigital.com.br/rss" htmlUrl="https://olhardigital.com.br/"/>
-      <outline text="Simon Willison's Weblog" title="Simon Willison's Weblog" type="rss" xmlUrl="https://simonwillison.net/atom/everything/" htmlUrl="https://simonwillison.net/"/>
       <outline text="Slashdot" title="Slashdot" type="rss" xmlUrl="https://rss.slashdot.org/Slashdot/slashdot" htmlUrl="https://slashdot.org/"/>
       <outline text="Tecnoblog" title="Tecnoblog" type="rss" xmlUrl="https://tecnoblog.net/feed/" htmlUrl="https://tecnoblog.net/"/>
       <outline text="The Atlantic — Technology" title="The Atlantic — Technology" type="rss" xmlUrl="https://feeds.feedburner.com/AtlanticScienceAndTechnology" htmlUrl="https://www.theatlantic.com/technology/"/>
@@ -130,7 +129,6 @@
       <outline text="Hyperallergic" title="Hyperallergic" type="rss" xmlUrl="https://hyperallergic.com/feed/" htmlUrl="https://hyperallergic.com/"/>
       <outline text="IndieWire" title="IndieWire" type="rss" xmlUrl="https://www.indiewire.com/feed/" htmlUrl="https://www.indiewire.com/"/>
       <outline text="io9" title="io9" type="rss" xmlUrl="https://io9.gizmodo.com/rss" htmlUrl="https://gizmodo.com/io9"/>
-      <outline text="Kottke" title="Kottke" type="rss" xmlUrl="https://kottke.org/index.xml" htmlUrl="https://kottke.org/"/>
       <outline text="Laughing Squid" title="Laughing Squid" type="rss" xmlUrl="https://laughingsquid.com/feed/" htmlUrl="https://laughingsquid.com/"/>
       <outline text="MUBI Notebook" title="MUBI Notebook" type="rss" xmlUrl="https://mubi.com/notebook/posts.atom" htmlUrl="https://mubi.com/notebook"/>
       <outline text="NYT — Magazine" title="NYT — Magazine" type="rss" xmlUrl="https://www.nytimes.com/services/xml/rss/nyt/Magazine.xml" htmlUrl="https://www.nytimes.com/section/magazine"/>
@@ -174,6 +172,16 @@
       <outline text="The Baffler" title="The Baffler" type="rss" xmlUrl="https://thebaffler.com/feed" htmlUrl="https://thebaffler.com/"/>
       <outline text="The Guardian — Datablog" title="The Guardian — Datablog" type="rss" xmlUrl="https://www.theguardian.com/news/datablog/rss" htmlUrl="https://www.theguardian.com/news/datablog"/>
       <outline text="The New Yorker — News" title="The New Yorker — News" type="rss" xmlUrl="https://www.newyorker.com/feed/news" htmlUrl="https://www.newyorker.com/news"/>
+    </outline>
+    <outline text="Blogs" title="Blogs">
+      <outline text="Austin Kleon" title="Austin Kleon" type="rss" xmlUrl="https://austinkleon.com/feed/" htmlUrl="https://austinkleon.com/"/>
+      <outline text="Charles Stross" title="Charles Stross" type="rss" xmlUrl="http://www.antipope.org/charlie/blog-static/atom.xml" htmlUrl="http://www.antipope.org/charlie/blog-static/"/>
+      <outline text="Cory Doctorow (Pluralistic)" title="Cory Doctorow (Pluralistic)" type="rss" xmlUrl="https://pluralistic.net/feed/" htmlUrl="https://pluralistic.net/"/>
+      <outline text="Craig Mod" title="Craig Mod" type="rss" xmlUrl="https://craigmod.com/index.xml" htmlUrl="https://craigmod.com/"/>
+      <outline text="John Scalzi (Whatever)" title="John Scalzi (Whatever)" type="rss" xmlUrl="https://whatever.scalzi.com/feed/" htmlUrl="https://whatever.scalzi.com/"/>
+      <outline text="Kieron Gillen" title="Kieron Gillen" type="rss" xmlUrl="https://buttondown.com/kierongillen/rss" htmlUrl="https://buttondown.com/kierongillen"/>
+      <outline text="Robin Sloan" title="Robin Sloan" type="rss" xmlUrl="https://www.robinsloan.com/feed.xml" htmlUrl="https://www.robinsloan.com/"/>
+      <outline text="Warren Ellis" title="Warren Ellis" type="rss" xmlUrl="https://warrenellis.ltd/feed/" htmlUrl="https://warrenellis.ltd/"/>
     </outline>
   </body>
 </opml>

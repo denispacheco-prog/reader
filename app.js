@@ -16,7 +16,7 @@ const LOAD_MORE_THRESHOLD_PX = 600;
 const ADDED_COLUMNS_KEY = 'reader:addedColumns';
 const LEGACY_ADDED_CATEGORIES_KEY = 'reader:addedCategories';
 const HOME_ITEMS_PER_COLUMN = 2;
-const DEFAULT_CATEGORY_ORDER = ['Brasil', 'São Paulo', 'Legislativo', 'Mundo', 'Tecnologia', 'Ciência', 'Futurismo', 'Cultura', 'Jogos', 'Ensaios'];
+const DEFAULT_CATEGORY_ORDER = ['Brasil', 'São Paulo', 'Legislativo', 'Mundo', 'Tecnologia', 'Ciência', 'Futurismo', 'Cultura', 'Jogos', 'Ensaios', 'Blogs'];
 
 // Columns introduced after the deck launched. Decks that already have saved
 // columns get each one inserted once, right after the column `after` (or
@@ -25,6 +25,7 @@ const ADDED_COLUMNS = [
   { type: 'category', value: 'São Paulo', after: 'category:Brasil' },
   { type: 'home' },
   { type: 'category', value: 'Legislativo', after: 'category:São Paulo' },
+  { type: 'category', value: 'Blogs', after: 'category:Ensaios' },
 ];
 
 const SOURCE_PALETTE = [
@@ -64,6 +65,7 @@ const CATEGORY_COLORS = {
   'Cultura': '#f5a6c8',
   'Jogos': '#d1a6ec',
   'Ensaios': '#f7bc8c',
+  'Blogs': '#d4b896',
 };
 
 // Neutral glyphs that identify category columns (header + rail). ︎ asks
@@ -80,6 +82,7 @@ const CATEGORY_SYMBOLS = {
   'Cultura': '♫︎',
   'Jogos': '♟︎',
   'Ensaios': '¶',
+  'Blogs': '✎︎',
 };
 
 function categorySymbol(name) {
