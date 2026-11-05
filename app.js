@@ -16,7 +16,7 @@ const LOAD_MORE_THRESHOLD_PX = 600;
 const ADDED_COLUMNS_KEY = 'reader:addedColumns';
 const LEGACY_ADDED_CATEGORIES_KEY = 'reader:addedCategories';
 const HOME_ITEMS_PER_COLUMN = 2;
-const DEFAULT_CATEGORY_ORDER = ['Brasil', 'São Paulo', 'Mundo', 'Tecnologia', 'Ciência', 'Futurismo', 'Cultura', 'Jogos', 'Ensaios'];
+const DEFAULT_CATEGORY_ORDER = ['Brasil', 'São Paulo', 'Legislativo', 'Mundo', 'Tecnologia', 'Ciência', 'Futurismo', 'Cultura', 'Jogos', 'Ensaios'];
 
 // Columns introduced after the deck launched. Decks that already have saved
 // columns get each one inserted once, right after the column `after` (or
@@ -24,6 +24,7 @@ const DEFAULT_CATEGORY_ORDER = ['Brasil', 'São Paulo', 'Mundo', 'Tecnologia', '
 const ADDED_COLUMNS = [
   { type: 'category', value: 'São Paulo', after: 'category:Brasil' },
   { type: 'home' },
+  { type: 'category', value: 'Legislativo', after: 'category:São Paulo' },
 ];
 
 const SOURCE_PALETTE = [
@@ -54,6 +55,7 @@ function hueFor(name) {
 const CATEGORY_COLORS = {
   'Brasil': '#8fd19e',
   'São Paulo': '#b8c2cf',
+  'Legislativo': '#c8d67f',
   'Mundo': '#f4a09c',
   'Ásia': '#f3d27e',
   'Tecnologia': '#94bdf5',
@@ -69,6 +71,7 @@ const CATEGORY_COLORS = {
 const CATEGORY_SYMBOLS = {
   'Brasil': '⚑︎',
   'São Paulo': '⌂',
+  'Legislativo': '§',
   'Mundo': '◎',
   'Ásia': '◑',
   'Tecnologia': '⌘',

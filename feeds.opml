@@ -25,10 +25,14 @@
     <outline text="São Paulo" title="São Paulo">
       <outline text="g1 São Paulo" title="g1 São Paulo" type="rss" xmlUrl="https://g1.globo.com/rss/g1/sp/sao-paulo/" htmlUrl="https://g1.globo.com/sp/sao-paulo/"/>
       <outline text="Diário do Transporte" title="Diário do Transporte" type="rss" xmlUrl="https://diariodotransporte.com.br/feed/" htmlUrl="https://diariodotransporte.com.br/"/>
-      <outline text="Câmara Municipal de São Paulo" title="Câmara Municipal de São Paulo" type="rss" xmlUrl="https://www.saopaulo.sp.leg.br/comunicacao/noticias/feed/" htmlUrl="https://www.saopaulo.sp.leg.br/comunicacao/noticias/"/>
-      <outline text="Alesp" title="Alesp" type="rss" xmlUrl="https://news.google.com/rss/search?q=site:al.sp.gov.br+when:14d&amp;hl=pt-BR&amp;gl=BR&amp;ceid=BR:pt-419" htmlUrl="https://www.al.sp.gov.br/noticia/"/>
       <outline text="Agência Mural" title="Agência Mural" type="rss" xmlUrl="https://agenciamural.org.br/feed/" htmlUrl="https://agenciamural.org.br/"/>
       <outline text="Estadão — São Paulo" title="Estadão — São Paulo" type="rss" xmlUrl="https://www.estadao.com.br/arc/outboundfeeds/feeds/rss/sections/sao-paulo/" htmlUrl="https://www.estadao.com.br/sao-paulo/"/>
+    </outline>
+    <outline text="Legislativo" title="Legislativo">
+      <outline text="Câmara Municipal de São Paulo" title="Câmara Municipal de São Paulo" type="rss" xmlUrl="https://www.saopaulo.sp.leg.br/comunicacao/noticias/feed/" htmlUrl="https://www.saopaulo.sp.leg.br/comunicacao/noticias/"/>
+      <outline text="Alesp" title="Alesp" type="rss" xmlUrl="https://news.google.com/rss/search?q=site:al.sp.gov.br+when:14d&amp;hl=pt-BR&amp;gl=BR&amp;ceid=BR:pt-419" htmlUrl="https://www.al.sp.gov.br/noticia/"/>
+      <outline text="Câmara dos Deputados" title="Câmara dos Deputados" type="rss" xmlUrl="https://www.camara.leg.br/noticias/rss/ultimas-noticias" htmlUrl="https://www.camara.leg.br/noticias/"/>
+      <outline text="Senado Federal" title="Senado Federal" type="rss" xmlUrl="https://www12.senado.leg.br/noticias/feed/todasnoticias/RSS" htmlUrl="https://www12.senado.leg.br/noticias/"/>
     </outline>
     <outline text="Mundo" title="Mundo">
       <outline text="Al Jazeera English" title="Al Jazeera English" type="rss" xmlUrl="https://www.aljazeera.com/xml/rss/all.xml" htmlUrl="https://www.aljazeera.com/"/>
