@@ -96,6 +96,18 @@ function decodeXml(buffer) {
 // a normal browser User-Agent. This is a known, accepted limitation (not a
 // bug to chase): those feeds just won't reliably appear via the automated
 // build, though the OPML entry is kept since it works locally.
+// Rest of World publishes URLs with bare "&", which is invalid XML. Only escape
+// on failure, and skip CDATA, where a bare "&" is valid and must stay as is.
+async function parseFeed(xml) {
+  try {
+    return await parser.parseString(xml);
+  } catch {
+    return parser.parseString(
+      xml.replace(/<!\[CDATA\[[\s\S]*?\]\]>|&(?!#?\w+;)/g, (match) => (match === '&' ? '&amp;' : match)),
+    );
+  }
+}
+
 async function fetchFeedItems(feed) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
@@ -109,7 +121,7 @@ async function fetchFeedItems(feed) {
       throw new Error(`HTTP ${response.status}`);
     }
     const xml = decodeXml(await response.arrayBuffer());
-    const parsed = await parser.parseString(xml);
+    const parsed = await parseFeed(xml);
     const sourceName = feed.title || parsed.title || feed.xmlUrl;
 
     return parsed.items
@@ -132,11 +144,15 @@ function normalizeItem(item, sourceName, category) {
     return null;
   }
 
+  // Google News appends the outlet to every headline ("Título - Veículo").
+  const titleRaw = link.startsWith('https://news.google.com/')
+    ? (item.title || '').replace(/ - [^-]+$/, '')
+    : item.title;
   const summaryRaw = item.contentSnippet || item.summary || item.content || '';
   const summary = decodeHtmlEntities(summaryRaw).trim().slice(0, SUMMARY_MAX_LENGTH);
 
   return {
-    title: decodeHtmlEntities(item.title || '(sem título)').trim(),
+    title: decodeHtmlEntities(titleRaw || '(sem título)').trim(),
     link,
     source: sourceName,
     category,

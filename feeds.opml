@@ -5,25 +5,34 @@
   </head>
   <body>
     <outline text="Brasil" title="Brasil">
+      <outline text="Agência Brasil" title="Agência Brasil" type="rss" xmlUrl="https://agenciabrasil.ebc.com.br/rss/ultimasnoticias/feed.xml" htmlUrl="https://agenciabrasil.ebc.com.br/"/>
       <outline text="Agência Pública" title="Agência Pública" type="rss" xmlUrl="https://apublica.org/feed/" htmlUrl="https://apublica.org/"/>
       <outline text="BBC Brasil" title="BBC Brasil" type="rss" xmlUrl="https://feeds.bbci.co.uk/portuguese/rss.xml" htmlUrl="https://www.bbc.com/portuguese"/>
+      <outline text="Congresso em Foco" title="Congresso em Foco" type="rss" xmlUrl="https://www.congressoemfoco.com.br/feed/" htmlUrl="https://www.congressoemfoco.com.br/"/>
       <outline text="Folha de S.Paulo — Cotidiano" title="Folha de S.Paulo — Cotidiano" type="rss" xmlUrl="https://feeds.folha.uol.com.br/cotidiano/rss091.xml" htmlUrl="https://www1.folha.uol.com.br/cotidiano/"/>
       <outline text="Folha de S.Paulo — Em Cima da Hora" title="Folha de S.Paulo — Em Cima da Hora" type="rss" xmlUrl="https://feeds.folha.uol.com.br/emcimadahora/rss091.xml" htmlUrl="https://www1.folha.uol.com.br/emcimadahora/"/>
       <outline text="Folha de S.Paulo — Poder" title="Folha de S.Paulo — Poder" type="rss" xmlUrl="https://feeds.folha.uol.com.br/poder/rss091.xml" htmlUrl="https://www1.folha.uol.com.br/poder/"/>
       <outline text="Gama Revista" title="Gama Revista" type="rss" xmlUrl="https://gamarevista.com.br/feed/" htmlUrl="https://gamarevista.com.br/"/>
+      <outline text="Intercept Brasil" title="Intercept Brasil" type="rss" xmlUrl="https://www.intercept.com.br/feed/" htmlUrl="https://www.intercept.com.br/"/>
+      <outline text="Lupa" title="Lupa" type="rss" xmlUrl="https://lupa.uol.com.br/feed/" htmlUrl="https://lupa.uol.com.br/"/>
+      <outline text="Nexo" title="Nexo" type="rss" xmlUrl="https://www.nexojornal.com.br/rss.xml" htmlUrl="https://www.nexojornal.com.br/"/>
       <outline text="Poder360" title="Poder360" type="rss" xmlUrl="https://www.poder360.com.br/feed/" htmlUrl="https://www.poder360.com.br/"/>
       <outline text="Quatro Cinco Um" title="Quatro Cinco Um" type="rss" xmlUrl="https://quatrocincoum.com.br/feed/" htmlUrl="https://quatrocincoum.com.br/"/>
+      <outline text="Repórter Brasil" title="Repórter Brasil" type="rss" xmlUrl="https://reporterbrasil.org.br/feed/" htmlUrl="https://reporterbrasil.org.br/"/>
       <outline text="Revista piauí" title="Revista piauí" type="rss" xmlUrl="https://piaui.folha.uol.com.br/feed/" htmlUrl="https://piaui.folha.uol.com.br/"/>
       <outline text="Sumaúma" title="Sumaúma" type="rss" xmlUrl="https://sumauma.com/feed/" htmlUrl="https://sumauma.com/"/>
     </outline>
     <outline text="São Paulo" title="São Paulo">
       <outline text="g1 São Paulo" title="g1 São Paulo" type="rss" xmlUrl="https://g1.globo.com/rss/g1/sp/sao-paulo/" htmlUrl="https://g1.globo.com/sp/sao-paulo/"/>
       <outline text="Diário do Transporte" title="Diário do Transporte" type="rss" xmlUrl="https://diariodotransporte.com.br/feed/" htmlUrl="https://diariodotransporte.com.br/"/>
+      <outline text="Câmara Municipal de São Paulo" title="Câmara Municipal de São Paulo" type="rss" xmlUrl="https://www.saopaulo.sp.leg.br/comunicacao/noticias/feed/" htmlUrl="https://www.saopaulo.sp.leg.br/comunicacao/noticias/"/>
+      <outline text="Alesp" title="Alesp" type="rss" xmlUrl="https://news.google.com/rss/search?q=site:al.sp.gov.br+when:14d&amp;hl=pt-BR&amp;gl=BR&amp;ceid=BR:pt-419" htmlUrl="https://www.al.sp.gov.br/noticia/"/>
+      <outline text="Agência Mural" title="Agência Mural" type="rss" xmlUrl="https://agenciamural.org.br/feed/" htmlUrl="https://agenciamural.org.br/"/>
+      <outline text="Estadão — São Paulo" title="Estadão — São Paulo" type="rss" xmlUrl="https://www.estadao.com.br/arc/outboundfeeds/feeds/rss/sections/sao-paulo/" htmlUrl="https://www.estadao.com.br/sao-paulo/"/>
     </outline>
     <outline text="Mundo" title="Mundo">
       <outline text="Al Jazeera English" title="Al Jazeera English" type="rss" xmlUrl="https://www.aljazeera.com/xml/rss/all.xml" htmlUrl="https://www.aljazeera.com/"/>
       <outline text="Axios" title="Axios" type="rss" xmlUrl="https://www.axios.com/feeds/feed.rss" htmlUrl="https://www.axios.com/"/>
-      <outline text="BBC Brasil — Internacional" title="BBC Brasil — Internacional" type="rss" xmlUrl="https://feeds.bbci.co.uk/portuguese/internacional/rss.xml" htmlUrl="https://www.bbc.com/portuguese/topics/cz74k717pw5t"/>
       <outline text="BBC News" title="BBC News" type="rss" xmlUrl="https://feeds.bbci.co.uk/news/rss.xml" htmlUrl="https://www.bbc.com/news"/>
       <outline text="Bellingcat" title="Bellingcat" type="rss" xmlUrl="https://www.bellingcat.com/feed/" htmlUrl="https://www.bellingcat.com/"/>
       <outline text="Carbon Brief" title="Carbon Brief" type="rss" xmlUrl="https://www.carbonbrief.org/feed/" htmlUrl="https://www.carbonbrief.org/"/>
