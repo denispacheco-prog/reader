@@ -862,7 +862,7 @@ function renderRailColumns() {
       icon.style.setProperty('--tint', info.tint);
       icon.classList.add('has-tint');
     }
-    item.append(icon);
+    item.append(icon, el('span', 'rail-col-label', info.title));
     view.railEl = item;
     return item;
   });
