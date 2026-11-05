@@ -63,14 +63,19 @@
       <outline text="404 Media" title="404 Media" type="rss" xmlUrl="https://www.404media.co/rss/" htmlUrl="https://www.404media.co/"/>
       <outline text="Ars Technica" title="Ars Technica" type="rss" xmlUrl="https://feeds.arstechnica.com/arstechnica/index/" htmlUrl="https://arstechnica.com/"/>
       <outline text="BBC News — Technology" title="BBC News — Technology" type="rss" xmlUrl="https://feeds.bbci.co.uk/news/technology/rss.xml" htmlUrl="https://www.bbc.com/news/technology"/>
+      <outline text="Benedict Evans" title="Benedict Evans" type="rss" xmlUrl="https://www.ben-evans.com/benedictevans?format=rss" htmlUrl="https://www.ben-evans.com/"/>
       <outline text="Engadget" title="Engadget" type="rss" xmlUrl="https://www.engadget.com/rss.xml" htmlUrl="https://www.engadget.com/"/>
       <outline text="Folha de S.Paulo — Tec" title="Folha de S.Paulo — Tec" type="rss" xmlUrl="https://feeds.folha.uol.com.br/tec/rss091.xml" htmlUrl="https://www1.folha.uol.com.br/tec/"/>
-      <outline text="Lifehacker" title="Lifehacker" type="rss" xmlUrl="https://lifehacker.com/feed" htmlUrl="https://lifehacker.com/"/>
+      <outline text="Futurism.com" title="Futurism.com" type="rss" xmlUrl="https://futurism.com/feed" htmlUrl="https://futurism.com/"/>
+      <outline text="IEEE Spectrum" title="IEEE Spectrum" type="rss" xmlUrl="https://spectrum.ieee.org/feeds/feed.rss" htmlUrl="https://spectrum.ieee.org/"/>
+      <outline text="Interesting Engineering" title="Interesting Engineering" type="rss" xmlUrl="https://interestingengineering.com/feed" htmlUrl="https://interestingengineering.com/"/>
       <outline text="MIT News — CSAIL" title="MIT News — CSAIL" type="rss" xmlUrl="https://news.mit.edu/topic/mitcomputer-science-and-artificial-intelligence-laboratory-csail-rss.xml" htmlUrl="https://news.mit.edu/topic/computer-science-and-artificial-intelligence-laboratory-csail"/>
       <outline text="MIT Technology Review" title="MIT Technology Review" type="rss" xmlUrl="https://www.technologyreview.com/feed/" htmlUrl="https://www.technologyreview.com/"/>
       <outline text="MIT Technology Review — Brasil" title="MIT Technology Review — Brasil" type="rss" xmlUrl="https://mittechreview.com.br/feed/" htmlUrl="https://mittechreview.com.br/"/>
+      <outline text="New Atlas" title="New Atlas" type="rss" xmlUrl="https://newatlas.com/index.rss" htmlUrl="https://newatlas.com/"/>
       <outline text="NYT — Technology" title="NYT — Technology" type="rss" xmlUrl="https://www.nytimes.com/services/xml/rss/nyt/Technology.xml" htmlUrl="https://www.nytimes.com/section/technology"/>
       <outline text="Olhar Digital" title="Olhar Digital" type="rss" xmlUrl="https://olhardigital.com.br/rss" htmlUrl="https://olhardigital.com.br/"/>
+      <outline text="Singularity Hub" title="Singularity Hub" type="rss" xmlUrl="https://singularityhub.com/feed/" htmlUrl="https://singularityhub.com/"/>
       <outline text="Slashdot" title="Slashdot" type="rss" xmlUrl="https://rss.slashdot.org/Slashdot/slashdot" htmlUrl="https://slashdot.org/"/>
       <outline text="Tecnoblog" title="Tecnoblog" type="rss" xmlUrl="https://tecnoblog.net/feed/" htmlUrl="https://tecnoblog.net/"/>
       <outline text="The Atlantic — Technology" title="The Atlantic — Technology" type="rss" xmlUrl="https://feeds.feedburner.com/AtlanticScienceAndTechnology" htmlUrl="https://www.theatlantic.com/technology/"/>
@@ -104,14 +109,6 @@
       <outline text="The Conversation" title="The Conversation" type="rss" xmlUrl="https://theconversation.com/br/articles.atom" htmlUrl="https://theconversation.com/br"/>
       <outline text="The Guardian — Science" title="The Guardian — Science" type="rss" xmlUrl="https://www.theguardian.com/science/rss" htmlUrl="https://www.theguardian.com/science"/>
       <outline text="Undark" title="Undark" type="rss" xmlUrl="https://undark.org/feed/" htmlUrl="https://undark.org/"/>
-    </outline>
-    <outline text="Futurismo" title="Futurismo">
-      <outline text="Benedict Evans" title="Benedict Evans" type="rss" xmlUrl="https://www.ben-evans.com/benedictevans?format=rss" htmlUrl="https://www.ben-evans.com/"/>
-      <outline text="Futurism.com" title="Futurism.com" type="rss" xmlUrl="https://futurism.com/feed" htmlUrl="https://futurism.com/"/>
-      <outline text="IEEE Spectrum" title="IEEE Spectrum" type="rss" xmlUrl="https://spectrum.ieee.org/feeds/feed.rss" htmlUrl="https://spectrum.ieee.org/"/>
-      <outline text="Interesting Engineering" title="Interesting Engineering" type="rss" xmlUrl="https://interestingengineering.com/feed" htmlUrl="https://interestingengineering.com/"/>
-      <outline text="New Atlas" title="New Atlas" type="rss" xmlUrl="https://newatlas.com/index.rss" htmlUrl="https://newatlas.com/"/>
-      <outline text="Singularity Hub" title="Singularity Hub" type="rss" xmlUrl="https://singularityhub.com/feed/" htmlUrl="https://singularityhub.com/"/>
     </outline>
     <outline text="Cultura" title="Cultura">
       <outline text="/Film" title="/Film" type="rss" xmlUrl="https://feeds.feedburner.com/slashfilm" htmlUrl="https://www.slashfilm.com/"/>

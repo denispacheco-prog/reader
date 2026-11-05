@@ -16,7 +16,10 @@ const LOAD_MORE_THRESHOLD_PX = 600;
 const ADDED_COLUMNS_KEY = 'reader:addedColumns';
 const LEGACY_ADDED_CATEGORIES_KEY = 'reader:addedCategories';
 const HOME_ITEMS_PER_COLUMN = 2;
-const DEFAULT_CATEGORY_ORDER = ['Brasil', 'São Paulo', 'Legislativo', 'Mundo', 'Tecnologia', 'Ciência', 'Futurismo', 'Cultura', 'Jogos', 'Ensaios', 'Blogs'];
+const DEFAULT_CATEGORY_ORDER = ['Brasil', 'São Paulo', 'Legislativo', 'Mundo', 'Tecnologia', 'Ciência', 'Cultura', 'Jogos', 'Ensaios', 'Blogs'];
+
+// Categories merged into another one; saved decks drop their old column.
+const RETIRED_COLUMN_IDS = ['category:Futurismo'];
 
 // Columns introduced after the deck launched. Decks that already have saved
 // columns get each one inserted once, right after the column `after` (or
@@ -61,7 +64,6 @@ const CATEGORY_COLORS = {
   'Ásia': '#f3d27e',
   'Tecnologia': '#94bdf5',
   'Ciência': '#8ad8d3',
-  'Futurismo': '#b9b3f6',
   'Cultura': '#f5a6c8',
   'Jogos': '#d1a6ec',
   'Ensaios': '#f7bc8c',
@@ -78,7 +80,6 @@ const CATEGORY_SYMBOLS = {
   'Ásia': '◑',
   'Tecnologia': '⌘',
   'Ciência': '⚛︎',
-  'Futurismo': '✦',
   'Cultura': '♫︎',
   'Jogos': '♟︎',
   'Ensaios': '¶',
@@ -91,6 +92,7 @@ function categorySymbol(name) {
 
 const CATEGORY_ALIASES = {
   'Cultura & Entretenimento': 'Cultura',
+  'Futurismo': 'Tecnologia',
 };
 
 function canonicalCategory(name) {
@@ -191,7 +193,8 @@ function readColumns() {
   if (!Array.isArray(stored)) return null;
   return stored
     .filter((col) => col && typeof col.type === 'string')
-    .map((col) => ({ ...col, id: columnId(col) }));
+    .map((col) => ({ ...col, id: columnId(col) }))
+    .filter((col) => !RETIRED_COLUMN_IDS.includes(col.id));
 }
 
 function saveColumns() {
