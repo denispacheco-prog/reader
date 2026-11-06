@@ -17,6 +17,7 @@ const ADDED_COLUMNS_KEY = 'reader:addedColumns';
 const LEGACY_ADDED_CATEGORIES_KEY = 'reader:addedCategories';
 const HOME_ROTATION_SIZE = 10;
 const HOME_ROTATION_MS = 60 * 1000;
+const HOME_ORDER_CYCLE_MS = 10 * 60 * 1000;
 const DEFAULT_CATEGORY_ORDER = ['Brasil', 'São Paulo', 'Legislativo', 'Mundo', 'Tecnologia', 'Ciência', 'Cultura', 'Jogos', 'Ensaios', 'Blogs'];
 
 // Categories merged into another one; saved decks drop their old column.
@@ -772,8 +773,12 @@ function renderHomeCard(col, item) {
 // A block under the pointer or holding focus stays put.
 let homeRotationCursor = 0;
 
+function homeView() {
+  return [...state.views.values()].find((v) => v.col.type === 'home');
+}
+
 function rotateHome() {
-  const view = [...state.views.values()].find((v) => v.col.type === 'home');
+  const view = homeView();
   const blocks = view && view.homeBlocks ? view.homeBlocks.filter((b) => b.items.length > 1) : [];
   if (blocks.length > 0 && document.visibilityState === 'visible') {
     const block = blocks[homeRotationCursor % blocks.length];
@@ -796,6 +801,38 @@ function advanceHomeBlock(view, block) {
   block.card.replaceWith(card);
   block.card = card;
   block.counterEl.textContent = `${block.index + 1}/${block.items.length}`;
+}
+
+// The blocks also take turns at the top: about every HOME_ORDER_CYCLE_MS /
+// blocks, the bottom block moves up and the rest slide down, so a full lap
+// takes ~10 minutes. `homeOrderShift` counts how many blocks have wrapped
+// and survives data refreshes. The order holds while the pointer is over
+// the column, focus is inside it, or it is scrolled away from the top.
+function homeDisplayOrder(view) {
+  const blocks = view.homeBlocks;
+  const shift = (view.homeOrderShift || 0) % blocks.length;
+  return shift ? [...blocks.slice(-shift), ...blocks.slice(0, -shift)] : blocks;
+}
+
+function shiftHomeOrder() {
+  const view = homeView();
+  const blocks = view && view.homeBlocks ? view.homeBlocks : [];
+  const busy = view && (view.el.matches(':hover') || view.el.contains(document.activeElement) || view.bodyEl.scrollTop > 8);
+  if (blocks.length > 1 && document.visibilityState === 'visible' && !busy) {
+    view.homeOrderShift = ((view.homeOrderShift || 0) + 1) % blocks.length;
+    const [top, ...rest] = homeDisplayOrder(view);
+    const sliding = rest.flatMap((block) => [block.heading, block.card]);
+    const before = sliding.map((node) => node.getBoundingClientRect().top);
+    view.listEl.prepend(top.heading, top.card);
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      sliding.forEach((node, i) => {
+        const dy = before[i] - node.getBoundingClientRect().top;
+        if (dy) node.animate([{ transform: `translateY(${dy}px)` }, { transform: 'none' }], { duration: 500, easing: 'ease-out' });
+      });
+      [top.heading, top.card].forEach((node) => node.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 500, easing: 'ease-out' }));
+    }
+  }
+  setTimeout(shiftHomeOrder, HOME_ORDER_CYCLE_MS / Math.max(blocks.length, 1));
 }
 
 function renderColumnBody(view, { fromUpdate = false } = {}) {
@@ -828,9 +865,9 @@ function renderColumnBody(view, { fromUpdate = false } = {}) {
       const heading = renderHomeHeading(section.col, section.items.length);
       const card = renderHomeCard(section.col, section.items[0]);
       view.cardByLink.set(section.items[0].link, card);
-      fragment.append(heading, card);
       return { ...section, index: 0, heading, card, counterEl: heading.querySelector('.home-heading-count') };
     });
+    homeDisplayOrder(view).forEach((block) => fragment.append(block.heading, block.card));
   } else {
     items.slice(0, view.limit).forEach(appendCard);
   }
@@ -1448,6 +1485,8 @@ async function loadReader() {
   }, 60000);
   setInterval(checkForUpdates, POLL_INTERVAL_MS);
   setTimeout(rotateHome, HOME_ROTATION_MS);
+  // offset from the item rotation so the two motions rarely coincide
+  setTimeout(shiftHomeOrder, HOME_ROTATION_MS * 1.5);
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') checkForUpdates();
   });
