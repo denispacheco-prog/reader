@@ -25,7 +25,7 @@
     <outline text="São Paulo" title="São Paulo">
       <outline text="g1 São Paulo" title="g1 São Paulo" type="rss" xmlUrl="https://g1.globo.com/rss/g1/sp/sao-paulo/" htmlUrl="https://g1.globo.com/sp/sao-paulo/"/>
       <outline text="Diário do Transporte" title="Diário do Transporte" type="rss" xmlUrl="https://diariodotransporte.com.br/feed/" htmlUrl="https://diariodotransporte.com.br/"/>
-      <outline text="Agência Mural" title="Agência Mural" type="rss" xmlUrl="https://agenciamural.org.br/feed/" htmlUrl="https://agenciamural.org.br/"/>
+      <outline text="Agência Mural" title="Agência Mural" type="rss" xmlUrl="https://news.google.com/rss/search?q=site:agenciamural.org.br+when:7d&amp;hl=pt-BR&amp;gl=BR&amp;ceid=BR:pt-419" htmlUrl="https://agenciamural.org.br/"/>
       <outline text="Estadão — São Paulo" title="Estadão — São Paulo" type="rss" xmlUrl="https://www.estadao.com.br/arc/outboundfeeds/feeds/rss/sections/sao-paulo/" htmlUrl="https://www.estadao.com.br/sao-paulo/"/>
     </outline>
     <outline text="Legislativo" title="Legislativo">
@@ -63,7 +63,6 @@
       <outline text="404 Media" title="404 Media" type="rss" xmlUrl="https://www.404media.co/rss/" htmlUrl="https://www.404media.co/"/>
       <outline text="Ars Technica" title="Ars Technica" type="rss" xmlUrl="https://feeds.arstechnica.com/arstechnica/index/" htmlUrl="https://arstechnica.com/"/>
       <outline text="BBC News — Technology" title="BBC News — Technology" type="rss" xmlUrl="https://feeds.bbci.co.uk/news/technology/rss.xml" htmlUrl="https://www.bbc.com/news/technology"/>
-      <outline text="Benedict Evans" title="Benedict Evans" type="rss" xmlUrl="https://www.ben-evans.com/benedictevans?format=rss" htmlUrl="https://www.ben-evans.com/"/>
       <outline text="Engadget" title="Engadget" type="rss" xmlUrl="https://www.engadget.com/rss.xml" htmlUrl="https://www.engadget.com/"/>
       <outline text="Folha de S.Paulo — Tec" title="Folha de S.Paulo — Tec" type="rss" xmlUrl="https://feeds.folha.uol.com.br/tec/rss091.xml" htmlUrl="https://www1.folha.uol.com.br/tec/"/>
       <outline text="Futurism.com" title="Futurism.com" type="rss" xmlUrl="https://futurism.com/feed" htmlUrl="https://futurism.com/"/>
@@ -88,27 +87,31 @@
       <outline text="Aeon" title="Aeon" type="rss" xmlUrl="https://aeon.co/feed.rss" htmlUrl="https://aeon.co/"/>
       <outline text="Agência FAPESP" title="Agência FAPESP" type="rss" xmlUrl="https://agencia.fapesp.br/rss" htmlUrl="https://agencia.fapesp.br/"/>
       <outline text="Ars Technica — Science" title="Ars Technica — Science" type="rss" xmlUrl="https://feeds.arstechnica.com/arstechnica/science" htmlUrl="https://arstechnica.com/science/"/>
+      <outline text="ESA" title="ESA" type="rss" xmlUrl="https://www.esa.int/rssfeed/TopNews" htmlUrl="https://www.esa.int/"/>
       <outline text="Folha de S.Paulo — Ciência" title="Folha de S.Paulo — Ciência" type="rss" xmlUrl="https://feeds.folha.uol.com.br/ciencia/rss091.xml" htmlUrl="https://www1.folha.uol.com.br/ciencia/"/>
       <outline text="Futurity" title="Futurity" type="rss" xmlUrl="https://www.futurity.org/feed/" htmlUrl="https://www.futurity.org/"/>
       <outline text="Live Science" title="Live Science" type="rss" xmlUrl="https://www.livescience.com/feeds.xml" htmlUrl="https://www.livescience.com/"/>
+      <outline text="Medical Xpress" title="Medical Xpress" type="rss" xmlUrl="https://medicalxpress.com/rss-feed/" htmlUrl="https://medicalxpress.com/"/>
       <outline text="NASA" title="NASA" type="rss" xmlUrl="https://www.nasa.gov/news-release/feed/" htmlUrl="https://www.nasa.gov/"/>
       <outline text="Nature" title="Nature" type="rss" xmlUrl="https://www.nature.com/nature/current_issue/rss" htmlUrl="https://www.nature.com/nature/"/>
       <outline text="Nautilus" title="Nautilus" type="rss" xmlUrl="https://nautil.us/feed/" htmlUrl="https://nautil.us/"/>
-      <outline text="New Scientist" title="New Scientist" type="rss" xmlUrl="https://www.newscientist.com/feed/home/" htmlUrl="https://www.newscientist.com/"/>
       <outline text="NYT — Science" title="NYT — Science" type="rss" xmlUrl="https://www.nytimes.com/services/xml/rss/nyt/Science.xml" htmlUrl="https://www.nytimes.com/section/science"/>
       <outline text="Phys.org" title="Phys.org" type="rss" xmlUrl="https://phys.org/rss-feed/" htmlUrl="https://phys.org/"/>
       <outline text="Quanta Magazine" title="Quanta Magazine" type="rss" xmlUrl="https://www.quantamagazine.org/feed/" htmlUrl="https://www.quantamagazine.org/"/>
       <outline text="RathBiotaClan" title="RathBiotaClan" type="rss" xmlUrl="https://www.rathbiotaclan.com/feed/" htmlUrl="https://www.rathbiotaclan.com/"/>
       <outline text="Retraction Watch" title="Retraction Watch" type="rss" xmlUrl="https://retractionwatch.com/feed/" htmlUrl="https://retractionwatch.com/"/>
       <outline text="Revista Pesquisa FAPESP" title="Revista Pesquisa FAPESP" type="rss" xmlUrl="https://revistapesquisa.fapesp.br/feed/" htmlUrl="https://revistapesquisa.fapesp.br/"/>
+      <outline text="Science News" title="Science News" type="rss" xmlUrl="https://www.sciencenews.org/feed" htmlUrl="https://www.sciencenews.org/"/>
       <outline text="ScienceAlert" title="ScienceAlert" type="rss" xmlUrl="https://feeds.feedburner.com/sciencealert-latestnews" htmlUrl="https://www.sciencealert.com/"/>
       <outline text="ScienceDaily" title="ScienceDaily" type="rss" xmlUrl="https://www.sciencedaily.com/newsfeed.xml" htmlUrl="https://www.sciencedaily.com/"/>
       <outline text="ScienceDaily — Aerospace" title="ScienceDaily — Aerospace" type="rss" xmlUrl="https://www.sciencedaily.com/rss/matter_energy/aerospace.xml" htmlUrl="https://www.sciencedaily.com/news/matter_energy/aerospace/"/>
       <outline text="Scientific American" title="Scientific American" type="rss" xmlUrl="https://www.scientificamerican.com/platform/syndication/rss/" htmlUrl="https://www.scientificamerican.com/"/>
       <outline text="Space.com" title="Space.com" type="rss" xmlUrl="https://www.space.com/feeds/all" htmlUrl="https://www.space.com/"/>
+      <outline text="Superinteressante" title="Superinteressante" type="rss" xmlUrl="https://super.abril.com.br/feed/" htmlUrl="https://super.abril.com.br/"/>
       <outline text="The Conversation" title="The Conversation" type="rss" xmlUrl="https://theconversation.com/br/articles.atom" htmlUrl="https://theconversation.com/br"/>
       <outline text="The Guardian — Science" title="The Guardian — Science" type="rss" xmlUrl="https://www.theguardian.com/science/rss" htmlUrl="https://www.theguardian.com/science"/>
       <outline text="Undark" title="Undark" type="rss" xmlUrl="https://undark.org/feed/" htmlUrl="https://undark.org/"/>
+      <outline text="Universe Today" title="Universe Today" type="rss" xmlUrl="https://www.universetoday.com/feed/" htmlUrl="https://www.universetoday.com/"/>
     </outline>
     <outline text="Cultura" title="Cultura">
       <outline text="/Film" title="/Film" type="rss" xmlUrl="https://feeds.feedburner.com/slashfilm" htmlUrl="https://www.slashfilm.com/"/>
@@ -118,7 +121,6 @@
       <outline text="Bleeding Cool" title="Bleeding Cool" type="rss" xmlUrl="https://www.bleedingcool.com/feed/" htmlUrl="https://www.bleedingcool.com/"/>
       <outline text="Boing Boing" title="Boing Boing" type="rss" xmlUrl="https://boingboing.net/feed" htmlUrl="https://boingboing.net/"/>
       <outline text="Collider" title="Collider" type="rss" xmlUrl="https://www.collider.com/feed/" htmlUrl="https://collider.com/"/>
-      <outline text="Damn Interesting" title="Damn Interesting" type="rss" xmlUrl="https://www.damninteresting.com/feed/" htmlUrl="https://www.damninteresting.com/"/>
       <outline text="Deadline" title="Deadline" type="rss" xmlUrl="https://www.deadline.com/feed/" htmlUrl="https://deadline.com/"/>
       <outline text="Decider" title="Decider" type="rss" xmlUrl="https://decider.com/feed/" htmlUrl="https://decider.com/"/>
       <outline text="GeekTyrant" title="GeekTyrant" type="rss" xmlUrl="https://geektyrant.com/news/atom.xml" htmlUrl="https://geektyrant.com/"/>
@@ -148,7 +150,6 @@
     <outline text="Jogos" title="Jogos">
       <outline text="Aftermath" title="Aftermath" type="rss" xmlUrl="https://aftermath.site/feed/" htmlUrl="https://aftermath.site/"/>
       <outline text="Ars Technica — Gaming" title="Ars Technica — Gaming" type="rss" xmlUrl="https://feeds.arstechnica.com/arstechnica/gaming/" htmlUrl="https://arstechnica.com/gaming/"/>
-      <outline text="Critical Distance" title="Critical Distance" type="rss" xmlUrl="https://critical-distance.com/archives/feed" htmlUrl="https://critical-distance.com/"/>
       <outline text="Eurogamer" title="Eurogamer" type="rss" xmlUrl="https://www.eurogamer.net/feed" htmlUrl="https://www.eurogamer.net/"/>
       <outline text="GamesRadar+" title="GamesRadar+" type="rss" xmlUrl="https://www.gamesradar.com/all-platforms/news/rss/" htmlUrl="https://www.gamesradar.com/"/>
       <outline text="JBox" title="JBox" type="rss" xmlUrl="https://www.jbox.com.br/feed/" htmlUrl="https://www.jbox.com.br/"/>
@@ -158,19 +159,16 @@
       <outline text="Rock Paper Shotgun" title="Rock Paper Shotgun" type="rss" xmlUrl="https://www.rockpapershotgun.com/feed" htmlUrl="https://www.rockpapershotgun.com/"/>
     </outline>
     <outline text="Ensaios" title="Ensaios">
-      <outline text="Data Is Plural" title="Data Is Plural" type="rss" xmlUrl="https://www.data-is-plural.com/feed.xml" htmlUrl="https://www.data-is-plural.com/"/>
       <outline text="Jacobin" title="Jacobin" type="rss" xmlUrl="https://jacobinmag.com/feed/" htmlUrl="https://jacobin.com/"/>
-      <outline text="Le Monde Diplomatique" title="Le Monde Diplomatique" type="rss" xmlUrl="https://diplomatique.org.br/feed/" htmlUrl="https://diplomatique.org.br/"/>
+      <outline text="Le Monde Diplomatique" title="Le Monde Diplomatique" type="rss" xmlUrl="https://news.google.com/rss/search?q=site:diplomatique.org.br+when:7d&amp;hl=pt-BR&amp;gl=BR&amp;ceid=BR:pt-419" htmlUrl="https://diplomatique.org.br/"/>
       <outline text="Longreads" title="Longreads" type="rss" xmlUrl="https://longreads.com/feed/" htmlUrl="https://longreads.com/"/>
-      <outline text="n+1" title="n+1" type="rss" xmlUrl="https://www.nplusonemag.com/feed/" htmlUrl="https://www.nplusonemag.com/"/>
       <outline text="Noema Magazine" title="Noema Magazine" type="rss" xmlUrl="https://www.noemamag.com/feed/" htmlUrl="https://www.noemamag.com/"/>
       <outline text="The Atlantic" title="The Atlantic" type="rss" xmlUrl="https://feeds.feedburner.com/TheAtlantic" htmlUrl="https://www.theatlantic.com/"/>
-      <outline text="The Baffler" title="The Baffler" type="rss" xmlUrl="https://thebaffler.com/feed" htmlUrl="https://thebaffler.com/"/>
-      <outline text="The Guardian — Datablog" title="The Guardian — Datablog" type="rss" xmlUrl="https://www.theguardian.com/news/datablog/rss" htmlUrl="https://www.theguardian.com/news/datablog"/>
       <outline text="The New Yorker — News" title="The New Yorker — News" type="rss" xmlUrl="https://www.newyorker.com/feed/news" htmlUrl="https://www.newyorker.com/news"/>
     </outline>
     <outline text="Blogs" title="Blogs">
       <outline text="Austin Kleon" title="Austin Kleon" type="rss" xmlUrl="https://austinkleon.com/feed/" htmlUrl="https://austinkleon.com/"/>
+      <outline text="Benedict Evans" title="Benedict Evans" type="rss" xmlUrl="https://www.ben-evans.com/benedictevans?format=rss" htmlUrl="https://www.ben-evans.com/"/>
       <outline text="Charles Stross" title="Charles Stross" type="rss" xmlUrl="http://www.antipope.org/charlie/blog-static/atom.xml" htmlUrl="http://www.antipope.org/charlie/blog-static/"/>
       <outline text="Cory Doctorow (Pluralistic)" title="Cory Doctorow (Pluralistic)" type="rss" xmlUrl="https://pluralistic.net/feed/" htmlUrl="https://pluralistic.net/"/>
       <outline text="Craig Mod" title="Craig Mod" type="rss" xmlUrl="https://craigmod.com/index.xml" htmlUrl="https://craigmod.com/"/>

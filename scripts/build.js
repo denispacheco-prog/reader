@@ -91,13 +91,6 @@ function decodeXml(buffer) {
   }
 }
 
-// Some feeds behind Cloudflare (e.g. Le Monde Diplomatique, New Scientist,
-// Quatro Cinco Um, io9) fetch fine from a residential connection but return
-// zero items when this runs in GitHub Actions — Cloudflare's bot protection
-// tends to challenge/block traffic from cloud datacenter IP ranges even with
-// a normal browser User-Agent. This is a known, accepted limitation (not a
-// bug to chase): those feeds just won't reliably appear via the automated
-// build, though the OPML entry is kept since it works locally.
 // Rest of World publishes URLs with bare "&", which is invalid XML. Only escape
 // on failure, and skip CDATA, where a bare "&" is valid and must stay as is.
 async function parseFeed(xml) {
@@ -110,6 +103,13 @@ async function parseFeed(xml) {
   }
 }
 
+// Some feeds behind Cloudflare fetch fine from a residential connection but
+// return zero items when this runs in GitHub Actions — Cloudflare's bot
+// protection tends to challenge/block traffic from cloud datacenter IP ranges
+// even with a normal browser User-Agent. This is a known, accepted limitation
+// (not a bug to chase). When Google News indexes the site, feeds.opml points
+// at a Google News search for it instead (Agência Mural, Le Monde
+// Diplomatique); otherwise the feed is dropped.
 async function fetchFeedItems(feed) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
@@ -137,6 +137,19 @@ async function fetchFeedItems(feed) {
   }
 }
 
+// A Google News site search also returns navigation pages: archives, author
+// pages, issue covers and, for Alesp, contract and bill records.
+const GOOGLE_NEWS_NOISE = [
+  /^Arquivos\b/,
+  /Página \d+ de \d+/,
+  /, Autor em /,
+  /^Edição\b/,
+  /^Processo de Contrato\b/,
+  /^Projeto de Lei [\d.]+\/\d{4}$/,
+  /^\d+ª Sessão (Ordinária|Extraordinária|Solene)$/,
+  /^(Banco de Notícias|Legislação Estadual|Sua quebrada)$/,
+];
+
 function normalizeItem(item, sourceName, category) {
   const link = item.link;
   const rawDate = item.isoDate || item.pubDate;
@@ -153,9 +166,11 @@ function normalizeItem(item, sourceName, category) {
   }
 
   // Google News appends the outlet to every headline ("Título - Veículo").
-  const titleRaw = link.startsWith('https://news.google.com/')
-    ? (item.title || '').replace(/ - [^-]+$/, '')
-    : item.title;
+  const fromGoogleNews = link.startsWith('https://news.google.com/');
+  const titleRaw = fromGoogleNews ? (item.title || '').replace(/ - [^-]+$/, '') : item.title;
+  if (fromGoogleNews && GOOGLE_NEWS_NOISE.some((pattern) => pattern.test(titleRaw.trim()))) {
+    return null;
+  }
   const summaryRaw = item.contentSnippet || item.summary || item.content || '';
   const summary = decodeHtmlEntities(summaryRaw).trim().slice(0, SUMMARY_MAX_LENGTH);
 
