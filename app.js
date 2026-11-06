@@ -15,9 +15,12 @@ const MAX_COLUMN_WIDTH = 440;
 const LOAD_MORE_THRESHOLD_PX = 600;
 const ADDED_COLUMNS_KEY = 'reader:addedColumns';
 const LEGACY_ADDED_CATEGORIES_KEY = 'reader:addedCategories';
-const HOME_ROTATION_SIZE = 10;
+const HOME_ROTATION_SIZE = 13;
 const HOME_ROTATION_MS = 60 * 1000;
-const HOME_ORDER_CYCLE_MS = 10 * 60 * 1000;
+// Keep this lap out of step with a block's item cycle (HOME_ROTATION_SIZE ×
+// HOME_ROTATION_MS = 13 min): when the two match, a block reaches the top at
+// the same point of its cycle every lap and some items are never on screen.
+const HOME_ORDER_CYCLE_MS = 7 * 60 * 1000;
 const DEFAULT_CATEGORY_ORDER = ['Brasil', 'São Paulo', 'Legislativo', 'Mundo', 'Tecnologia', 'Ciência', 'Cultura', 'Jogos', 'Ensaios', 'Blogs'];
 
 // Categories merged into another one; saved decks drop their old column.
@@ -805,7 +808,7 @@ function advanceHomeBlock(view, block) {
 
 // The blocks also take turns at the top: about every HOME_ORDER_CYCLE_MS /
 // blocks, the bottom block moves up and the rest slide down, so a full lap
-// takes ~10 minutes. `homeOrderShift` counts how many blocks have wrapped
+// takes ~7 minutes. `homeOrderShift` counts how many blocks have wrapped
 // and survives data refreshes. The order holds while the pointer is over
 // the column, focus is inside it, or it is scrolled away from the top.
 function homeDisplayOrder(view) {
@@ -861,11 +864,17 @@ function renderColumnBody(view, { fromUpdate = false } = {}) {
     return card;
   };
   if (sections) {
+    // On fresh data each block resumes from the story it was showing, so its
+    // whole cycle gets screen time; new stories come up when it wraps around.
+    const showing = new Map((view.homeBlocks || []).map((block) => [block.col.id, block.items[block.index].link]));
     view.homeBlocks = sections.map((section) => {
+      const index = Math.max(0, section.items.findIndex((item) => item.link === showing.get(section.col.id)));
       const heading = renderHomeHeading(section.col, section.items.length);
-      const card = renderHomeCard(section.col, section.items[0]);
-      view.cardByLink.set(section.items[0].link, card);
-      return { ...section, index: 0, heading, card, counterEl: heading.querySelector('.home-heading-count') };
+      const card = renderHomeCard(section.col, section.items[index]);
+      view.cardByLink.set(section.items[index].link, card);
+      const counterEl = heading.querySelector('.home-heading-count');
+      if (counterEl) counterEl.textContent = `${index + 1}/${section.items.length}`;
+      return { ...section, index, heading, card, counterEl };
     });
     homeDisplayOrder(view).forEach((block) => fragment.append(block.heading, block.card));
   } else {
