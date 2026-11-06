@@ -146,6 +146,12 @@ function normalizeItem(item, sourceName, category) {
     return null;
   }
 
+  // A wrong future date (BBC Culture once sent one weeks ahead) would pin the
+  // item to the top of its column; allow a day of slack for time zones.
+  if (date.getTime() > Date.now() + 24 * 60 * 60 * 1000) {
+    return null;
+  }
+
   // Google News appends the outlet to every headline ("Título - Veículo").
   const titleRaw = link.startsWith('https://news.google.com/')
     ? (item.title || '').replace(/ - [^-]+$/, '')

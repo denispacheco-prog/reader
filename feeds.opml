@@ -115,7 +115,6 @@
       <outline text="Anime News Network" title="Anime News Network" type="rss" xmlUrl="https://www.animenewsnetwork.com/news/rss.xml" htmlUrl="https://www.animenewsnetwork.com/news/"/>
       <outline text="Atlas Obscura" title="Atlas Obscura" type="rss" xmlUrl="https://www.atlasobscura.com/feeds/latest" htmlUrl="https://www.atlasobscura.com/"/>
       <outline text="Bandcamp Daily" title="Bandcamp Daily" type="rss" xmlUrl="https://daily.bandcamp.com/feed" htmlUrl="https://daily.bandcamp.com/"/>
-      <outline text="BBC Culture" title="BBC Culture" type="rss" xmlUrl="https://www.bbc.com/culture/feed.rss" htmlUrl="https://www.bbc.com/culture"/>
       <outline text="Bleeding Cool" title="Bleeding Cool" type="rss" xmlUrl="https://www.bleedingcool.com/feed/" htmlUrl="https://www.bleedingcool.com/"/>
       <outline text="Boing Boing" title="Boing Boing" type="rss" xmlUrl="https://boingboing.net/feed" htmlUrl="https://boingboing.net/"/>
       <outline text="Collider" title="Collider" type="rss" xmlUrl="https://www.collider.com/feed/" htmlUrl="https://collider.com/"/>
@@ -125,8 +124,8 @@
       <outline text="GeekTyrant" title="GeekTyrant" type="rss" xmlUrl="https://geektyrant.com/news/atom.xml" htmlUrl="https://geektyrant.com/"/>
       <outline text="Hyperallergic" title="Hyperallergic" type="rss" xmlUrl="https://hyperallergic.com/feed/" htmlUrl="https://hyperallergic.com/"/>
       <outline text="IndieWire" title="IndieWire" type="rss" xmlUrl="https://www.indiewire.com/feed/" htmlUrl="https://www.indiewire.com/"/>
-      <outline text="io9" title="io9" type="rss" xmlUrl="https://io9.gizmodo.com/rss" htmlUrl="https://gizmodo.com/io9"/>
       <outline text="Laughing Squid" title="Laughing Squid" type="rss" xmlUrl="https://laughingsquid.com/feed/" htmlUrl="https://laughingsquid.com/"/>
+      <outline text="Literary Hub" title="Literary Hub" type="rss" xmlUrl="https://lithub.com/feed/" htmlUrl="https://lithub.com/"/>
       <outline text="MUBI Notebook" title="MUBI Notebook" type="rss" xmlUrl="https://mubi.com/notebook/posts.atom" htmlUrl="https://mubi.com/notebook"/>
       <outline text="NYT — Magazine" title="NYT — Magazine" type="rss" xmlUrl="https://www.nytimes.com/services/xml/rss/nyt/Magazine.xml" htmlUrl="https://www.nytimes.com/section/magazine"/>
       <outline text="NYT — Movies" title="NYT — Movies" type="rss" xmlUrl="https://www.nytimes.com/services/xml/rss/nyt/Movies.xml" htmlUrl="https://www.nytimes.com/section/movies"/>
