@@ -15,7 +15,8 @@ const MAX_COLUMN_WIDTH = 440;
 const LOAD_MORE_THRESHOLD_PX = 600;
 const ADDED_COLUMNS_KEY = 'reader:addedColumns';
 const LEGACY_ADDED_CATEGORIES_KEY = 'reader:addedCategories';
-const HOME_ITEMS_PER_COLUMN = 2;
+const HOME_ROTATION_SIZE = 10;
+const HOME_ROTATION_MS = 60 * 1000;
 const DEFAULT_CATEGORY_ORDER = ['Brasil', 'São Paulo', 'Legislativo', 'Mundo', 'Tecnologia', 'Ciência', 'Cultura', 'Jogos', 'Ensaios', 'Blogs'];
 
 // Categories merged into another one; saved decks drop their old column.
@@ -307,23 +308,30 @@ function applyAddedColumns() {
   if (changed) saveColumns();
 }
 
-// The home column: the newest items of every other column (saved excluded),
-// in deck order, preferring different outlets and never repeating a story.
-// Stories are matched by title too, since sibling feeds (e.g. two Folha
-// sections) publish the same piece under different links.
+// The home column: one block per other column (saved excluded), in deck
+// order. Each block opens on the column's newest story and then rotates
+// through up to HOME_ROTATION_SIZE of its items, preferring different
+// outlets. No block shows a story that opens another block. Stories are
+// matched by title too, since sibling feeds (e.g. two Folha sections)
+// publish the same piece under different links.
 function homeSections() {
-  const used = new Set();
-  return state.columns
+  const firsts = new Set();
+  const sections = state.columns
     .filter((col) => col.type !== 'home' && col.type !== 'saved')
     .map((col) => {
-      const items = pickHighlights(itemsForColumn(col), HOME_ITEMS_PER_COLUMN, used);
-      items.forEach((item) => {
-        used.add(item.link);
-        used.add(titleKey(item));
-      });
-      return { col, items };
+      const all = itemsForColumn(col);
+      const [first] = pickHighlights(all, 1, firsts);
+      if (first) {
+        firsts.add(first.link);
+        firsts.add(titleKey(first));
+      }
+      return { col, all, first };
     })
-    .filter((section) => section.items.length > 0);
+    .filter((section) => section.first);
+  return sections.map(({ col, all, first }) => ({
+    col,
+    items: [first, ...pickHighlights(all, HOME_ROTATION_SIZE - 1, firsts)],
+  }));
 }
 
 function titleKey(item) {
@@ -732,7 +740,7 @@ function captureColumnAnchor(view) {
   return null;
 }
 
-function renderHomeHeading(col) {
+function renderHomeHeading(col, total) {
   const info = columnInfo(col);
   const heading = el('button', 'home-heading');
   heading.type = 'button';
@@ -743,13 +751,56 @@ function renderHomeHeading(col) {
     icon.style.setProperty('--tint', info.tint);
     icon.classList.add('has-tint');
   }
-  heading.append(icon, el('span', 'home-heading-title', info.title), el('span', 'home-heading-more', 'ver coluna →'));
+  heading.append(icon, el('span', 'home-heading-title', info.title));
+  if (total > 1) heading.append(el('span', 'home-heading-count', `1/${total}`));
+  heading.append(el('span', 'home-heading-more', 'ver coluna →'));
   return heading;
+}
+
+function renderHomeCard(col, item) {
+  const card = renderCard(item, col);
+  const { tint } = columnInfo(col);
+  if (tint) {
+    card.style.setProperty('--tint', tint);
+    card.classList.add('has-tint');
+  }
+  return card;
+}
+
+// Home blocks take turns: one advances every HOME_ROTATION_MS / blocks, so
+// each block changes about once a minute and never all at the same time.
+// A block under the pointer or holding focus stays put.
+let homeRotationCursor = 0;
+
+function rotateHome() {
+  const view = [...state.views.values()].find((v) => v.col.type === 'home');
+  const blocks = view && view.homeBlocks ? view.homeBlocks.filter((b) => b.items.length > 1) : [];
+  if (blocks.length > 0 && document.visibilityState === 'visible') {
+    const block = blocks[homeRotationCursor % blocks.length];
+    homeRotationCursor += 1;
+    if (!isHomeBlockActive(block)) advanceHomeBlock(view, block);
+  }
+  setTimeout(rotateHome, HOME_ROTATION_MS / Math.max(blocks.length, 1));
+}
+
+function isHomeBlockActive(block) {
+  return block.heading.matches(':hover') || block.card.matches(':hover') || block.card.contains(document.activeElement);
+}
+
+function advanceHomeBlock(view, block) {
+  block.index = (block.index + 1) % block.items.length;
+  const card = renderHomeCard(block.col, block.items[block.index]);
+  card.classList.add('is-rotating-in');
+  view.cardByLink.delete(block.card.dataset.link);
+  view.cardByLink.set(card.dataset.link, card);
+  block.card.replaceWith(card);
+  block.card = card;
+  block.counterEl.textContent = `${block.index + 1}/${block.items.length}`;
 }
 
 function renderColumnBody(view, { fromUpdate = false } = {}) {
   const sections = view.col.type === 'home' ? homeSections() : null;
-  const items = sections ? sections.flatMap((section) => section.items) : itemsForColumn(view.col);
+  const items = sections ? sections.map((section) => section.items[0]) : itemsForColumn(view.col);
   const anchor = fromUpdate ? captureColumnAnchor(view) : null;
 
   let newCount = 0;
@@ -773,16 +824,12 @@ function renderColumnBody(view, { fromUpdate = false } = {}) {
     return card;
   };
   if (sections) {
-    sections.forEach((section) => {
-      const { tint } = columnInfo(section.col);
-      fragment.append(renderHomeHeading(section.col));
-      section.items.forEach((item) => {
-        const card = appendCard(item);
-        if (tint) {
-          card.style.setProperty('--tint', tint);
-          card.classList.add('has-tint');
-        }
-      });
+    view.homeBlocks = sections.map((section) => {
+      const heading = renderHomeHeading(section.col, section.items.length);
+      const card = renderHomeCard(section.col, section.items[0]);
+      view.cardByLink.set(section.items[0].link, card);
+      fragment.append(heading, card);
+      return { ...section, index: 0, heading, card, counterEl: heading.querySelector('.home-heading-count') };
     });
   } else {
     items.slice(0, view.limit).forEach(appendCard);
@@ -1209,7 +1256,7 @@ function renderAddPanel() {
 
   const grid = el('div', 'add-grid');
   grid.append(
-    addOptionButton({ label: 'Início', detail: `${HOME_ITEMS_PER_COLUMN} destaques de cada coluna`, icon: '◈', type: 'home' }),
+    addOptionButton({ label: 'Início', detail: 'um destaque de cada coluna, em rodízio', icon: '◈', type: 'home' }),
     addOptionButton({ label: 'Tudo', detail: 'todas as fontes juntas', icon: '≡', type: 'all' }),
     addOptionButton({ label: 'Salvos', detail: 'itens marcados com ☆', icon: '★', type: 'saved' }),
   );
@@ -1400,6 +1447,7 @@ async function loadReader() {
     updateRelativeTimes();
   }, 60000);
   setInterval(checkForUpdates, POLL_INTERVAL_MS);
+  setTimeout(rotateHome, HOME_ROTATION_MS);
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') checkForUpdates();
   });
