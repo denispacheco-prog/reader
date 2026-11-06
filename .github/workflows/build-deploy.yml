@@ -12,9 +12,12 @@ permissions:
   pages: write
   id-token: write
 
+# Queue runs instead of cancelling them: a run cancelled mid-deploy leaves a
+# Pages deployment behind that makes the next deploy fail. Only the newest
+# pending run is kept, so the queue never grows past one.
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   build-deploy:
