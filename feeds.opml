@@ -101,6 +101,7 @@
       <outline text="RathBiotaClan" title="RathBiotaClan" type="rss" xmlUrl="https://www.rathbiotaclan.com/feed/" htmlUrl="https://www.rathbiotaclan.com/"/>
       <outline text="Retraction Watch" title="Retraction Watch" type="rss" xmlUrl="https://retractionwatch.com/feed/" htmlUrl="https://retractionwatch.com/"/>
       <outline text="Revista Pesquisa FAPESP" title="Revista Pesquisa FAPESP" type="rss" xmlUrl="https://revistapesquisa.fapesp.br/feed/" htmlUrl="https://revistapesquisa.fapesp.br/"/>
+      <outline text="Science" title="Science" type="rss" xmlUrl="https://news.google.com/rss/search?q=site:science.org/content/article+when:7d&amp;hl=en-US&amp;gl=US&amp;ceid=US:en" htmlUrl="https://www.science.org/news"/>
       <outline text="Science News" title="Science News" type="rss" xmlUrl="https://www.sciencenews.org/feed" htmlUrl="https://www.sciencenews.org/"/>
       <outline text="ScienceAlert" title="ScienceAlert" type="rss" xmlUrl="https://feeds.feedburner.com/sciencealert-latestnews" htmlUrl="https://www.sciencealert.com/"/>
       <outline text="ScienceDaily" title="ScienceDaily" type="rss" xmlUrl="https://www.sciencedaily.com/newsfeed.xml" htmlUrl="https://www.sciencedaily.com/"/>
