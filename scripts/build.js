@@ -8,9 +8,13 @@ const ROOT = path.resolve(__dirname, '..');
 
 const OPML_PATH = path.join(ROOT, 'feeds.opml');
 const OUTPUT_PATH = path.join(ROOT, 'reader.json');
+const FIRST_SEEN_PATH = path.join(ROOT, 'first-seen.json');
+const PUBLISHED_FIRST_SEEN_URL = 'https://denispacheco-prog.github.io/reader/first-seen.json';
 const WINDOW_DAYS = 7;
 // Personal blogs post far less often than news sites; 7 days would empty them.
 const CATEGORY_WINDOW_DAYS = { Blogs: 30 };
+const DAY_MS = 24 * 60 * 60 * 1000;
+const BUILD_TIME = new Date().toISOString();
 const FETCH_TIMEOUT_MS = 10000;
 const FETCH_CONCURRENCY = 20;
 const SUMMARY_MAX_LENGTH = 500;
@@ -110,6 +114,48 @@ async function parseFeed(xml) {
 // (not a bug to chase). When Google News indexes the site, feeds.opml points
 // at a Google News search for it instead (Agência Mural, Le Monde
 // Diplomatique); otherwise the feed is dropped.
+// Some feeds give no date (Nikkei Asia, Agência FAPESP) or stamp every item
+// with the moment the feed was generated (The Korea Times, and date-only
+// feeds like Taipei Times that put the whole day at midnight). Those dates
+// would pin a feed to the top of its column on every build, so such items
+// get the time a build first saw them instead. The first sightings travel
+// from build to build in first-seen.json, published next to reader.json.
+let previousFirstSeen = new Map();
+const firstSeen = new Map();
+
+function withTrustedDates(items) {
+  const dates = items.map((item) => item.date);
+  const allStamped = items.length >= 5 && dates.every((date) => date && date === dates[0]);
+  return items.map((item) => {
+    if (item.date && !allStamped) return item;
+    const date = previousFirstSeen.get(item.link) || BUILD_TIME;
+    firstSeen.set(item.link, date);
+    return { ...item, date };
+  });
+}
+
+async function loadPreviousFirstSeen() {
+  try {
+    const response = await fetch(PUBLISHED_FIRST_SEEN_URL, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    return new Map(Object.entries(await response.json()));
+  } catch (err) {
+    console.error(`[build] first-seen.json anterior indisponível (${err.message}); itens sem data confiável usam o horário deste build`);
+    return new Map();
+  }
+}
+
+// Keep what this build saw, plus earlier sightings still inside the longest
+// window, so a feed that fails once doesn't have its items re-stamped as new.
+function firstSeenToSave() {
+  const keepMs = (Math.max(WINDOW_DAYS, ...Object.values(CATEGORY_WINDOW_DAYS)) + 1) * DAY_MS;
+  const saved = new Map(firstSeen);
+  previousFirstSeen.forEach((date, link) => {
+    if (!saved.has(link) && Date.now() - new Date(date).getTime() < keepMs) saved.set(link, date);
+  });
+  return Object.fromEntries(saved);
+}
+
 async function fetchFeedItems(feed) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
@@ -126,9 +172,10 @@ async function fetchFeedItems(feed) {
     const parsed = await parseFeed(xml);
     const sourceName = feed.title || parsed.title || feed.xmlUrl;
 
-    return parsed.items
+    const items = parsed.items
       .map((item) => normalizeItem(item, sourceName, feed.category))
       .filter((item) => item !== null);
+    return withTrustedDates(items);
   } catch (err) {
     console.error(`[build] falha ao buscar "${feed.title}" (${feed.xmlUrl}): ${err.message}`);
     return [];
@@ -157,9 +204,11 @@ const LINK_NOISE = [/^https:\/\/www\.videogameschronicle\.com\/guide\//];
 function normalizeItem(item, sourceName, category) {
   const link = item.link;
   const rawDate = item.isoDate || item.pubDate;
-  const date = rawDate ? new Date(rawDate) : null;
+  const parsedDate = rawDate ? new Date(rawDate) : null;
+  // Undated items are kept; withTrustedDates fills in when they were first seen.
+  const date = parsedDate && !Number.isNaN(parsedDate.getTime()) ? parsedDate : null;
 
-  if (!link || !date || Number.isNaN(date.getTime())) {
+  if (!link) {
     return null;
   }
 
@@ -169,7 +218,7 @@ function normalizeItem(item, sourceName, category) {
 
   // A wrong future date (BBC Culture once sent one weeks ahead) would pin the
   // item to the top of its column; allow a day of slack for time zones.
-  if (date.getTime() > Date.now() + 24 * 60 * 60 * 1000) {
+  if (date && date.getTime() > Date.now() + DAY_MS) {
     return null;
   }
 
@@ -187,7 +236,7 @@ function normalizeItem(item, sourceName, category) {
     link,
     source: sourceName,
     category,
-    date: date.toISOString(),
+    date: date ? date.toISOString() : null,
     summary,
   };
 }
@@ -230,7 +279,7 @@ function dedupeByTitle(items) {
 }
 
 function withinWindow(items) {
-  const cutoffFor = (category) => Date.now() - (CATEGORY_WINDOW_DAYS[category] ?? WINDOW_DAYS) * 24 * 60 * 60 * 1000;
+  const cutoffFor = (category) => Date.now() - (CATEGORY_WINDOW_DAYS[category] ?? WINDOW_DAYS) * DAY_MS;
   return items.filter((item) => new Date(item.date).getTime() >= cutoffFor(item.category));
 }
 
@@ -242,6 +291,7 @@ async function main() {
     console.error('[build] nenhum feed encontrado em feeds.opml');
   }
 
+  previousFirstSeen = await loadPreviousFirstSeen();
   console.log(`[build] buscando ${feeds.length} feed(s)...`);
   const results = await mapWithConcurrency(feeds, FETCH_CONCURRENCY, fetchFeedItems);
   const allItems = results.flat();
@@ -259,6 +309,7 @@ async function main() {
   };
 
   await writeFile(OUTPUT_PATH, JSON.stringify(reader, null, 2), 'utf-8');
+  await writeFile(FIRST_SEEN_PATH, JSON.stringify(firstSeenToSave()), 'utf-8');
   console.log(
     `[build] reader.json gerado com ${recent.length} item(ns) (${windowed.length - recent.length} manchete(s) repetida(s) removida(s)).`,
   );

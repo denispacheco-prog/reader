@@ -39,7 +39,7 @@ jobs:
       - name: Preparar site estático
         run: |
           mkdir -p dist
-          cp index.html style.css app.js reader.json dist/
+          cp index.html style.css app.js reader.json first-seen.json dist/
 
       - uses: actions/configure-pages@v5
 
