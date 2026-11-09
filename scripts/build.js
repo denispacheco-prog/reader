@@ -20,6 +20,7 @@ const BUILD_TIME = new Date().toISOString();
 const FETCH_TIMEOUT_MS = 10000;
 const FETCH_CONCURRENCY = 20;
 const SUMMARY_MAX_LENGTH = 500;
+const MAX_ITEMS_PER_SOURCE = 40;
 const FETCH_USER_AGENT =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
 
@@ -285,6 +286,18 @@ function withinWindow(items) {
   return items.filter((item) => new Date(item.date).getTime() >= cutoffFor(item.category));
 }
 
+// Firehose feeds (Folha sections, Axios, g1...) post ~100 items a week and
+// would crowd their columns and bloat reader.json; keep each source's newest
+// MAX_ITEMS_PER_SOURCE. Expects items sorted newest first.
+function capPerSource(items) {
+  const counts = new Map();
+  return items.filter((item) => {
+    const count = (counts.get(item.source) || 0) + 1;
+    counts.set(item.source, count);
+    return count <= MAX_ITEMS_PER_SOURCE;
+  });
+}
+
 async function main() {
   const opmlXml = await readFile(OPML_PATH, 'utf-8');
   const feeds = parseOpml(opmlXml);
@@ -301,7 +314,8 @@ async function main() {
   const deduped = dedupeByLink(allItems);
   const windowed = withinWindow(deduped);
   windowed.sort((a, b) => new Date(b.date) - new Date(a.date));
-  const recent = dedupeByTitle(windowed);
+  const unique = dedupeByTitle(windowed);
+  const recent = capPerSource(unique);
 
   const reader = {
     generatedAt: new Date().toISOString(),
@@ -313,7 +327,7 @@ async function main() {
   await writeFile(OUTPUT_PATH, JSON.stringify(reader, null, 2), 'utf-8');
   await writeFile(FIRST_SEEN_PATH, JSON.stringify(firstSeenToSave()), 'utf-8');
   console.log(
-    `[build] reader.json gerado com ${recent.length} item(ns) (${windowed.length - recent.length} manchete(s) repetida(s) removida(s)).`,
+    `[build] reader.json gerado com ${recent.length} item(ns) (${windowed.length - unique.length} manchete(s) repetida(s) e ${unique.length - recent.length} acima do teto por fonte removidos).`,
   );
 }
 
