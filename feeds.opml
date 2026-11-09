@@ -84,6 +84,7 @@
     <outline text="Ciência" title="Ciência">
       <outline text="Aeon" title="Aeon" type="rss" xmlUrl="https://aeon.co/feed.rss" htmlUrl="https://aeon.co/"/>
       <outline text="Agência FAPESP" title="Agência FAPESP" type="rss" xmlUrl="https://agencia.fapesp.br/rss" htmlUrl="https://agencia.fapesp.br/"/>
+      <outline text="Archaeology Magazine" title="Archaeology Magazine" type="rss" xmlUrl="https://archaeology.org/feed/" htmlUrl="https://archaeology.org/"/>
       <outline text="Ars Technica — Science" title="Ars Technica — Science" type="rss" xmlUrl="https://feeds.arstechnica.com/arstechnica/science" htmlUrl="https://arstechnica.com/science/"/>
       <outline text="ESA" title="ESA" type="rss" xmlUrl="https://www.esa.int/rssfeed/TopNews" htmlUrl="https://www.esa.int/"/>
       <outline text="Folha de S.Paulo — Ciência" title="Folha de S.Paulo — Ciência" type="rss" xmlUrl="https://feeds.folha.uol.com.br/ciencia/rss091.xml" htmlUrl="https://www1.folha.uol.com.br/ciencia/"/>
