@@ -11,8 +11,10 @@ const OUTPUT_PATH = path.join(ROOT, 'reader.json');
 const FIRST_SEEN_PATH = path.join(ROOT, 'first-seen.json');
 const PUBLISHED_FIRST_SEEN_URL = 'https://denispacheco-prog.github.io/reader/first-seen.json';
 const WINDOW_DAYS = 7;
-// Personal blogs post far less often than news sites; 7 days would empty them.
-const CATEGORY_WINDOW_DAYS = { Blogs: 30 };
+// Personal blogs and art sites post far less often than news sites; 7 days
+// would empty them. Busy feeds there (e.g. Dezeen) only list their latest
+// ~50 items anyway, so the longer window mostly lets the slow ones in.
+const CATEGORY_WINDOW_DAYS = { Blogs: 30, 'Arte e Design': 30 };
 const DAY_MS = 24 * 60 * 60 * 1000;
 const BUILD_TIME = new Date().toISOString();
 const FETCH_TIMEOUT_MS = 10000;

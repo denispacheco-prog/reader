@@ -21,7 +21,7 @@ const HOME_ROTATION_MS = 60 * 1000;
 // HOME_ROTATION_MS = 13 min): when the two match, a block reaches the top at
 // the same point of its cycle every lap and some items are never on screen.
 const HOME_ORDER_CYCLE_MS = 7 * 60 * 1000;
-const DEFAULT_CATEGORY_ORDER = ['Brasil', 'São Paulo', 'Legislativo', 'Mundo', 'Tecnologia', 'Ciência', 'Cultura', 'Jogos', 'Ensaios', 'Blogs'];
+const DEFAULT_CATEGORY_ORDER = ['Brasil', 'São Paulo', 'Legislativo', 'Mundo', 'Tecnologia', 'Ciência', 'Cultura', 'Arte e Design', 'Jogos', 'Ensaios', 'Blogs'];
 
 // Categories merged into another one; saved decks drop their old column.
 const RETIRED_COLUMN_IDS = ['category:Futurismo'];
@@ -34,6 +34,7 @@ const ADDED_COLUMNS = [
   { type: 'home' },
   { type: 'category', value: 'Legislativo', after: 'category:São Paulo' },
   { type: 'category', value: 'Blogs', after: 'category:Ensaios' },
+  { type: 'category', value: 'Arte e Design', after: 'category:Cultura' },
 ];
 
 const SOURCE_PALETTE = [
@@ -70,6 +71,7 @@ const CATEGORY_COLORS = {
   'Tecnologia': '#94bdf5',
   'Ciência': '#8ad8d3',
   'Cultura': '#f5a6c8',
+  'Arte e Design': '#e8c26a',
   'Jogos': '#d1a6ec',
   'Ensaios': '#f7bc8c',
   'Blogs': '#d4b896',
@@ -86,9 +88,15 @@ const CATEGORY_SYMBOLS = {
   'Tecnologia': '⌘',
   'Ciência': '⚛︎',
   'Cultura': '♫︎',
+  'Arte e Design': '✿︎',
   'Jogos': '♟︎',
   'Ensaios': '¶',
   'Blogs': '✎︎',
+};
+
+// Shorter names for the rail, which fits about 11 characters.
+const CATEGORY_RAIL_LABELS = {
+  'Arte e Design': 'Arte/Design',
 };
 
 function categorySymbol(name) {
@@ -958,7 +966,8 @@ function renderRailColumns() {
       icon.style.setProperty('--tint', info.tint);
       icon.classList.add('has-tint');
     }
-    item.append(icon, el('span', 'rail-col-label', info.title));
+    const label = (col.type === 'category' && CATEGORY_RAIL_LABELS[canonicalCategory(col.value)]) || info.title;
+    item.append(icon, el('span', 'rail-col-label', label));
     view.railEl = item;
     return item;
   });

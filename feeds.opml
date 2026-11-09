@@ -123,7 +123,6 @@
       <outline text="Deadline" title="Deadline" type="rss" xmlUrl="https://www.deadline.com/feed/" htmlUrl="https://deadline.com/"/>
       <outline text="Decider" title="Decider" type="rss" xmlUrl="https://decider.com/feed/" htmlUrl="https://decider.com/"/>
       <outline text="GeekTyrant" title="GeekTyrant" type="rss" xmlUrl="https://geektyrant.com/news/atom.xml" htmlUrl="https://geektyrant.com/"/>
-      <outline text="Hyperallergic" title="Hyperallergic" type="rss" xmlUrl="https://hyperallergic.com/feed/" htmlUrl="https://hyperallergic.com/"/>
       <outline text="IndieWire" title="IndieWire" type="rss" xmlUrl="https://www.indiewire.com/feed/" htmlUrl="https://www.indiewire.com/"/>
       <outline text="Laughing Squid" title="Laughing Squid" type="rss" xmlUrl="https://laughingsquid.com/feed/" htmlUrl="https://laughingsquid.com/"/>
       <outline text="Literary Hub" title="Literary Hub" type="rss" xmlUrl="https://lithub.com/feed/" htmlUrl="https://lithub.com/"/>
@@ -136,7 +135,6 @@
       <outline text="Slate — Culture" title="Slate — Culture" type="rss" xmlUrl="https://slate.com/feeds/culture.rss" htmlUrl="https://slate.com/culture"/>
       <outline text="Stereogum" title="Stereogum" type="rss" xmlUrl="https://www.stereogum.com/feed/" htmlUrl="https://www.stereogum.com/"/>
       <outline text="The A.V. Club — Film" title="The A.V. Club — Film" type="rss" xmlUrl="https://www.avclub.com/article-category/film/feed" htmlUrl="https://www.avclub.com/film"/>
-      <outline text="The Guardian — Art and Design" title="The Guardian — Art and Design" type="rss" xmlUrl="https://www.theguardian.com/artanddesign/rss" htmlUrl="https://www.theguardian.com/artanddesign"/>
       <outline text="The Guardian — Culture" title="The Guardian — Culture" type="rss" xmlUrl="https://www.theguardian.com/culture/rss" htmlUrl="https://www.theguardian.com/culture"/>
       <outline text="The Guardian — Film" title="The Guardian — Film" type="rss" xmlUrl="https://www.theguardian.com/film/rss" htmlUrl="https://www.theguardian.com/film"/>
       <outline text="The Guardian — Music" title="The Guardian — Music" type="rss" xmlUrl="https://www.theguardian.com/music/rss" htmlUrl="https://www.theguardian.com/music"/>
@@ -144,6 +142,20 @@
       <outline text="The New Yorker" title="The New Yorker" type="rss" xmlUrl="https://www.newyorker.com/feed/culture" htmlUrl="https://www.newyorker.com/culture"/>
       <outline text="TheWrap" title="TheWrap" type="rss" xmlUrl="https://www.thewrap.com/feed/" htmlUrl="https://www.thewrap.com/"/>
       <outline text="Variety" title="Variety" type="rss" xmlUrl="https://variety.com/feed/" htmlUrl="https://variety.com/"/>
+    </outline>
+    <outline text="Arte e Design" title="Arte e Design">
+      <outline text="Colossal" title="Colossal" type="rss" xmlUrl="https://www.thisiscolossal.com/feed/" htmlUrl="https://www.thisiscolossal.com/"/>
+      <outline text="Core77" title="Core77" type="rss" xmlUrl="https://www.core77.com/blog/rss.xml" htmlUrl="https://www.core77.com/"/>
+      <outline text="Creative Boom" title="Creative Boom" type="rss" xmlUrl="https://www.creativeboom.com/feed/" htmlUrl="https://www.creativeboom.com/"/>
+      <outline text="Design Milk" title="Design Milk" type="rss" xmlUrl="https://design-milk.com/feed/" htmlUrl="https://design-milk.com/"/>
+      <outline text="designboom" title="designboom" type="rss" xmlUrl="https://www.designboom.com/feed/" htmlUrl="https://www.designboom.com/"/>
+      <outline text="Dezeen" title="Dezeen" type="rss" xmlUrl="https://www.dezeen.com/feed/" htmlUrl="https://www.dezeen.com/"/>
+      <outline text="feuilleton (John Coulthart)" title="feuilleton (John Coulthart)" type="rss" xmlUrl="https://www.johncoulthart.com/feuilleton/feed/" htmlUrl="https://www.johncoulthart.com/feuilleton/"/>
+      <outline text="Hi-Fructose" title="Hi-Fructose" type="rss" xmlUrl="https://hifructose.com/feed/" htmlUrl="https://hifructose.com/"/>
+      <outline text="Hyperallergic" title="Hyperallergic" type="rss" xmlUrl="https://hyperallergic.com/feed/" htmlUrl="https://hyperallergic.com/"/>
+      <outline text="Neural" title="Neural" type="rss" xmlUrl="https://neural.it/feed/" htmlUrl="https://neural.it/"/>
+      <outline text="Print Magazine" title="Print Magazine" type="rss" xmlUrl="https://www.printmag.com/feed/" htmlUrl="https://www.printmag.com/"/>
+      <outline text="The Guardian — Art and Design" title="The Guardian — Art and Design" type="rss" xmlUrl="https://www.theguardian.com/artanddesign/rss" htmlUrl="https://www.theguardian.com/artanddesign"/>
     </outline>
     <outline text="Jogos" title="Jogos">
       <outline text="Aftermath" title="Aftermath" type="rss" xmlUrl="https://aftermath.site/feed/" htmlUrl="https://aftermath.site/"/>
@@ -171,10 +183,12 @@
       <outline text="Charles Stross" title="Charles Stross" type="rss" xmlUrl="http://www.antipope.org/charlie/blog-static/atom.xml" htmlUrl="http://www.antipope.org/charlie/blog-static/"/>
       <outline text="Cory Doctorow (Pluralistic)" title="Cory Doctorow (Pluralistic)" type="rss" xmlUrl="https://pluralistic.net/feed/" htmlUrl="https://pluralistic.net/"/>
       <outline text="Craig Mod" title="Craig Mod" type="rss" xmlUrl="https://craigmod.com/index.xml" htmlUrl="https://craigmod.com/"/>
+      <outline text="Interconnected (Matt Webb)" title="Interconnected (Matt Webb)" type="rss" xmlUrl="https://interconnected.org/home/feed" htmlUrl="https://interconnected.org/home/"/>
       <outline text="John Scalzi (Whatever)" title="John Scalzi (Whatever)" type="rss" xmlUrl="https://whatever.scalzi.com/feed/" htmlUrl="https://whatever.scalzi.com/"/>
       <outline text="Kieron Gillen" title="Kieron Gillen" type="rss" xmlUrl="https://buttondown.com/kierongillen/rss" htmlUrl="https://buttondown.com/kierongillen"/>
       <outline text="Robin Sloan" title="Robin Sloan" type="rss" xmlUrl="https://www.robinsloan.com/feed.xml" htmlUrl="https://www.robinsloan.com/"/>
       <outline text="Warren Ellis" title="Warren Ellis" type="rss" xmlUrl="https://warrenellis.ltd/feed/" htmlUrl="https://warrenellis.ltd/"/>
+      <outline text="Wyrd Britain" title="Wyrd Britain" type="rss" xmlUrl="https://wyrdbritain.blogspot.com/feeds/posts/default" htmlUrl="https://wyrdbritain.blogspot.com/"/>
     </outline>
   </body>
 </opml>
