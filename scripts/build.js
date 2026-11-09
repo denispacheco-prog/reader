@@ -150,12 +150,20 @@ const GOOGLE_NEWS_NOISE = [
   /^(Banco de Notícias|Legislação Estadual|Sua quebrada)$/,
 ];
 
+// Feeds that mix walkthroughs and guides into their news, with no news-only
+// feed to subscribe to instead.
+const LINK_NOISE = [/^https:\/\/www\.videogameschronicle\.com\/guide\//];
+
 function normalizeItem(item, sourceName, category) {
   const link = item.link;
   const rawDate = item.isoDate || item.pubDate;
   const date = rawDate ? new Date(rawDate) : null;
 
   if (!link || !date || Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  if (LINK_NOISE.some((pattern) => pattern.test(link))) {
     return null;
   }
 

@@ -158,6 +158,7 @@
       <outline text="Polygon" title="Polygon" type="rss" xmlUrl="https://www.polygon.com/rss/index.xml" htmlUrl="https://www.polygon.com/"/>
       <outline text="Respec" title="Respec" type="rss" xmlUrl="https://www.respec.net/feed" htmlUrl="https://www.respec.net/"/>
       <outline text="Rock Paper Shotgun" title="Rock Paper Shotgun" type="rss" xmlUrl="https://www.rockpapershotgun.com/feed" htmlUrl="https://www.rockpapershotgun.com/"/>
+      <outline text="VGC (Video Games Chronicle)" title="VGC (Video Games Chronicle)" type="rss" xmlUrl="https://www.videogameschronicle.com/feed/" htmlUrl="https://www.videogameschronicle.com/"/>
     </outline>
     <outline text="Ensaios" title="Ensaios">
       <outline text="Jacobin" title="Jacobin" type="rss" xmlUrl="https://jacobinmag.com/feed/" htmlUrl="https://jacobin.com/"/>
