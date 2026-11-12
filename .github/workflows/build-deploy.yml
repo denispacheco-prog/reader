@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url || steps.deployment_retry.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
 
@@ -48,10 +48,19 @@ jobs:
           path: dist
 
       # deploy-pages occasionally fails with a transient GitHub Pages API
-      # error; retry a few times before giving up.
+      # error, so try once more after a pause. Keep this to official actions:
+      # this step can publish the site. (A third-party retry wrapper, pinned
+      # to a moving @v3 tag, ran its own copy of deploy-pages and on
+      # 2026-11-12 reported deploys as successful while the site stayed
+      # frozen.)
       - id: deployment
-        uses: Wandalen/wretry.action@v3
-        with:
-          action: actions/deploy-pages@v4
-          attempt_limit: 3
-          attempt_delay: 15000
+        uses: actions/deploy-pages@v4
+        continue-on-error: true
+
+      - name: Aguardar antes de tentar de novo
+        if: steps.deployment.outcome == 'failure'
+        run: sleep 30
+
+      - id: deployment_retry
+        if: steps.deployment.outcome == 'failure'
+        uses: actions/deploy-pages@v4
