@@ -19,7 +19,7 @@ front-end.
   nem invólucros de "retry". Em 12/11/2026 um invólucro de terceiros
   (`Wandalen/wretry.action@v3`) congelou o site por 6 horas enquanto os builds
   apareciam como concluídos. Veja o comentário no workflow.
-- **O projeto é editado em duas máquinas.** Rode `git pull` antes de mexer.
+- **O projeto é editado em três máquinas.** Rode `git pull` antes de mexer.
 - **Pergunte antes de commitar ou dar push.** O dono confirma cada um.
 - **Feed novo:** teste com `npm run build` e depois confira o site publicado.
   Alguns sites (Cloudflare, Sucuri) só bloqueiam o build do GitHub; nesses
