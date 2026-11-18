@@ -93,6 +93,12 @@ button {
   margin-bottom: 10px;
 }
 
+.rail-logo svg {
+  display: block;
+  width: 28px;
+  height: 28px;
+}
+
 .rail-spacer {
   flex: 1;
 }
