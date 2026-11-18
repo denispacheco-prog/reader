@@ -6,6 +6,8 @@ const POLL_INTERVAL_MS = 5 * 60 * 1000;
 const TOKEN_KEY = 'reader:githubToken';
 const LAST_DISPATCH_KEY = 'reader:lastDispatch';
 const DISPATCH_URL = 'https://api.github.com/repos/denispacheco-prog/reader/actions/workflows/build-deploy.yml/dispatches';
+// botão "ler depois": abre uma janelinha do artigos que salva o link sozinha e fecha
+const ARTIGOS_SALVAR_URL = 'https://denispacheco-prog.github.io/artigos/#salvar?auto=1&url=';
 const STALE_AFTER_MS = 10 * 60 * 1000;
 const MANUAL_STALE_AFTER_MS = 2 * 60 * 1000;
 const FOLLOW_UP_CHECKS_MS = [75000, 150000, 240000];
@@ -573,7 +575,11 @@ function renderCard(item, col) {
   copy.type = 'button';
   copy.title = 'copiar link';
   copy.setAttribute('aria-label', 'copiar link');
-  actions.append(save, copy);
+  const later = el('button', 'card-action card-later', '↧');
+  later.type = 'button';
+  later.title = 'ler depois no artigos';
+  later.setAttribute('aria-label', 'ler depois no artigos');
+  actions.append(save, copy, later);
   main.append(actions);
 
   card.append(avatar, main);
@@ -1077,6 +1083,20 @@ function updateRelativeTimes() {
 
 // --- deck interactions -----------------------------------------------------
 
+function readLater(link, btn) {
+  const popup = window.open(ARTIGOS_SALVAR_URL + encodeURIComponent(link), 'artigos_salvar', 'width=480,height=320');
+  if (!popup) {
+    console.error('[app] janela do artigos bloqueada pelo navegador');
+    return;
+  }
+  btn.classList.add('copied');
+  btn.textContent = '✓';
+  setTimeout(() => {
+    btn.classList.remove('copied');
+    btn.textContent = '↧';
+  }, 1600);
+}
+
 function copyLink(link, btn) {
   navigator.clipboard.writeText(link).then(() => {
     btn.classList.add('copied');
@@ -1112,6 +1132,11 @@ deckEl.addEventListener('click', (event) => {
 
   if (event.target.closest('.card-copy')) {
     copyLink(link, event.target.closest('.card-copy'));
+    return;
+  }
+
+  if (event.target.closest('.card-later')) {
+    readLater(link, event.target.closest('.card-later'));
     return;
   }
 

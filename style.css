@@ -884,7 +884,8 @@ button {
   color: var(--star);
 }
 
-.card-copy.copied {
+.card-copy.copied,
+.card-later.copied {
   color: var(--accent);
 }
 
