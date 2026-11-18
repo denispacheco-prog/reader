@@ -1516,7 +1516,7 @@ async function loadReader() {
     applyReaderData(await response.json(), { initial: true });
     maybeTriggerBuild();
   } catch (err) {
-    const error = el('p', 'deck-loading', 'não foi possível carregar o Reader. rode "node scripts/build.js" e sirva a pasta com um servidor estático.');
+    const error = el('p', 'deck-loading', 'não foi possível carregar as notícias. rode "node scripts/build.js" e sirva a pasta com um servidor estático.');
     deckEl.replaceChildren(error);
     console.error('[app] falha ao carregar reader.json:', err);
     return;
