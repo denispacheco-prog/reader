@@ -39,7 +39,8 @@ jobs:
       - name: Preparar site estático
         run: |
           mkdir -p dist
-          cp index.html style.css app.js reader.json first-seen.json dist/
+          cp index.html style.css app.js sw.js manifest.webmanifest reader.json first-seen.json dist/
+          cp -r icones dist/
 
       - uses: actions/configure-pages@v5
 

@@ -1,6 +1,16 @@
 const THEME_KEY = 'reader:theme';
 const SAVED_KEY = 'reader:saved';
 const COLUMNS_KEY = 'reader:columns';
+
+// Offline (sw.js): sem internet, o app abre com as últimas notícias baixadas.
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
+function markConnection() {
+  document.body.classList.toggle('is-offline', !navigator.onLine);
+}
+addEventListener('online', markConnection);
+addEventListener('offline', markConnection);
+if (document.body) markConnection();
+else addEventListener('DOMContentLoaded', markConnection);
 const LEGACY_CATEGORY_ORDER_KEY = 'reader:categoryOrder';
 const POLL_INTERVAL_MS = 5 * 60 * 1000;
 const TOKEN_KEY = 'reader:githubToken';

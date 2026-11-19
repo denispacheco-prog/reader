@@ -1132,3 +1132,22 @@ button {
     scroll-snap-align: start;
   }
 }
+
+/* Sem internet: aviso discreto; as notícias são as últimas baixadas */
+body.is-offline::after {
+  content: "offline · últimas notícias baixadas";
+  position: fixed;
+  left: 50%;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  z-index: 90;
+  transform: translateX(-50%);
+  padding: 0.3rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--raised);
+  box-shadow: var(--shadow);
+  font-size: 0.75rem;
+  color: var(--muted);
+  white-space: nowrap;
+  pointer-events: none;
+}
