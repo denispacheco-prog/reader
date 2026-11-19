@@ -23,7 +23,7 @@ const HOME_ROTATION_MS = 60 * 1000;
 // HOME_ROTATION_MS = 13 min): when the two match, a block reaches the top at
 // the same point of its cycle every lap and some items are never on screen.
 const HOME_ORDER_CYCLE_MS = 7 * 60 * 1000;
-const DEFAULT_CATEGORY_ORDER = ['Brasil', 'São Paulo', 'Legislativo', 'Mundo', 'Tecnologia', 'Ciência', 'Cultura', 'Arte e Design', 'Jogos', 'Ensaios', 'Blogs'];
+const DEFAULT_CATEGORY_ORDER = ['Brasil', 'São Paulo', 'Legislativo', 'Mundo', 'Tecnologia', 'Ciência', 'Cultura', 'Arte e Design', 'Jogos', 'Ensaios', 'Blogs', 'USP'];
 
 // Categories merged into another one; saved decks drop their old column.
 const RETIRED_COLUMN_IDS = ['category:Futurismo'];
@@ -37,6 +37,7 @@ const ADDED_COLUMNS = [
   { type: 'category', value: 'Legislativo', after: 'category:São Paulo' },
   { type: 'category', value: 'Blogs', after: 'category:Ensaios' },
   { type: 'category', value: 'Arte e Design', after: 'category:Cultura' },
+  { type: 'category', value: 'USP', after: 'category:Blogs' },
 ];
 
 const SOURCE_PALETTE = [
@@ -77,6 +78,7 @@ const CATEGORY_COLORS = {
   'Jogos': '#d1a6ec',
   'Ensaios': '#f7bc8c',
   'Blogs': '#d4b896',
+  'USP': '#a9c6e8',
 };
 
 // Neutral glyphs that identify category columns (header + rail). ︎ asks
@@ -94,6 +96,7 @@ const CATEGORY_SYMBOLS = {
   'Jogos': '♟︎',
   'Ensaios': '¶',
   'Blogs': '✎︎',
+  'USP': '⌖',
 };
 
 // Shorter names for the rail, which fits about 11 characters.

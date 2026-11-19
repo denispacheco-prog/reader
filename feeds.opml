@@ -190,5 +190,10 @@
       <outline text="Warren Ellis" title="Warren Ellis" type="rss" xmlUrl="https://warrenellis.ltd/feed/" htmlUrl="https://warrenellis.ltd/"/>
       <outline text="Wyrd Britain" title="Wyrd Britain" type="rss" xmlUrl="https://wyrdbritain.blogspot.com/feeds/posts/default" htmlUrl="https://wyrdbritain.blogspot.com/"/>
     </outline>
+    <outline text="USP" title="USP">
+      <outline text="Jornal da USP" title="Jornal da USP" type="rss" xmlUrl="https://jornal.usp.br/feed/" htmlUrl="https://jornal.usp.br/"/>
+      <outline text="Sintusp" title="Sintusp" type="rss" xmlUrl="https://www.sintusp.org.br/feed/" htmlUrl="https://www.sintusp.org.br/"/>
+      <outline text="Adusp" title="Adusp" type="rss" xmlUrl="https://adusp.org.br/feed/" htmlUrl="https://adusp.org.br/"/>
+    </outline>
   </body>
 </opml>
