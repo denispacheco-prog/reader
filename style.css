@@ -816,6 +816,11 @@ button {
   cursor: pointer;
 }
 
+.card-origin {
+  flex-shrink: 0;
+  cursor: default;
+}
+
 .card-source:hover,
 .card-source:focus-visible {
   text-decoration: underline;

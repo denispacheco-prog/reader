@@ -33,10 +33,10 @@ const HOME_ROTATION_MS = 60 * 1000;
 // HOME_ROTATION_MS = 13 min): when the two match, a block reaches the top at
 // the same point of its cycle every lap and some items are never on screen.
 const HOME_ORDER_CYCLE_MS = 7 * 60 * 1000;
-const DEFAULT_CATEGORY_ORDER = ['Brasil', 'São Paulo', 'Legislativo', 'Mundo', 'Tecnologia', 'Ciência', 'Cultura', 'Arte e Design', 'Jogos', 'Ensaios', 'Blogs', 'USP'];
+const DEFAULT_CATEGORY_ORDER = ['Brasil', 'São Paulo', 'Legislativo', 'Mundo', 'Tecnologia', 'Ciência', 'Cultura', 'Arte e Design', 'Moda', 'Jogos', 'Ensaios', 'Blogs', 'USP'];
 
 // Categories merged into another one; saved decks drop their old column.
-const RETIRED_COLUMN_IDS = ['category:Futurismo'];
+const RETIRED_COLUMN_IDS = ['category:Futurismo', 'category:Ásia'];
 
 // Columns introduced after the deck launched. Decks that already have saved
 // columns get each one inserted once, right after the column `after` (or
@@ -48,6 +48,7 @@ const ADDED_COLUMNS = [
   { type: 'category', value: 'Blogs', after: 'category:Ensaios' },
   { type: 'category', value: 'Arte e Design', after: 'category:Cultura' },
   { type: 'category', value: 'USP', after: 'category:Blogs' },
+  { type: 'category', value: 'Moda', after: 'category:Arte e Design' },
 ];
 
 const SOURCE_PALETTE = [
@@ -85,6 +86,7 @@ const CATEGORY_COLORS = {
   'Ciência': '#8ad8d3',
   'Cultura': '#f5a6c8',
   'Arte e Design': '#e8c26a',
+  'Moda': '#c7a4a0',
   'Jogos': '#d1a6ec',
   'Ensaios': '#f7bc8c',
   'Blogs': '#d4b896',
@@ -103,6 +105,7 @@ const CATEGORY_SYMBOLS = {
   'Ciência': '⚛︎',
   'Cultura': '♫︎',
   'Arte e Design': '✿︎',
+  'Moda': '✂︎',
   'Jogos': '♟︎',
   'Ensaios': '¶',
   'Blogs': '✎︎',
@@ -121,6 +124,7 @@ function categorySymbol(name) {
 const CATEGORY_ALIASES = {
   'Cultura & Entretenimento': 'Cultura',
   'Futurismo': 'Tecnologia',
+  'Ásia': 'Mundo',
 };
 
 function canonicalCategory(name) {
@@ -279,10 +283,10 @@ function makeColumn(type, value) {
 function availableCategories() {
   const categories = new Set();
   state.feeds.forEach((feed) => {
-    if (feed.category) categories.add(feed.category);
+    if (feed.category) categories.add(canonicalCategory(feed.category));
   });
   state.items.forEach((item) => {
-    if (item.category) categories.add(item.category);
+    if (item.category) categories.add(canonicalCategory(item.category));
   });
   return [...categories];
 }
@@ -567,7 +571,16 @@ function renderCard(item, col) {
   const time = el('time', 'card-time', relativeTime(item.date));
   time.dateTime = item.date;
   time.title = formatDate(item.date);
-  meta.append(source, el('span', 'card-dot', '·'), time);
+  meta.append(source);
+  // Stories from a folder merged into another column (e.g. Ásia inside
+  // Mundo) keep a small glyph of their original folder.
+  if (item.category && canonicalCategory(item.category) !== item.category && CATEGORY_SYMBOLS[item.category]) {
+    const mark = el('span', 'card-origin', CATEGORY_SYMBOLS[item.category]);
+    mark.title = item.category;
+    mark.setAttribute('aria-label', item.category);
+    meta.append(mark);
+  }
+  meta.append(el('span', 'card-dot', '·'), time);
 
   const title = el('a', 'card-title', item.title);
   title.href = item.link;

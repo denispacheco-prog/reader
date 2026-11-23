@@ -14,7 +14,7 @@ const WINDOW_DAYS = 7;
 // Personal blogs and art sites post far less often than news sites; 7 days
 // would empty them. Busy feeds there (e.g. Dezeen) only list their latest
 // ~50 items anyway, so the longer window mostly lets the slow ones in.
-const CATEGORY_WINDOW_DAYS = { Blogs: 30, 'Arte e Design': 30 };
+const CATEGORY_WINDOW_DAYS = { Blogs: 30, 'Arte e Design': 30, Moda: 30 };
 const DAY_MS = 24 * 60 * 60 * 1000;
 const BUILD_TIME = new Date().toISOString();
 const FETCH_TIMEOUT_MS = 10000;

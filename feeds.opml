@@ -55,7 +55,6 @@
       <outline text="Taipei Times" title="Taipei Times" type="rss" xmlUrl="https://www.taipeitimes.com/xml/index.rss" htmlUrl="https://www.taipeitimes.com/"/>
       <outline text="The Japan Times" title="The Japan Times" type="rss" xmlUrl="https://feeds.feedburner.com/japantimes" htmlUrl="https://www.japantimes.co.jp/"/>
       <outline text="The Korea Times" title="The Korea Times" type="rss" xmlUrl="https://www.koreatimes.co.kr/www/rss/rss.xml" htmlUrl="https://www.koreatimes.co.kr/"/>
-      <outline text="Yonhap News Agency" title="Yonhap News Agency" type="rss" xmlUrl="https://en.yna.co.kr/RSS/news.xml" htmlUrl="https://en.yna.co.kr/"/>
     </outline>
     <outline text="Tecnologia" title="Tecnologia">
       <outline text="404 Media" title="404 Media" type="rss" xmlUrl="https://www.404media.co/rss/" htmlUrl="https://www.404media.co/"/>
@@ -156,6 +155,16 @@
       <outline text="Neural" title="Neural" type="rss" xmlUrl="https://neural.it/feed/" htmlUrl="https://neural.it/"/>
       <outline text="Print Magazine" title="Print Magazine" type="rss" xmlUrl="https://www.printmag.com/feed/" htmlUrl="https://www.printmag.com/"/>
       <outline text="The Guardian — Art and Design" title="The Guardian — Art and Design" type="rss" xmlUrl="https://www.theguardian.com/artanddesign/rss" htmlUrl="https://www.theguardian.com/artanddesign"/>
+    </outline>
+    <outline text="Moda" title="Moda">
+      <outline text="Blackbird Spyplane" title="Blackbird Spyplane" type="rss" xmlUrl="https://www.blackbirdspyplane.com/feed" htmlUrl="https://www.blackbirdspyplane.com/"/>
+      <outline text="Esquire — Style" title="Esquire — Style" type="rss" xmlUrl="https://www.esquire.com/rss/style.xml" htmlUrl="https://www.esquire.com/style/"/>
+      <outline text="GQ" title="GQ" type="rss" xmlUrl="https://www.gq.com/feed/rss" htmlUrl="https://www.gq.com/"/>
+      <outline text="Heddels" title="Heddels" type="rss" xmlUrl="https://www.heddels.com/feed/" htmlUrl="https://www.heddels.com/"/>
+      <outline text="Ivy Style" title="Ivy Style" type="rss" xmlUrl="https://www.ivy-style.com/feed" htmlUrl="https://www.ivy-style.com/"/>
+      <outline text="Permanent Style" title="Permanent Style" type="rss" xmlUrl="https://www.permanentstyle.com/feed" htmlUrl="https://www.permanentstyle.com/"/>
+      <outline text="POPEYE" title="POPEYE" type="rss" xmlUrl="https://popeyemagazine.jp/feed/" htmlUrl="https://popeyemagazine.jp/"/>
+      <outline text="Put This On" title="Put This On" type="rss" xmlUrl="https://putthison.com/feed/" htmlUrl="https://putthison.com/"/>
     </outline>
     <outline text="Jogos" title="Jogos">
       <outline text="Aftermath" title="Aftermath" type="rss" xmlUrl="https://aftermath.site/feed/" htmlUrl="https://aftermath.site/"/>
